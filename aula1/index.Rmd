@@ -1,0 +1,217 @@
+---
+title: "Aula 1 - Introdução à Econometria"
+author: "João Ricardo F. de Lima"
+date: "`r format(Sys.time(), '%d de %B de %Y.')`"
+output: 
+    html_document:
+        theme: flatly
+        number_sections: yes
+        highlight: textmate
+#        includes: 
+#          in_header: "header.html"
+        toc: yes
+        toc_float:
+          collapsed: yes
+          smooth_scroll: yes 
+---
+
+<br>
+
+# Econometria
+
+**Econometria** é baseada no desenvolvimento de métodos estatísticos para estimar relações econômicas, testar teorias, avaliar e implementar políticas de governo e de negócios  
+
+O campo mais comum de uso da **Econometria** é a previsão de importantes variáveis macroeconômicas, como juros, inflação, PIB, etc.  
+
+Contudo, a **Econometria** pode ser utilizada em diversas outras áreas que não tem relação com previsão de variáveis macro. Um exemplo seria estimar os efeitos de gastos com educação sobre os índices de criminalidade em municípios de um estado.
+
+<br>
+
+# Passos na análise econômica empírica
+
+Análise empírica é aquela que usa dados para testar uma teoria ou estimar uma relação. Para realizar esta análise é preciso seguir alguns passos:
+
+* Afirmação da teoria ou hipótese econômica  
+* Especificação do modelo matemático (equação)  
+* Especificação do modelo econométrico   
+* Obtenção dos dados   
+* Estimação dos parâmetros do modelo econométrico  
+* Teste de hipóteses  
+* Previsão  
+* Uso do Modelo para elaboração de Políticas públicas ou Empresas
+
+<br>
+
+# As Estruturas de Dados
+
+1. **Corte transversal** *(seção cruzada)*: amostra de indivíduos, consumidores, empresas, países, etc., tomada em um instante do tempo;  
+
+2. **Série Temporal**: observações sobre uma variável ou muitas variáveis ao longo do tempo;  
+
+3. **Cortes transversais independentes agrupados**: tem características tanto de corte transversal quanto de série temporal. Ocorre quando se agrupa cortes transversais coletados em diferentes instantes do tempo;  
+
+4.	**Dados em Painel** *(longitudinais)*: consiste em uma série temporal para cada registro do corte transversal do conjunto de dados. Em outras palavras, modelos de regressão com dados em painel são os que estudam o **mesmo grupo** de "entidades" ao longo do tempo.
+
+<br>
+
+## Exemplos no R
+
+### Carregamento dos Pacotes
+
+```{r pacotes, warning=FALSE, message=FALSE}
+library(wooldridge)
+library(dplyr)
+library(rstatix)
+```
+
+```{r pacotes2, include=FALSE}
+library(htmltools)
+library(knitr)
+library(kableExtra)
+```
+
+### Exemplo de uma base com Seção Cruzada
+
+```{r exemplo SC}
+data('wage1')
+dados1 <- wage1[,c(1:8)]
+glimpse(dados1)
+```
+
+```{r exemplo SC1}
+kable(head(dados1, 10)) %>% 
+  kable_styling(full_width=TRUE, position = "center")
+```
+
+<br>  
+Esta base de dados possui `r nrow(dados1)` observações e `r ncol(dados1)` variáveis no total. 
+
+### Exemplo de uma base com Série Temporal
+
+
+```{r exemplo ST}
+data('intdef')
+dados2 <- intdef[,c(1:6)]
+glimpse(dados2)
+```
+
+```{r exemplo ST1}
+kable(head(dados2, 10), align='cccccc', col.names = c("Ano", "Taxa Tesouro 3 meses", "Taxa Inflação", "Receitas %PIB", "Despesas %PIB", "REC-DESP")) %>% 
+  kable_styling(full_width=TRUE, position = "center")
+```
+
+### Análise dos Dados {.tabset .tabset-fade} 
+
+#### Estatística Descritiva
+``` {r teste, echo=FALSE}
+resumo <-dados2 %>% get_summary_stats(c("i3", "inf", "rec", "out", "def"), type = "mean_sd")
+
+kable(resumo,align='cccccc', col.names = c("Variáveis", "Amostra", "Média", "Desvio Padrão")) %>% 
+  kable_styling(full_width=TRUE, position = "center", bootstrap_options = c("striped", "hover", "responsive"))
+```
+
+#### Gráfico
+```{r teste1}
+dados2<-ts(dados2, start = 1948)
+plot(dados2[,3], xlab='anos', ylab='Percentual', main='Evolução da Taxa de Inflação - EUA')
+```
+
+### Exemplo de uma base com Corte Transversal Agrupado
+
+
+```{r exemplo CTA}
+data('hprice3')
+dados3 <- hprice3[,c(1:8)]
+glimpse(dados3)
+```
+
+```{r exemplo CTA1}
+kable(dados3[c(175:185),]) %>% 
+  kable_styling(full_width=TRUE, position = "center")
+```
+
+### Exemplo de uma base com Dados em Painel
+
+
+```{r exemplo Painel}
+data('crime2')  
+dados4 <- crime2[,c(1:9)]  
+glimpse(dados4) 
+```
+
+
+```{r exemplo Painel1}
+kable(head(dados4, 10))  %>% 
+  kable_styling(full_width=TRUE, position = "center")
+```
+
+<br>
+
+# Metodologia da Econometria - Exemplo
+
+1. Afirmação da teoria ou hipótese econômica:
+
+A quantidade demandada de um bem Y é inversamente relacionada com o seu preço (X);  
+  
+
+2. Especificação do modelo matemático (equação):  
+
+$$Y=\beta_0+\beta_1X$$ com $\beta_1<0$ 
+
+  
+3. Especificação do modelo econométrico  
+$$Y=\hat{\beta_0}+\hat{\beta_1}X+\hat{u}$$
+em que Y é a quantidade demandada, X o preço, os $\beta_i$ são os parâmetros estimados e u é o termo estocástico que diferencia um modelo matemático e o estatístico. Ele representa tudo o que afetar Y e que não está explicitado no modelo.
+
+4. Os dados podem ser seção cruzada ou um série temporal. Existem também combinações de seção cruzada e série temporal, denominados de dados em Painel.
+
+$$\hat{Y}=10-0.9X$$
+Se o preço aumentar 10 reais, a demanda reduz 9 unidades;
+
+5. Testar se a constante -0.9 estimada é estatisticamente igual ou diferente de zero, ou seja, se $\beta_1=0$.
+
+<br>
+
+# A natureza da análise da regressão
+
+Regressão Linear é a principal ferramenta da econometria e trata do estudo da dependência de uma variável, regressando (Y), em relação a uma ou mais variáveis explicativas (regressores), com o objetivo de estimar e/ou prever o valor médio de Y dados os valores de X. 
+
+Apesar da análise de regressão tratar da dependência de uma variável sobre outras variáveis, isto não necessariamente implica "causa". Uma relação estatística em si não pode logicamente implicar em causa. Para atribuir causalidade deve-se considerar a teoria econômica ou mesmo o senso comum.
+
+<br>
+
+# Regressão versus Correlação
+
+Relacionado mas conceitualmente muito diferente é a análise da regressão e de correlação. Na correlação o objetivo é mensurar o grau de associação linear entre duas variáveis. 
+
+As estimativas de correlação podem ser positivas ou negativas. O primeiro caso é quando uma variável cresce, a outra aumenta também. O segundo caso é o inverso.
+
+![Correlação Positiva e Negativa](img_r/aporho1.png){width=85%}
+
+<br>
+
+O coeficiente de correlação de Pearson ($r$) pode ser encontrado pela fórmula:
+
+$$r=\frac{\sum X_iY_i-\frac{\sum X_i-\sum Y_i}{n}}{\Bigg[\sum X_i^2-\frac{(\sum X_i)^2}{n}\Bigg]\Bigg[\sum Y_i^2-\frac{(\sum Y_i)^2}{n}\Bigg]}$$
+A ocorrência de um valor de r=0 ou próximo de zero indica que não há correlação linear entre as variáveis, mas pode ocorrer não linear.
+
+<br>
+
+As principais características do coeficiente de correlação de Pearson são:
+
+a) Seus valores estão compreendidos entre -1 e 1;
+
+B) Se o coeficiente for positivo, as duas características estudadas tendem a variar no mesmo sentido;
+
+C) Se o sinal for negativo, as duas características estudadas tendem a variar no sentido contrário;
+
+D) A relação entre duas variáveis é tanto mais estreita quanto mais o coeficiente se aproxima de 1 ou de -1;
+
+E) o valor de r é uma estimativa do parâmetro $\rho$ (rho) da mesma forma que a média ($\bar{x}$) é uma estimativa de $\mu$; 
+
+<br>
+
+Na regressão é estimar ou prever o valor médio do regressando (Y) com base nos valores fixos dos regressores (X).
+
+<br>
+<br>
