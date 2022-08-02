@@ -1,0 +1,917 @@
+---
+title: "Aula 12 - Introdução à Econometria"
+author: "João Ricardo F. de Lima"
+date: "`r format(Sys.time(), '%d de %B de %Y.')`"
+output: 
+    html_document:
+        theme: flatly
+        number_sections: yes
+        keep_tex: yes
+        highlight: textmate
+#        includes: 
+#          in_header: "header.html"
+        toc: yes
+        toc_float:
+          collapsed: yes
+          smooth_scroll: yes 
+    bookdown::html_document2: default
+---
+
+<br>
+
+# Modelos de Dados em Painel
+
+<br>
+
+## As Estruturas de Dados
+
+<br>
+
+**Corte transversal** (seção cruzada): amostra de indivíduos, consumidores, empresas, países, etc., tomada em um instante do tempo;
+
+**Série Temporal**: observações sobre uma variável ou muitas variáveis ao longo do tempo;
+
+**Cortes transversais independentes agrupados**: tem características tanto de corte transversal quanto de série temporal. Ocorre quando se agrupa cortes transversais coletados em diferentes instantes do tempo;
+
+```{r aula12_1, warning=FALSE, message=FALSE}
+#Cortes transversais agrupados: 2 anos de preços de imóveis.
+
+data(hprice3, package='wooldridge')
+
+head(hprice3[c(175:184),c(1:9)],10)
+```
+
+<br>
+
+**Dados em Painel** (longitudinais): consiste em uma série temporal para cada registro do corte transversal do conjunto de dados. Em outras palavras, modelos de regressão com dados em painel são os que estudam o *mesmo grupo} de "entidades" ao longo do tempo.
+
+```{r aula12_2, warning=FALSE, message=FALSE}
+#Conjunto de Dados em Painel: Estatisticas Crime em estados dos USA
+
+data(murder, package='wooldridge')
+
+head(murder[,c(1:6)],9)
+```
+
+<br>
+
+## A Importância dos Dados em Painel
+
+<br>
+
+Baltagi (1995) lista os seguintes fatores como sendo vantagens dos dados em painel:  
+
+1) Trata com indivíduos, empresas, estados, países ao longo do tempo. É necessário que exista uma heterogeneidade nestas unidades, na qual pode ser frequentemente não observada; 
+
+2) Quando se combina cortes transversais e séries temporais, se tem dados com maior informação, maior variabilidade e menor colinearidade, mais graus de liberdade e eficiência.
+
+3) Quando se estuda as observações do corte transversal ao longo do tempo, os dados em painel são mais adequados para se estudar as dinâmicas de mudanças; 
+
+4) Dados em painel podem detectar melhor e medir efeitos que não podem ser observados com dados empilhados de cross-section (cortes transversais agrupados) ou séries temporais.
+
+<br>
+
+## Notação Básica
+
+<br>
+
+Considere a indexação de todas as variáveis com $i$ para para o indivíduo $i = 1, ..., N$ e $t$ para o período $t = 1, ..., T$. Assim, o modelo de regressão linear clássico pode ser escrito como abaixo, 
+
+<br>
+
+$$
+y_{it} = \beta_0 + x_{it}^{'} \beta + \varepsilon_{it} 
+\tag{1}
+$$
+
+<br>
+
+onde $x_{it}$ é um vetor de dimensão $K$ contendo as variáveis explicativas, sem considerar o termo constante. Esse tipo de modelo impõe que o intercepto $\beta_0$ e o coeficiente de inclinação em $\beta$ sejam idênticos para todos os indivíduos e períodos. O termo de erro em (1) varia ao longo dos indivíduos e tempo, capturando todos os fatores não observados que afetam $y_{it}$.
+
+O modelo dado em (1) possui as premissas usuais requeridas para se ter estimadores não viesados, consistentes e eficientes.
+
+<br>
+
+$$
+E[\epsilon_{it}|x_{i1}, x_{i2}, \dots, x_{iT}]=0
+$$
+
+$$
+Var[\epsilon_{it}|x_{i1}, x_{i2}, \dots, x_{iT}]=\sigma^2_\epsilon
+$$
+
+$$
+Cov[\epsilon_{it},\epsilon_{js} |x_{i1}, x_{i2}, \dots, x_{iT}]=0 \quad \forall i \neq j \quad ou \quad t\neq s
+$$
+<br>
+
+## Cortes Transversais Agrupados
+
+<br>
+
+Uma razão para usar agrupamentos independentes de cortes transversais é aumentar o N. Com isso, pode-se obter estimadores mais precisos e estatísticas de teste mais poderosas;
+
+Para refletir o fato de que a população pode ter distribuições diferentes em períodos de tempo distintos, é permitido ao intercepto diferir ao longo dos períodos; 
+
+Isso pode ser implementado através da adição de variáveis *dummies* para os $n-1$ períodos da amostra. 
+
+<br>
+
+## Cortes Transversais Agrupados - Exemplo no R
+
+<br>
+
+O dataset cps contém dados de 1978 e 1985 da **Current Population Surveys**. O código abaixo importa os dados e estima o modelo sugerido em Wooldridge (2016).
+
+<br>
+```{r aula12_3, warning=FALSE, message=FALSE}
+# Usando o R para verificar mudanças no retorno da eduação e a diferença salarial por gênero
+
+data(cps78_85, package='wooldridge')
+
+cps <- cps78_85
+
+reg1 <- lm(lwage~y85*(educ+female)+exper
+           +I((exper^2)/100)+union, data=cps)
+
+summary(reg1)
+```
+<br>
+
+O ano base é 1978. y85 é uma variável dummy igual a um se a observação se refere ao ano de 1985 e 0, caso contrário, ou seja, do ano de 1978. A constante é o intercepto do ano base. A constante mais o coeficiente de y85 é o intercepto de 1985. 
+
+O retorno da educação em 1978 é estimado (forma não precisa) em 7,5% e para o ano de 1985 é cerca de 1,846 mais elevado (7,5 + 1,846=9,346%).
+
+Em 1978, tudo o mais constante, uma mulher ganhava precisamente ``r (exp(-0.316709)-1)*100``% a menos do que um homem. Em 1985 o valor é ``r (exp(-0.316709+0.085052)-1)*100``%.
+
+<br>
+
+## O Estimador de Diferenças em Diferenças
+
+<br>
+
+O *estimador de diferença em diferenças* é um tipo de corte transversal agrupado que pode ser muito útil para avaliar o impacto de um determinado evento ou decisão política (em termos gerais);
+
+Suponha que exista um evento exógeno que altere "x". A ideia é comparar a mudança ao longo do tempo de um resultado de interesse entre um grupo de observações impactado e outro não impactado.
+
+Um modelo simples de comparação dos resultados é a avaliação de um grupo antes e depois do evento, em uma regressão da forma
+
+<br>
+$$ 
+y_{it} = \alpha_0 + \beta D_t+ \varepsilon_{it}, \quad i=1, \dots, N, \quad t=0,1 \tag{2} 
+$$ 
+onde $D_t=1$ no período 1 (pós-evento) e $D_t=0$ no período 0, e $y_{it}$ mede o resultado;
+
+Esta regressão com dados agrupados vai gerar uma estimativa do impacto da política igual a $\beta$ 
+
+<br>
+
+$$
+\hat{\beta} = N^{-1} \sum_{i}^{max}(y_{i1}-y_{i0})=\bar{y}_1-\bar{y}_0 \tag{3} 
+$$
+
+No entanto, esta especificação de um único grupo antes e após a intervenção tem o pressuposto forte de que o grupo permanece comparável no tempo;
+
+Uma maneira de melhorar esta especificação consiste na inclusão de um grupo adicional que não sofreu tratamento, e para o qual se tenha observações nos dois períodos.
+
+A especificação passa a ser então 
+
+<br>
+
+$$
+y_{it}^j = \alpha + \alpha_1D_t+ \alpha^1D^J+\beta D_t^j+ \varepsilon_{it}^j
+\tag{4}
+$$
+<br>
+
+onde j é para os grupos, t o tempo e $\varepsilon$ é o termo de erro homocedástico. A equação (4) pode ter a inclusão de covariadas.
+
+Esta relação implica que para o grupo de tratamento, tem-se o pré-evento dado por 
+
+$$ 
+y_{i0}^1 = \alpha + \alpha^1D^1+ \varepsilon_{i0}^1 
+\tag{5} 
+$$ 
+e pós-evento 
+
+$$ 
+y_{i1}^1 = \alpha + \alpha_1+\alpha^1D^1+ \beta+\varepsilon_{i1}^1
+\tag{6} 
+$$ 
+e o impacto é 
+
+$$
+y_{i1}^1 - y_{i0}^1= \alpha_1 + \beta+\varepsilon_{i1}^1 - \varepsilon_{i0}^1 
+\tag{7} 
+$$
+<br>
+
+As equações correspondentes para o grupo não-tratado são 
+
+$$
+y_{i0}^0= \alpha + \varepsilon_{i0}^0 
+\tag{8} 
+$$ 
+
+$$ 
+y_{i1}^0= \alpha + \alpha_1+\varepsilon_{i1}^0 
+\tag{9} 
+$$
+e a diferença é
+
+$$
+y_{i1}^0 - y_{i0}^0= \alpha_1 + \varepsilon_{i1}^0 - \varepsilon_{i0}^0
+\tag{10}
+$$
+<br>
+
+O estimador de Diff-in-Diff vêm, então, da diferença entre as equações (7) e (10) 
+
+$$
+(y_{i1}^1 - y_{i0}^1)-(y_{i1}^0 - y_{i0}^0)= \beta+ (\varepsilon_{i1}^1 - \varepsilon_{i0}^1) - (\varepsilon_{i1}^0 - \varepsilon_{i0}^0) 
+\tag{11} 
+$$
+<br>
+
+E assumindo que $E[(\varepsilon_{i1}^1 - \varepsilon_{i0}^1) - (\varepsilon_{i1}^0 - \varepsilon_{i0}^0)]=0$, obtém-se uma estimativa não viesada de $\beta$.
+
+<br>
+
+
+```{r aula12_4, warning=FALSE, message=FALSE}
+# Usando o R para verificar efeito da localização de um incinerador sobre os preços de imóveis
+
+data(kielmc, package='wooldridge')
+
+kielmc <- kielmc
+
+# Regressões separadas para 1978 e 1981
+
+reg2 <- lm(rprice~nearinc, data=kielmc, subset=(year==1978))
+summary(reg2)
+```
+
+<br>
+
+O intercepto mostra o valor médio dos imóveis e o coeficiente da variável dummy indica que mesmo antes da existência do incinerador, os imóveis daquela localidade era cerca de 18,8 mil dólares mais baixos do que o de outro distante do local.
+
+<br>
+
+```{r aula12_5, warning=FALSE, message=FALSE}
+reg3 <- lm(rprice~nearinc, data=kielmc, subset=(year==1981))
+summary(reg3)
+```
+<br>
+
+No caso da regressão no ano de 1981 os resultados mostram que os preços dos imóveis subiram para 101 mil dólares aproximadamente e que os imóveis localizados perto de onde foi instalado o incinerador estão cerca de 30,7 mil dólares mais baratos.
+
+Como se pode avaliar se a instalação do incinerador reduziu os preços dos imóveis? Para isto é preciso verificar como mudou o coeficiente da variável dummy nos dois períodos. 
+
+<br>
+```{r aula12_6, warning=FALSE, message=FALSE}
+#Diferença entre os coeficientes
+coef.78<-coef(lm(rprice~nearinc, data=kielmc, subset=(year==1978)))
+coef.81<-coef(lm(rprice~nearinc, data=kielmc, subset=(year==1981)))
+coef.81[2]-coef.78[2]
+
+#Mesmos Resultados, outra forma
+library(lmtest)
+coeftest(lm(rprice~nearinc*y81, data=kielmc))
+```
+
+<br>
+
+Assim, por duas maneiras distintas de estimar o modelo é possível verficar que a diferença entre os dois coefientes é de -11.863,9 dólares. Esta é a estimativa do efeito do incinerador sobre os preços dos imóveis pertos de sua localização. O valor da estimativa ficou conhecido na econometria como estimador de diferença em diferenças.
+
+$$
+\hat{\delta}_1 = (\bar{rprice_{81,pr}} - \bar{rprice_{81,af}}) - (\bar{rprice_{78,pr}} - \bar{rprice_{78,af}})=-11.863,9
+$$
+
+Contudo, precisa-se saber se este valor é ou não estatisticamente igual a zero. Como pode ser visto na segunda forma de estimar o valor, o valor de probabilidade é maior do que 0,10, não rejeitando a hipótese nula. Assim, não se pode afirmar que a instalação do incinerador alterou as diferenças de preços de imóveis mais distantes.
+
+<br>
+```{r aula12_7, warning=FALSE, message=FALSE}
+
+coeftest(lm(log(rprice)~nearinc*y81, data=kielmc))
+#Inclusão de covariaveis
+coeftest(lm(log(price)~nearinc*y81+lintst+lland+larea+rooms, data=kielmc) )
+```
+
+<br>
+
+As estimativas acima são para mostrar que logaritimizando a variável dependente se tem um efeito percentual do efeito do incinerador sobre os preços dos imóveis. O coeficiente mostra que os imóveis próximos do incinerador reduziram cerca de 6,3% no seu valor. Contudo, não é estatisticamente significativo. 
+
+Ao se inserir outras variáveis explicativas no modelo como a distância para a rodovia interestadual (instst), área do terreno (land), área construida (area) e o número de quartos (rooms), a redução passa a ser de aproximadamente 11,2% e estatisticamente significativo a 10% de probabilidade. 
+
+Diferentemente de um experimento estatístico verdadeiro, no qual os grupos de controle e de tratamento são obtidos de forma aleatória, no caso em análise os grupos surgem da mudança em um fator exógeno;
+
+Assim, de forma a controlar diferenças sistemáticas entre os grupos, é preciso ter um amostra com dois anos de dados, uma anterior e outra posterior à mudança. 
+
+A amostra fica dividida em quatro grupos: o grupo de controle antes e depois da mudança e o grupo de tratamento antes e depois da mudança. 
+
+Como em Wooldridge(2016), considere que $A$ seja o grupo de controle e $B$ seja o grupo de tratamento. Assim, $dB$ é igual a 1 para as observações do grupo $B$ (tratamento) e zero, caso contrário. A variável **dummy** para o segundo período é dada por $d2$, de modo que a equação passa a ser
+
+<br>
+
+$$
+y = \beta_0 + \delta_0 d2 + \beta_1 dB + \delta_1 d2 dB + \text{outros fatores}
+\tag{12}
+$$ 
+<br>
+
+onde $y$ é a variável de interesse, $\delta_1$ vai medir o efeito da decisão ou do evento exógeno;
+
+Sem outros fatores, $\hat{\delta}_1$ será o estimador de diferenciamento:
+
+$$
+\hat{\delta_1} = (\bar{y_{2,B}} - \bar{y_{2,A}}) - (\bar{y_{1,B}} - \bar{y_{1,A}})
+$$
+
+<br>
+
+## Análise de Dados em Painel de Dois Períodos
+
+<br>
+
+É o tipo mais simples de dados em painel: um corte transversal **dos mesmos** indivíduos de dois períodos. Para ilustrar, considere, por exemplo, o arquivo ``crime2.csv``, disponibilizado por Wooldridge(2016), que contém, entre outras coisas, dados sobre taxas de criminalidade e de desemprego de 46 cidades para os anos de 1982 e 1987;
+
+Pode-se fazer um regressão simples da taxa de criminalidade ``crmrte`` com a taxa de desemprego ``unem`` para o ano de 1987, como abaixo, mas a mesma terá uma série de problemas.
+
+<br>
+
+```{r aula12_8, warning=FALSE, message=FALSE}
+data(crime2, package='wooldridge')
+crime2 <- crime2
+
+#Modelo de regressao simples para 1987
+reg4 <- lm(crmrte~unem, data=crime2, subset=(year==87))
+summary(reg4)
+```
+
+<br>
+
+Um formato de dados em painel separa os fatores não observados que afetam a variável dependente em dois tipos: os que são constantes e os que variam ao longo do tempo. Como exposto em Wooldridge(2016), seja $i$ a unidade de corte transversal e $t$ o período de tempo. Pode-se escrever um modelo com uma única variável explicativa como 
+
+<br>
+
+$$ 
+y_{it} = \beta_0 + \delta_0 d2_t + \beta_1 x_{it} + a_i + u_{it}, \quad t = 1,2. 
+\tag{13} 
+$$ 
+
+<br>
+
+Onde $y_{it}$ é o indivíduo (pessoa, empresa, país, indústria, etc.) $i$ no período $t$. A variável $d2$ é uma *dummy* igual a zero quando $t=1$ e 1 quando $t=2$. 
+
+Nessa equação, o intercepto em $t=1$ é $\beta_0$ e $\beta_0 + \delta_0$ quando $t=2$. A variável $a_i$ captura os **fatores não observados**, constantes no tempo, que afetam $y_{it}$. Ela é fundamental para se definir o modelo dado pela equação (12), chamado de **modelo de efeitos fixos**. Por fim, $u_{it}$ representa os fatores não observados que mudam ao longo do tempo e afetam $y_{it}$, chamado de **erro idiossincrático**. 
+
+Um modelo simples de efeitos fixos da taxa de criminalidade de uma cidade americana nos anos de 1982 e 1987 pode ser representado como 
+
+<br>
+
+$$
+\text{crmrte}_{it} = \beta_0 + \delta_0 \text{d87}_t + \beta_1 \text{unem}_{it} + a_i + u_{it}
+\tag{14} 
+$$ 
+<br>
+
+onde $\text{d87}_t$ é uma variável *dummy* para o ano de 1987. Dado que $i$ refere-se as cidades distintas, $a_i$ pode ser interpretada como *efeito fixo da cidade*, representando todos os fatores que afetam a taxa de criminalidade da cidade $i$ que não mudam ao longo do tempo. 
+
+Existem dificuldades para se estimar (14). Se considerar a estratégia de simplesmente agrupar os dois anos de dados, estimando (14) por MQO, os parâmetros podem ser inconsistentes e viesados. Isso porque não é possível garantir que $a_i$ seja não correlacionado com $x_{it}$. Para ilustrar, estima-se (14) abaixo, supondo que $a_i$ esteja no termo de erro, que passa a ser $v_{it} = a_i + u_{it}$;
+
+<br>
+
+```{r aula12_9, warning=FALSE, message=FALSE}
+#Modelo de regressao simples para 1987
+reg5 <- lm(crmrte~unem, data=crime2, subset=(year==87))
+summary(reg5)
+```
+<br>
+
+O uso do MQO agrupado não muda praticamente nada o cenário, dado que, na prática, não foi resolvido o *problema de variável omitida*, $a_i$ está no termo de erro. 
+ 
+Como observa Wooldridge(2016), na maioria das aplicações, a principal razão para coletar dados em painel é considerar que $a_i$ seja correlacionado com $x_{it}$. Para obter isso, basta diferenciar os dados ao longo dos dois períodos. Assim, para uma observação $i$ de corte transversal,  
+
+$$
+y_{i2} = (\beta_0 + \delta_0) + \beta_1 x_{i2} + a_i + u_{i2} \quad \text{para} \quad t=2 
+$$
+$$
+y_{i1} = \beta_0 + \beta_1 x_{i1} + a_i + u_{i1} \quad \text{para} \quad t=1. 
+$$ 
+<br>
+
+Subtraindo a segunda da primeira equação, chega-se 
+
+<br>
+
+$$
+(y_{i2} - y_{i1}) = \delta_0 + \beta_1(x_{i2} - x_{i1}) + (u_{i2} - u_{i1})
+$$ 
+
+<br>
+
+Ou simplesmente 
+
+<br>
+$$
+\Delta y_i = \delta_0 + \beta_1 \Delta x_i + \Delta u_i, 
+\tag{15} 
+$$ 
+
+<br>
+
+onde $\Delta$ representa a mudança de $t=1$ para $t=2$. 
+<br>
+
+O efeito não observado $a_i$ desaparece, bem como o intercepto passa a ser a \emph{mudança no intercepto de $t=1$ para $t=2$}. A equação (15) é chamada de **Equação de Primeiras Diferenças**;
+\bigskip
+
+O código abaixo estima (15):
+
+<br>
+
+```{r aula12_10, warning=FALSE, message=FALSE}
+
+# Estimação da Equação de Primeiras Diferenças
+
+dcrmrte<-crime2$crmrte[crime2$year=='87']-crime2$crmrte[crime2$year=='82']
+dunem<-crime2$unem[crime2$year=='87']-crime2$unem[crime2$year=='82']
+reg6 <- lm(dcrmrte~dunem, data=crime2)
+summary(reg6)
+```
+
+<br>
+
+Existe uma relação positiva e estatisticamente significativa entre desemprego e taxa de criminalidade. Isto é, a diferenciação com o objetivo de eliminar os *efeitos constantes no tempo* teve grande efeito nesse caso;
+
+A equação (15) explicitamente considera como as alterações na variável explicativa ao longo do tempo afetam a mudança em $y$ ao longo do mesmo período do tempo;
+
+Essa é a forma mais simples de estimar um conjunto de dados em painel para dois períodos de tempo, via mínimos quadrados ordinários. 
+
+```{r aula12_11, warning=FALSE, message=FALSE}
+
+# Organização dos dados em Painel
+library(plm)
+
+crime2.p <- pdata.frame(crime2, index=46)
+# Cálculo manual da primeira diferença
+crime2.p$dcrmrte <- diff(crime2.p$crmrte)
+crime2.p$dunem   <- diff(crime2.p$unem)
+# Estimando o modelo com a função lm sobre as primeiras diferenças
+coeftest(lm(dcrmrte~dunem, data=crime2.p))
+# Estimando o modelo com a função plm sobre os dados originais
+# Observe que a interpretação muda completamente.
+coeftest(plm(crmrte~unem, data=crime2.p, model="fd"))
+```
+ 
+<br>
+
+## A Organização dos Dados em Painel no R
+
+<br>
+ 
+Para os cálculos utilizados em dados em painel, se deve ter certeza que o conjunto de dados é sistematicamente organizado e que as rotinas de estimação *compreendem* essa estrutura de dados. Usualmente, um conjunto de dados em painel vem em uma forma longa onde cada **linha** dos dados corresponde a uma combinação de $i$ e $t$. É necessário definir, então, quais observações se pertencem ao introduzir um indexador para a unidade de corte transversal e também para o tempo $t$;
+
+O painel podem ser longo (long panel) ou curto (short panel). No painel longo o N de cortes transversais é menor do que o T da série temporal. Se N for maior que T, se tem um painel curto.
+
+No **R**, o pacote ``plm`` é uma coleção compreensiva de funções criadas para lidar com conjuntos de dados em painel. Semelhantemente à especificação de dados de séries temporais, oferece uma estrutura de dados nomeada como ``pdata.frame``. Essencialmente corresponde a um ``data.frame`` padrão, mas com atributos adicionadas que descrevem indivíduos e dimensões temporais. 
+
+Considere uma base de dados padrão nomeado como ``crime4``. Ela inclui um variável ``county`` indicando a unidade de corte transversal e uma variável ``year`` indicando o tempo. Assim, cria-se o data frame de painel com a função.
+ 
+<br>
+
+```{r aula12_12, warning=FALSE, message=FALSE}
+
+# Organização dos dados em Painel
+
+data(crime4, package='wooldridge')
+crime4<-crime4
+
+summary(crime4[,c(1:5)])
+
+crime4.p <- pdata.frame(crime4, index=c("county","year"))
+```
+
+<br>
+
+Caso se tenha um **painel balanceado**, (isto é, com o mesmo número de observações $T$ para cada **indivíduo** $i = 1,..,n$), e as observações forem primeiro ordenadas por $i$ e depois por $t$, pode-se escrever como abaixo (corresponde a um **painel balanceado** de 46 cidades, devidamente ordenado. O código abaixo importa e trata o conjunto de dados):
+ 
+<br>
+ 
+```{r aula12_13, warning=FALSE, message=FALSE}
+crime2.p <- pdata.frame(crime2, index=46)
+
+# Verificando a dimensão
+pdim(crime2.p)
+```
+<br>
+
+Um painel balanceado com 46 cidades dispostas em dois períodos, correspondendo assim a 92 observações. Nesse caso, são geradas novas variáveis **id** e **time** como indexadores. Uma vez que se tenha definido o conjunto de dados, pode-se ainda checar as dimensões com a função ``pdim(crime2.p)``;
+
+Ela irá reportar se o painel é balanceado, o número de $n$ unidades de corte transversal, o número de $T$ unidades de tempo e o total de observações (o que será $n*T$ em painéis balanceados).
+
+<br>
+
+## O Modelo de Efeitos Fixos
+
+<br>
+
+O estimador de primeira diferença é apenas uma das muita maneiras de eliminar o efeito fixo, $a_t$. Um outro método, que pode funcionar melhor, é chamado de **transformação ou modelo de efeitos fixos** 
+
+<br>
+
+$$ 
+y_{it} = \beta_1 x_{it} + a_i + u_{it}, \quad t = 1,2,...,T. 
+\tag{16} 
+$$ 
+
+<br>
+
+De modo que para cada $i$, se calcule a média dessa equação ao longo do tempo 
+
+<br>
+
+$$ 
+\bar{y}_i = \beta_1 \bar{x}_i + a_i + \bar{u}_i 
+\tag{17}
+$$ 
+
+<br>
+
+em que $\bar{y}_i = T^{-1} \sum_{t=1}^{T} y_{it}$, e assim por diante. 
+
+Como $a_i$ é fixo ao longo do tempo, ele aparece tanto em (16) quanto em (17). Assim, ao se subtrair uma da outra, para cada $t$, tem-se 
+<br>
+
+$$ 
+\ddot{y}_{it} = \beta_1 \ddot{x}_it +\ddot{u}_it , \quad t = 1,2,...,T, \tag{18} 
+$$ 
+<br>
+
+onde $\ddot{y}_{it} = y_{it} - \bar{y}$ são *dados centrados na média* de $y$ e $\ddot{x}_{it}$ e $\ddot{u}_{it}$ são obtidos da mesma forma.
+
+Como se pode notar, o efeito não observado $a_i$ desapareceu em (18), de modo que é possível estimá-la por um MQO agrupado. Um estimador MQO, por suposto, que se baseia em variáveis temporais reduzidas é chamado de **estimador de efeitos fixos** ou **estimador intragrupos**. 
+
+Pode-se generalizar (18) começando pela equação de efeitos não observados original 
+
+<br>
+
+$$ 
+y_{it} = \beta_1 x_{it1} + \beta_2 x_{it2} + ... + \beta_k x_{itk} + a_i + u_{it}, \quad t = 1,2,...,T, 
+\tag{19} 
+$$ 
+<br>
+
+de modo a obter 
+
+$$ 
+\ddot{y}_{it} = \beta_1 \ddot{x}_{it1} + \beta_2 \ddot{x}_{it2} + ... + \beta_k \ddot{x}_{itk} + \ddot{u}_{it}, \quad t = 1,2,...,T, 
+\tag{20} 
+$$ 
+<br>
+
+que pode ser estimado pelo MQO agrupado.
+
+O estimador de efeitos fixos é não viesado considerando que o erro $u_{it}$ seja não correlacionado com cada variável explicativa ao longo de todos os períodos de tempo;
+
+O estimador de efeitos fixos leva em consideração uma correlação entre $a_i$ e as variáveis explicativas em qualquer período de tempo. Assim, qualquer variável explicativa que seja constante no tempo para todo *i* é removida pela transformação de efeitos fixos: $\ddot{x}_{it}=0$, para todo *i* e *t*, se $x_{it}$ for constante ao longo de *t*.
+
+Os erros $u_{it}$ devem ser homocedásticos e serialmente não correlacionados.
+
+O conjunto de dados ``wagenpan.csv`` foi utilizado para um estudo sobre sindicalismo e os determinantes das taxas de salários para homens jovens;
+
+Algumas variáveis, como experiência, estado civil e filiação sindical mudam ao longo do tempo. Outras variáveis, como raça e educação não mudam;
+
+Assim, usando efeitos fixos, não é possível incluir essas variáveis na equação. O que pode ser feito é incluir interações da educação com ``dummies`` anuais, de modo a testar se o retorno da educação foi constante ao longo do tempo.
+
+<br>
+
+```{r aula12_14, warning=FALSE, message=FALSE}
+#Modelo de efeitos Fixos
+data(wagepan, package='wooldridge')
+wagenpan <- wagepan
+
+#Criar o data frame
+wagepan.p <- pdata.frame(wagepan, index=c("nr","year") )
+pdim(wagepan.p)
+
+# Estimar o modelo de efeitos fixos
+summary(plm(lwage~married+union+factor(year)*educ,
+            data=wagepan.p, model="within"))
+
+#Pode-se verificar que o retorno da educação é cerca de 
+#três pontos percentuais maior em 1987 do que no ano-base, 
+#que é 1980.
+```
+
+<br>
+
+Observe que foi colocado no argumento **model** a opção **within**, que corresponde à subtração da média de uma observação $x_{it}$.
+
+<br>
+
+## Efeitos Fixos ou Primeira Diferença?
+
+<br>
+
+Se T=2,  as estimativas por ambos métodos são as mesmas, assim como os testes estatísticos. Então, é indiferente escolher entre EF ou PD. 
+
+Se $T \geq 3$, os estimadores EF e PD não são os mesmos. Ambos são não viesados e consistentes. Para N grande e T pequeno, a escolha vai depender da eficiência dos estimadores, determinado pela correlação serial nos resíduos, $u_{it}$.
+
+Se os resíduos forem não correlacionados, os estimadores de EF são mais eficientes em comparação com PD. Se forem, por exemplo, um passeio aleatório, a PD será melhor. Se houver correlação positiva mas não for um passeio aleatório, é mais difícil comparar a eficiência de EF e PD. Se a correlação for negativa, melhor EF.
+
+<br>
+
+## O Modelo de Efeitos Aleatórios
+
+<br>
+
+Considere o modelo já visto  
+
+<br>
+
+$$
+y_{it} = \beta_0 + \beta_1 x_{it1} + ... + \beta_k x_{itk} +  a_i + u_{it}, \tag{21}  
+$$
+<br>
+
+em que foi incluído um intercepto de modo que se possa presumir que o efeito não observado, $a_i$, tem média zero. 
+
+Ao utilizar efeitos fixos ou primeira diferença, o objetivo era eliminar $a_i$, dado que o mesmo poderia ser correlacionado com as variáveis explicativas;
+
+Entretanto, pode-se supor que $a_i$ é não correlacionado com cada variável explicativa em todos os períodos de tempo. Nesse caso específico, os estimadores são ineficientes se $a_i$ for eliminado.
+
+Nesse contexto, a equação (21) poderá se tornar um **modelo de efeitos aleatórios** quando se supor que o efeito não observado $a_i$ é não correlacionado com cada variável explicativa em todos os períodos de tempo, isto é,
+
+<br>
+
+$$ 
+Cov(x_{itj}, a_i) = 0, \quad t = 1,2,...,T; \quad j = 1,2,...,k. 
+\tag{22} 
+$$
+<br>
+
+Sob (22), como estimar $\beta_j$? Se for considerado que $a_i$ não é correlacionado com o vetor de variáveis explicativas, o vetor $\beta_j$ poderá ser consistentemente estimado com o uso de um único *corte transversal*. Isso, entretanto, implica em desconsiderar informações dos demais períodos de tempo.
+
+É possível ainda utilizar os dados em um procedimento de MQO agrupado. Isso também produzirá estimadores consistentes, entretanto irá ignorar um ponto importante. Isto porque, se for definido o termo de erro composto como $v_{it} = a_i + u_{it}$, (21) poderá ser escrita como
+
+<br>
+
+$$ 
+y_{it} = \beta_0 + \beta_1 x_{it1} + ... + \beta_k x_{itk} + v_{it}. \tag{23}
+$$
+<br>
+
+Como $a_i$ é o erro composto em cada período de tempo, os $v_{it}$ serão serialmente correlacionados ao longo do tempo. Sob as hipóteses de efeitos aleatórios,
+
+<br>
+
+$$ 
+Corr(v_{it}, v_{is}) = \frac{\sigma_a^2}{\sigma_a^2 + \sigma_u^2}, \quad t \neq s, 
+\tag{24}
+$$
+<br>
+
+onde $\sigma_a^2$ = Var(a_i)$ e $\sigma_u^2 = Var(u_{it})$
+
+Essa correlação serial positiva no termo de erro pode ser substancial. Dado que os erros-padrão do estimador de MQO agrupado normalmente ignoram essa correlação, eles serão incorretos, assim como as estatísticas de teste. De modo a resolver esse problema, pode-se utilizar mínimos quadrados generalizados (MQG). Considere
+
+<br>
+
+$$ 
+\theta = 1 - \left [ \sigma_u^2/(\sigma_u^2 + T \sigma_a^2) \right ]^{\frac{1}{2}} 
+\tag{25}
+$$
+<br>
+
+que estará entre zero e um. A seguir, a equação transformada resultará em
+
+<br>
+
+$$ 
+y_{it} - \theta \bar{y}_i = \beta_0 (1 - \theta) + \beta_1 (x_{it1} - \theta \bar{x}_{i1}) + ... + \beta_k (x_{itk} - \theta \bar{x}_{ik}) + (v_{it} - \theta \bar{v}_i) 
+\tag{26}
+$$
+<br>
+
+de modo que a transformação de efeitos aleatórios irá subtrair uma fração daquela média temporal, sendo que esta fração irá depender de $\sigma_{u}^2$, \sigma_a^2$ e do número de períodos de tempo $T$.
+
+O estimador MQG é simplesmente o estimador MQO agrupado de (26).
+A transformação contida em (26) considera variáveis explicativas que sejam constantes ao longo do tempo. Isto porque o estimador de efeitos aleatórios presume que o efeito não observado é não correlacionado com todas as variáveis explicativas, sejam elas fixas ao longo do tempo ou não;
+
+Assim, por exemplo, em uma equação de salário, pode-se incluir uma variável como educação, mesmo que ela não se altere ao longo do tempo. 
+
+Na prática, o parâmetro $\theta$ nunca é conhecido, devendo ser estimado.
+
+Em geral, para se estimar $\hat{\theta}$ se faz
+
+<br>
+
+$$
+\hat{\theta}=1-\left \{\frac{1}{[1+T(\frac{\hat{\sigma}^2_a}{\hat{\sigma}^2_u})]}\right\}^\frac{1}{2}
+$$
+<br>
+
+em que $\hat{\sigma}^2_a$ e $\hat{\sigma}^2_u$ são estimadores consistentes de $\sigma^2_a$ e $\sigma^2_u$;
+
+Estes estimadores podem estar baseados nos resíduos do MQO agrupado ou EF.
+
+Uma possibilidade é que
+<br>
+$$
+\hat{\sigma}^2_a=\left [\frac{NT(T-1)}{2-(k+1)}\right]^{-1} \sum_{i=1}^{N}\sum_{t=1}^{T-1}\sum_{s=t+1}^{T} \hat{v}_{it}\hat{v}_{is}
+\tag{28}
+$$
+<br>
+
+em que os $\hat{v}_{it}$ são os resíduos de estimar {23} pelo MQO agrupado;
+
+Em seguida pode-se estimar $\sigma^2_u$ usando $\hat{\sigma}^2_u=\hat{\sigma}^2_v-\hat{\sigma}^2_a$ em que $\hat{\sigma}^2_v$ é o quadrado do erro padrão da regressão pelo MQO agrupado;
+
+O estimador MQG factível que usa $\hat{\theta}$ em lugar de $\theta$ é chamado de **estimador de efeitos aleatórios**. Sob pressupostos de ausência de multicolinearidade, $E(a_i|X_i)=\beta_0$ e $Var(a_i|X_i)=\sigma^2_a$ o estimador é não viesado, consistente, distribuído normalmente e assimptoticamente conforme N fica maior com T fixo.
+
+A equação (26) permite relacionar o estimado de EA com MQO agrupado e EF.  
+Se $\hat{\theta}$ estiver próximo de zero, as estimativas de EA estarão próximas das estimativas do MQO agrupado, sendo o caso quando $a_i$ tem pouca importância. Se $\hat{\sigma}^2_a$ for grande em relação a $\hat{\sigma}^2_u$, $\hat{\theta}$ vai estar mais próximo de 1. Conforme T fica maior, $\hat{\theta}$ tende a um, fazendo com que EA e EF sejam semelhantes.
+
+O modelo abaixo estima uma equação para os salários do homens, com as variáveis explicativas sendo educação, raça, experiência, estado civil e se é sindicalizado. A regressão também contém um conjunto de dummies anuais;
+O modelo utilizado é de dados em painel com efeitos aleatórios, dado que foi colocado no argumento ``model`` a opção *random*.
+
+<br>
+
+```{r aula12_15, warning=FALSE, message=FALSE}
+#Estimar o modelo de efeitos Aleatórios
+# Estimar o modelo de efeitos aleatórios
+wagepan.p$yr <- factor(wagepan.p$year)
+pvar(wagepan.p)
+summary(plm(lwage~educ+black+hisp+exper+I(exper^2)+married+union+yr, 
+             data=wagepan.p, model="random"))
+```
+<br>
+
+O salário dos homens em 1987 é cerca de 14,45\% mais elevado do que no ano base (1980). Participar de sindicato ou ser casado aumentam o salarios em cerca de 11,2\% e 6,61\%, respecticamente. A estimativa de $\theta$ é 0,6429.
+
+## O Teste de Hausman
+
+O teste de Hausman (1978) testa o vetor de coeficientes **b** do modelo de efeitos fixos contra o vetor $\hat{\beta}$ do modelo de efeitos aleatórios, verificando a ortogonalidade dos efeitos comuns com os regressores;
+
+O teste é baseado na ideia de que, na ausência de correlação sob $H_0$, tanto o modelo de efeitos fixos quanto o de efeitos aleatórios são consistentes, mas o modelo de efeitos fixos é ineficiente;
+
+Então, sob a hipótese nula de que o modelo de efeitos aleatórios é o mais adequado, formula-se a seguinte estatística de teste 
+
+<br>
+
+$$
+H = (b-\hat{\beta})'(var[b]-var[\hat{\beta}])^{-1}(b-\hat{\beta}) \sim \chi^2(k-1)
+\tag{29} 
+$$
+<br>
+
+No **R**, o teste é o ``phtest``.
+
+<br>
+
+```{r aula12_16, warning=FALSE, message=FALSE}
+#Testes de Hausman
+#HO: Efeitos aleatorios e melhor
+#basicamente testa se os erros sao correlacionados
+#com os regressores e a H0 é que nao sao.
+
+ffe <- plm(lwage~married+union+factor(year)*educ,
+            data=wagepan.p, model="within")
+fre <- plm(lwage~educ+black+hisp+exper+I(exper^2)+married+union+yr, 
+             data=wagepan.p, model="random")
+
+phtest(ffe, fre)
+```
+
+<br>
+
+## Demonstração no R com o exemplo do livro do Gujarati
+
+<br>
+
+```{r aula12_17, warning=FALSE, message=FALSE}
+
+#Direcionado o R para o Diretorio a ser trabalhado
+setwd('/Users/jricardofl/Dropbox/tempecon/Facape/econometria1')
+
+#Extracao dos dados Gujarati
+dados <- read.csv2('painel_gujarati.csv', header=T, sep=";", dec=".")
+names(dados)[1] <- c("crossid")
+
+#Regressao com dados empilhados
+regressao1 <- lm(ct ~ q+lf+pf, data=dados)
+summary(regressao1)
+
+#Regressao com o uso de variaveis Dummy e Efeitos Fixos
+fixed.dum <- lm(ct ~ q+lf+pf+factor(crossid)-1, data=dados)
+summary(fixed.dum)
+
+#Configuracao como dados em painel
+pdados <- pdata.frame(dados, c("crossid","dateid"))
+pdados <- pdata.frame(dados, index=6) #opção para painel balanceado (n=90/t=15)
+#Checar as dimensoes do painel
+pdim(pdados)
+#Checar por variação no corte transversal e no tempo
+pvar(pdados)
+
+#Pool Test
+#teste F de estabilidade dos coeficientes do modelo em painel. Testa a hipótese de que os coefs
+# excluindo os interceptos sao iguais.
+pooltest(ct ~ q+lf+pf, data=pdados, model='within')
+#Testa a hipótese de que os coefs incluindo os interceptos sao iguais.
+pooltest(ct ~ q+lf+pf, data=pdados, model='pooling')
+
+#Testa se não há efeitos (individual u tempo) não 
+# observados nos resíduos (ausencia de autocorrelacao residuos).
+# H0=correlação zero entre os residuos do mesmo grupo. 
+pwtest(ct ~ q+lf+pf, data=pdados, model='pooling')
+
+#Teste para verificar conjuntamente a existencia de efeito aleatorio
+# e correlação serial. A H0 é ausencia dos dois.
+pbsytest(ct ~ q+lf+pf, data=pdados, model='pooling', test = 'j')
+
+#Teste para verificar a existencia de 
+# correlação serial. A H0 é ausencia de correlação.
+pbsytest(ct ~ q+lf+pf, data=pdados, model='pooling')
+
+#Teste para verificar a existencia de efeito aleatorio
+#. A H0 é ausencia de efeito aleatório.
+pbsytest(ct ~ q+lf+pf, data=pdados, model='pooling', test = 're')
+
+#Teste para verificar a existencia de correlação serial
+# em erros sob efeitos aleatórios (AR(1) ou MA(1). 
+# A H0 é ausencia de correlação.
+pbltest(ct ~ q+lf+pf, data=pdados, model='pooling', alternative = 'oneside')
+
+#Uso de Funções diversas com Panel Data
+pdados$q.l <- lag(pdados$q) #1 Lag
+pdados$q.d <- diff(pdados$q) #1 Diff
+pdados$q.B <- Between(pdados$q) #Média por Cross-Section
+pdados$q.W <- Within(pdados$q) #x-x.bar
+
+#Estimacao de modelo com efeitos Fixos
+ffe <- plm(ct ~ q+lf+pf, model="within", data = pdados)
+summary(ffe)
+#O coeficiente estimado indica quanto ct muda ao longo do tempo
+# na media por empresa aerea, quando a variavel aumenta uma unidade 
+fixef(ffe) #mostra os seis diferentes interceptos
+summary(fixef(ffe)) #mostra os seis diferentes interceptos com signif.
+
+#Teste do RFE contra MqO
+#Hipotese Nula: Modelo de MqO e melhor
+pFtest(ffe, regressao1)
+
+#Teste de Correlação serial quando T for pequeno em 
+#Modelo de Efeito Fixo.H0: ausencia de correlacao serial
+pwartest(ffe)
+
+pwfdtest(ct ~ q+lf+pf, data = pdados)
+
+#Estimacao de modelo com Efeitos Aleatorios
+fre <- plm(ct ~ q+lf+pf, model="random", data = pdados)
+summary(fre)
+#Os coeficientes estimados indicam o efeito medio de X sobre Y quando
+# X muda ao longo do tempo e entre as empresas aereas em uma unidade.
+
+#Testes de Hausman
+#HO: Efeitos aleatorios e melhor
+#basicamente testa se os erros sao correlacionados
+#com os regressores e a H0 é que nao sao.
+
+phtest(ffe, fre)
+
+#Teste de estacionariedade das series
+#Hipotese nula: os dados possuem raiz unitaria
+library(tseries)
+adf.test(pdados$ct, k=2)
+adf.test(pdados$lf, k=2)
+adf.test(pdados$pf, k=2)
+adf.test(pdados$q, k=2)
+
+#Teste para Correlacao Serial
+#Hipotese Nula: ausencia de autocorrelacao serial
+pbgtest(ffe, order=2)
+
+#Teste de Breusch-Pagan de homocedasticidade
+#Hipotese nula eh homocedasticidade
+bptest(ct ~ q+lf+pf+factor(crossid), data=dados, studentize=F)
+
+#Solucao de problema de Heterocedasticidade
+#Estimacao com erros padroes robustos Modelo Efeitos Fixos
+coeftest(ffe) #resultado sem correcao
+coeftest(ffe, vcovHC(ffe, type="HC4")) #resultado corrigido
+#Estimacao com erros padroes robustos Modelo Efeitos Aleatorios
+coeftest(fre)
+coeftest(fre, vcovHC(fre, type="HC4"))
+
+#Solucao de problema de Autocorrelacao
+#Estimacao com erros padroes robustos Modelo Efeitos Fixos
+coeftest(ffe) #resultado sem correcao
+coeftest(ffe, vcovHC(ffe, cluster="group")) #resultado corrigido
+#Estimacao com erros padroes robustos Modelo Efeitos Aleatorios
+coeftest(fre) #resultado sem correcao
+coeftest(fre, vcovHC(fre, cluster="group")) #resultado corrigido
+
+
+```
