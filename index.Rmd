@@ -205,7 +205,7 @@ STOCK, J.H.; WATSON, M. W. *Econometria*. São Paulo: Addison Wesley, 2004. 485p
 
 <br>
 
-# [AULA R](https://econfacape.github.io/microeconometria/aulaR)+±
+# [AULA R](https://econfacape.github.io/microeconometria/aulaR)
 
 # [AULA 1](https://econfacape.github.io/microeconometria/aula1)
 
