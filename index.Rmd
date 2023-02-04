@@ -73,6 +73,8 @@ A avaliação do curso constará de provas e exercícios. As Provas cobrirão a 
 
 WOOLDRIDGE, J. *Introdução à Econometria: uma abordagem moderna*. 4.ed. São Paulo: Cengage Learning, 2017. 878p. 
 
+HANCK, C.; ARNOLD, M., GERBER, A.; SCHMELZER, M.. Introduction to Econometrics with R. Acessado em: https://www.econometrics-with-r.org/index.html.
+
 <br>
 
 **Outros Textos**: 
@@ -90,8 +92,6 @@ HILL, Carter, GRIFFITHS, W. e JUDGE, G. *Econometria*. 3.ed. São Paulo, Editora
 MADDALA, G. S. *Introdução à Econometria*. Rio de Janeiro: LTC Editora, 2003. 345p. 
 
 STOCK, J.H.; WATSON, M. W. *Econometria*. São Paulo: Addison Wesley, 2004. 485p. 
-
-VASCONCELOS, M. A. S. e ALVES, D. (Editores) *Manual de Econometria*. São Paulo: Editora Atlas, 2000. 308p. 
 
 <br>
 
@@ -205,7 +205,7 @@ VASCONCELOS, M. A. S. e ALVES, D. (Editores) *Manual de Econometria*. São Paulo
 
 <br>
 
-# [AULA R](https://econfacape.github.io/microeconometria/aulaR)
+# [AULA R](https://econfacape.github.io/microeconometria/aulaR)+±
 
 # [AULA 1](https://econfacape.github.io/microeconometria/aula1)
 
