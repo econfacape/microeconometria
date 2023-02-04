@@ -49,7 +49,7 @@ knitr::opts_chunk$set(
 
 <br>
 
-O R pode ser baixado no site <http://www.r-project.org>. A versão atual é a 4.1.3, mas constantemente são lançadas novas versões. Para uma melhor interface com o usuário, recomenda-se usar um outro software, chamado R-Studio, que pode ser baixado no site <http://www.rstudio.com>. O R deve ser instalado primeiro e depois o R Studio. O R Studio não funciona se o R não tiver sido instalado.
+O R pode ser baixado no site <http://www.r-project.org>. A versão atual é a 4.2.2, mas constantemente são lançadas novas versões. Para uma melhor interface com o usuário, recomenda-se usar um outro software, chamado R-Studio, que pode ser baixado no site <http://www.rstudio.com>. O R deve ser instalado primeiro e depois o R Studio. O R Studio não funciona se o R não tiver sido instalado.
 
 <br>
 
@@ -90,7 +90,7 @@ O R é "case sensitive", ou seja, se o comando estiver escrito em maiúsculo e a
 
 <br>
 
-Como usar o Help? A forma mais simples é ?? na frente do que se deseja obter ajuda. Outra possibilidade é recorrer a internet. Existem centenas de sites em português ou inglês com soluções para problemas encontrados em R;
+Como usar o Help? A forma mais simples é ?? na frente do que se deseja obter ajuda. Outra possibilidade é recorrer a internet. Existem centenas de sites em português ou inglês com soluções para problemas encontrados em R:
 
 <br>
 
@@ -112,7 +112,7 @@ Os objetos do R podem ser variáveis, arranjos de números, funções, etc., sen
 
 Os comandos no R são escritos da mesma forma, tendo um nome e, entre parentes, as opções diversas e os dados `nomedafuncao(parte1, parte2, etc)`. A função `rm()` deve ser utilizada para se remover objetos. A função `rm(list=ls()` apaga todos os objetos.
 
-Todos os objetos criados em uma sessão do R podem ser armazenados em um arquivo para uso em sessões futuras. No final de toda sessão, o R pergunta se quer salvar os objetos disponíveis. Caso se queira, o R vai criar um arquivo .RData no diretório e as linhas de comandos serão guardadas em .Rhistory; O ideal é que se tenha um diretório para cada análise realizada no R.
+Todos os objetos criados em uma sessão do R podem ser armazenados em um arquivo para uso em sessões futuras. No final de toda sessão, o R pergunta se quer salvar os objetos disponíveis. Caso se queira, o R vai criar um arquivo .RData no diretório e as linhas de comandos serão guardadas em .Rhistory. O ideal é que se tenha um diretório para cada análise realizada no R.
 
 <br>
 
@@ -339,16 +339,16 @@ summary(mydata2$status)
 
 Todos os objetos no R possuem uma "class". 
 
-1) ``numeric``, 
-2) ``logical``,
-3) ``integer``,
-4) ``double``,
+1) ``numeric`` 
+2) ``logical``
+3) ``integer``
+4) ``double``
 5) ``factor``
 
 Estas classes definem a forma do objeto:
 
-1) ``matrix``, 
-2) ``array``, 
+1) ``matrix`` 
+2) ``array`` 
 3) ``data.frame``
 4) ``tibble``
 
@@ -521,7 +521,11 @@ save(custo_cesta, file="custo_cesta.RData")
 load("custo_cesta.RData")
 ```
 
+<br>
+
 # Explorando os dados e o espaço de trabalho
+
+<br>
 
 ```{r eco24, warning=FALSE, message=FALSE}  
 summary(custo_cesta) # estatísticas descritivas
@@ -557,9 +561,7 @@ custo_cesta[1:10,1:2] # 10 primeiras linhas das 2 primeiras variáveis
 
 <br>
 
-Parte significante do trabalho de análise de dados envolve trabalhar bases brutas e transformá-las em formatos mais interessantes. O R já vem com ferramentas para isso, mas elas não são tão eficientes quanto as disponibilizadas no pacote ``dplyr``. A ideia do ``dplyr`` é oferecer uma _gramática dos dados_, uma maneira concisa e clara de manipulá-los.
-
-``flights`` vai carregar a base com os vôos:
+Parte significante do trabalho de análise de dados envolve trabalhar bases brutas e transformá-las em formatos mais interessantes. O R já vem com ferramentas para isso, mas elas não são tão eficientes quanto as disponibilizadas no pacote ``dplyr``. A ideia do ``dplyr`` é oferecer uma _gramática dos dados_, uma maneira concisa e clara de manipulá-los. ``flights`` vai carregar a base com os vôos:
 
 ```{r eco25, warning=FALSE, message=FALSE}
 
@@ -630,7 +632,7 @@ transmute(flights,
 
 <br>
 
-`Pipes` (ou tubos) são uma ferramenta poderosa para expressar claramente uma sequência de várias operações. `Pipes`, *%>%*, são carregados através do pacote *magrittr*. O objetivo do `pipe` é ajudá-lo a escrever código de uma maneira que seja mais fácil de ler e entender.
+Pipes (``%>%``) (ou tubos) são uma ferramenta poderosa para expressar claramente uma sequência de várias operações. Pipes (``%>%``), são carregados através do pacote `magrittr`. O objetivo do `pipe` é ajudá-lo a escrever código de uma maneira que seja mais fácil de ler e entender.
 
 ```{r eco32, warning=FALSE, message=FALSE}
 library(tidyverse)
