@@ -207,7 +207,7 @@ E) o valor de r é uma estimativa do parâmetro $\rho$ (rho) da mesma forma que 
 
 <br>
 
-```{r exemplo correlation1}
+```{r exemplo_correlation1, warning=FALSE, message=FALSE}
 library(MASS)
 
 # configurar uma semente 
