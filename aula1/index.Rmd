@@ -182,13 +182,9 @@ Apesar da análise de regressão tratar da dependência de uma variável sobre o
 
 # Regressão versus Correlação
 
-Relacionado mas conceitualmente muito diferente é a análise da regressão e de correlação. Na correlação o objetivo é mensurar o grau de associação linear entre duas variáveis. 
+Relacionado mas conceitualmente muito diferente é a análise da regressão e de correlação. Na regressão é estimar ou prever o valor médio do regressando (Y) com base nos valores fixos dos regressores (X). Na correlação o objetivo é mensurar o grau de associação linear entre duas variáveis. 
 
 As estimativas de correlação podem ser positivas ou negativas. O primeiro caso é quando uma variável cresce, a outra aumenta também. O segundo caso é o inverso.
-
-![Correlação Positiva e Negativa](img_r/aporho1.png){width=85%}
-
-<br>
 
 O coeficiente de correlação de Pearson ($r$) pode ser encontrado pela fórmula:
 
@@ -199,7 +195,7 @@ A ocorrência de um valor de r=0 ou próximo de zero indica que não há correla
 
 As principais características do coeficiente de correlação de Pearson são:
 
-a) Seus valores estão compreendidos entre -1 e 1;
+A) Seus valores estão compreendidos entre -1 e 1;
 
 B) Se o coeficiente for positivo, as duas características estudadas tendem a variar no mesmo sentido;
 
@@ -211,7 +207,53 @@ E) o valor de r é uma estimativa do parâmetro $\rho$ (rho) da mesma forma que 
 
 <br>
 
-Na regressão é estimar ou prever o valor médio do regressando (Y) com base nos valores fixos dos regressores (X).
+```{r exemplo correlation1}
+library(MASS)
+
+# configurar uma semente 
+set.seed(1)
+
+# correlação positiva (0.81)
+exemplo1 <- mvrnorm(100,
+                    mu = c(0, 0), 
+                    Sigma = matrix(c(2, 2, 2, 3), ncol = 2),
+                    empirical = TRUE)
+
+# correlaçao negativa (-0.81)
+exemplo2 <- mvrnorm(100,
+                    mu = c(0, 0), 
+                    Sigma = matrix(c(2, -2, -2, 3), ncol = 2),
+                    empirical = TRUE)
+
+# sem correlação 
+exemplo3 <- mvrnorm(100,
+                    mu = c(0, 0), 
+                    Sigma = matrix(c(1, 0, 0, 1), ncol = 2),
+                    empirical = TRUE)
+
+# sem correlação  (relação quadrática)
+X <- seq(-3, 3, 0.01)
+Y <- - X^2 + rnorm(length(X))
+
+exemplo4 <- cbind(X, Y)
+
+# divide a area dos gráficos como um arranjo 2x2
+par(mfrow = c(2, 2))
+
+# dados dos gráficos
+plot(exemplo1, col = "steelblue", pch = 20, xlab = "X", ylab = "Y", 
+     main = "Correlação = 0.81")
+
+plot(exemplo2, col = "steelblue", pch = 20, xlab = "X", ylab = "Y", 
+     main = "Correlação = -0.81")
+
+plot(exemplo3, col = "steelblue", pch = 20, xlab = "X", ylab = "Y", 
+     main = "Correlação = 0")
+
+plot(exemplo4, col = "steelblue", pch = 20, xlab = "X", ylab = "Y", 
+     main = "Correlação = 0")
+
+```
 
 <br>
 <br>
