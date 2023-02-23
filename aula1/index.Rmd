@@ -219,11 +219,15 @@ exemplo1 <- mvrnorm(100,
                     Sigma = matrix(c(2, 2, 2, 3), ncol = 2),
                     empirical = TRUE)
 
+cor(exemplo1)
+
 # correlaçao negativa (-0.81)
 exemplo2 <- mvrnorm(100,
                     mu = c(0, 0), 
                     Sigma = matrix(c(2, -2, -2, 3), ncol = 2),
                     empirical = TRUE)
+
+cor(exemplo2)
 
 # sem correlação 
 exemplo3 <- mvrnorm(100,
@@ -231,11 +235,15 @@ exemplo3 <- mvrnorm(100,
                     Sigma = matrix(c(1, 0, 0, 1), ncol = 2),
                     empirical = TRUE)
 
+cor(exemplo3)
+
 # sem correlação  (relação quadrática)
 X <- seq(-3, 3, 0.01)
 Y <- - X^2 + rnorm(length(X))
 
 exemplo4 <- cbind(X, Y)
+
+cor(exemplo4)
 
 # divide a area dos gráficos como um arranjo 2x2
 par(mfrow = c(2, 2))

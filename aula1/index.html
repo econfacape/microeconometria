@@ -3267,25 +3267,41 @@ exemplo1 &lt;- mvrnorm(100,
                     Sigma = matrix(c(2, 2, 2, 3), ncol = 2),
                     empirical = TRUE)
 
-# correlaçao negativa (-0.81)
+cor(exemplo1)</code></pre>
+<pre><code>##           [,1]      [,2]
+## [1,] 1.0000000 0.8164966
+## [2,] 0.8164966 1.0000000</code></pre>
+<pre class="r"><code># correlaçao negativa (-0.81)
 exemplo2 &lt;- mvrnorm(100,
                     mu = c(0, 0), 
                     Sigma = matrix(c(2, -2, -2, 3), ncol = 2),
                     empirical = TRUE)
 
-# sem correlação 
+cor(exemplo2)</code></pre>
+<pre><code>##            [,1]       [,2]
+## [1,]  1.0000000 -0.8164966
+## [2,] -0.8164966  1.0000000</code></pre>
+<pre class="r"><code># sem correlação 
 exemplo3 &lt;- mvrnorm(100,
                     mu = c(0, 0), 
                     Sigma = matrix(c(1, 0, 0, 1), ncol = 2),
                     empirical = TRUE)
 
-# sem correlação  (relação quadrática)
+cor(exemplo3)</code></pre>
+<pre><code>##               [,1]          [,2]
+## [1,]  1.000000e+00 -1.560605e-16
+## [2,] -1.560605e-16  1.000000e+00</code></pre>
+<pre class="r"><code># sem correlação  (relação quadrática)
 X &lt;- seq(-3, 3, 0.01)
 Y &lt;- - X^2 + rnorm(length(X))
 
 exemplo4 &lt;- cbind(X, Y)
 
-# divide a area dos gráficos como um arranjo 2x2
+cor(exemplo4)</code></pre>
+<pre><code>##             X           Y
+## X 1.000000000 0.001822687
+## Y 0.001822687 1.000000000</code></pre>
+<pre class="r"><code># divide a area dos gráficos como um arranjo 2x2
 par(mfrow = c(2, 2))
 
 # dados dos gráficos
