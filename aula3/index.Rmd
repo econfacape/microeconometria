@@ -298,5 +298,21 @@ $$n=209, \quad R^2=0,01319$$
 
 ```{r econ3, warning=FALSE, message=FALSE}
 #Resultados da Regressao
-summary(regressao1)
+resultado <- summary(regressao1)
+resultado
+
+# computar R^2 manualmente
+SQR <- sum(resultado$residuals^2)
+SQT <- sum((dados$salary - mean(dados$salary))^2)
+R2 <- 1 - SQR/SQT
+
+# Mostrar o valor
+R2
+
+# computar SER (Erro padrao da regressao) manualmente
+n <- length(dados$roe)
+SER <- sqrt(SQR / (n-2))
+
+# print the value to the console
+SER
 ```
