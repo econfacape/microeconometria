@@ -303,6 +303,8 @@ ceolsal1 <- data('ceosal1')
 
 #Observar a estrutura dos dados
 glimpse(ceosal1)
+
+tail(ceolsal1)
 ```
 
 <br>
@@ -315,10 +317,19 @@ A primeira análise é sobre as estatísticas descritivas das duas variáveis.
 
 ``` {r econ2, warning=FALSE, message=FALSE}
 attach(ceosal1)
-
 #Estatistica Descritiva dos Dados
 summary(salary)
 summary(roe)
+
+# Gráfico de Dispersão dos dados
+
+plot(salary ~ roe,
+     data = ceosal1,
+     main = "Gráfico de Dispersão de Salário e ROE",
+     ylab = "Salário",
+     xlab = "ROE")
+
+cor(salary, roe)
 ```
 
 <br>
@@ -327,10 +338,26 @@ summary(roe)
 
 <br>
 
-Em seguida, a análise de regressão simples:
+A tarefa que enfrentamos agora é encontrar uma linha que melhor se ajuste aos dados. É claro que seria possível simplesmente ficar com a inspeção gráfica e a análise de correlação e, em seguida, selecionar a melhor linha de ajuste observando. 
+
+No entanto, isso seria bastante subjetivo: diferentes observadores traçariam diferentes linhas de regressão. Por conta disso, estamos interessados em técnicas menos arbitrárias. Tal técnica é dada pela estimativa de mínimos quadrados ordinários (MQO).
+
+Em seguida, a análise de regressão simples com o cálculo dos betas de diversas formas:
 
 ``` {r econ3, warning=FALSE, message=FALSE}
 #Estimar a regressao com intercepto
+
+# computa beta_1_chapéu
+beta_1 <- sum((roe - mean(roe)) * (salary - mean(salary))) / sum((roe - mean(roe))^2)
+
+# computa beta_0_chapéu
+beta_0 <- mean(salary) - beta_1 * mean(roe)
+
+# mostra os resultados no Console
+beta_1
+beta_0
+
+# Outra forma
 regressao1 <- lm(salary ~ roe, data=ceosal1)
 
 #Resultados da Regressao
