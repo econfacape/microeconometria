@@ -316,3 +316,12 @@ SER <- sqrt(SQR / (n-2))
 # print the value to the console
 SER
 ```
+
+<br>
+
+## Quadro da ANOVA
+
+<br>
+```{r econ4, warning=FALSE, message=FALSE}
+anova(regressao1)
+```
