@@ -325,3 +325,45 @@ SER
 ```{r econ4, warning=FALSE, message=FALSE}
 anova(regressao1)
 ```
+
+<br>
+
+# Intervalo de Confiança
+
+<br>
+
+Alguns softwares (como o R), calculam um intervalo de confiança para cada coeficiente estimado da regressão.
+
+Um intervalo de confiança para um $\beta_k$ qualquer é dado por
+		
+\begin{equation} 
+Pr[\beta_k \pm t_\alpha/_2 ep(\beta_k)]=(1-\alpha)
+\tag{1}
+\end{equation}
+
+com $\alpha$ sendo o nível de significância, Pr a probabilidade e $t_\alpha/_2$ o valor da estatística t obtido na tabela t de Student e $ep(\beta_k)$ o erro padrão de $\beta_k$.
+
+## Demonstração no R - Intervalo de Confiança
+
+<br>
+	
+``` {r econ5, warning=FALSE, message=FALSE}
+#Intervalo de Confiança
+confint(regressao1) 
+```
+
+A interpretação diz que se estimarmos esta equação 100 vezes, em 95 delas o valor da estimativa do ROE estará entre -3.428196 e  40.43057.
+
+
+```{r econ6, warning=FALSE, message=FALSE}
+
+#Intervalo de confiança dos betas estimados
+
+# Valor do t com alfa/2
+qt(.975, df=207)
+
+(18.50)-11.12*1.97149
+(18.50)+11.12*1.97149
+```
+
+<br>
