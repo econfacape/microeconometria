@@ -6,7 +6,6 @@ output:
     html_document:
         theme: flatly
         number_sections: yes
-        keep_tex: yes
         highlight: textmate
 #        includes: 
 #          in_header: "header.html"
@@ -14,77 +13,21 @@ output:
         toc_float:
           collapsed: yes
           smooth_scroll: yes 
-    bookdown::html_document2: default
 ---
 
-<br>
-
-# Intervalo de Confiança
-
-<br>
-
-Alguns softwares (como o R), calculam um intervalo de confiança para cada coeficiente estimado da regressão.
-
-Um intervalo de confiança para um $\beta_k$ qualquer é dado por
-		
-\begin{equation} 
-Pr[\beta_k \pm t_\alpha/_2 ep(\beta_k)]=(1-\alpha)
-\tag{1}
-\end{equation}
-
-com $\alpha$ sendo o nível de significância, Pr a probabilidade e $t_\alpha/_2$ o valor da estatística t obtido na tabela t de Student e $ep(\beta_k)$ o erro padrão de $\beta_k$.
-
-## Demonstração no R - Intervalo de Confiança
-
-<br>
-	
-``` {r pacotes, warning=FALSE, message=FALSE}
-#Direcionado o R para o Diretorio a ser trabalhado
-setwd('/Users/jricardofl/Dropbox/tempecon/Facape/econometria1')
-
-#Limpa o Ambiente Global
-rm(list=ls())
-
-#Pode usar dados de outros softwares
-library(wooldridge)
-library(dplyr)
-library(htmltools)
-library(knitr)
-library(kableExtra)
-library(tseries)
-
-#Carregar dados no computador
-data('ceosal1')
-
-# Estimação do Modelo
-regressao1 <- lm(salary ~ roe, data=ceosal1)
-
-#Resultados da Regressao
-summary(regressao1)
-
-#Quadro da Anova
-anova(regressao1)
-
-#Intervalo de Confiança
-confint(regressao1) 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo       = TRUE,
+  warning    = FALSE,
+  message    = FALSE,
+  fig.width  = 10, 
+  fig.height = 7,
+  fig.align  = "center",
+  comment    = "#",
+  size       = "normalsize"
+  )
 ```
 
-A interpretação diz que se estimarmos esta equação 100 vezes, em 95 delas o valor da estimativa do ROE estará entre -3.428196 e  40.43057.
-
-
-```{r aula5_2, warning=FALSE, message=FALSE}
-
-#Intervalo de confiança dos betas estimados
-
-# Valor do t com alfa/2
-qt(.975, df=207)
-
-(18.50)-11.12*1.97149
-(18.50)+11.12*1.97149
-```
-
-<br>
-	
 # Pressupostos do Modelo Clássico de Regressão Linear
 
 <br>
@@ -96,7 +39,95 @@ O Modelo Clássico de Regressão Linear se baseia em algumas hipóteses:
 
 2) Os regressores são fixos (não aleatórios) em amostras repetidas (análise de regressão é condicional aos valores de X, ou seja, $E(Y|X)$;
 
-3) Dados os valores de X, $E(u|X)=0$; 
+3) Dados os valores de X, $E(\mu|X)=0$: Isso significa que não importa qual valor escolhemos para x, o termo de erro $\mu$ não deve apresentar nenhum padrão sistemático e deve ter média igual a zero.
+
+Considere o caso em que, incondicionalmente, $E(\mu)=0$, mas para valores altos e baixos de x, o termo de erro tende a ser positivo e para valores médios de x, o erro tende a ser negativo. Pode-se usar R para construir tal exemplo. 
+
+Começamos criando um vetor contendo valores uniformemente distribuídos no intervalo $[−5,5]$. Isso pode ser feito com a função `runif()`. Também precisamos simular o termo de erro. Para isso, geramos números aleatórios normalmente distribuídos com média igual a 0 e variância igual a 1 usando `rnorm()`. Os valores de Y são obtidos como uma função quadrática dos  valores de X e do erro.
+
+Depois de gerar os dados, estima-se um modelo de regressão simples e um modelo quadrático que também inclui o regressor $X^2$. Por fim, plota-se os dados simulados e adiciona-se a linha de regressão estimada de um modelo de regressão simples, bem como as previsões feitas com um modelo quadrático para comparar o ajuste graficamente.
+
+<br>
+
+```{r aula5_2a, warning=FALSE, message=FALSE}
+# definir uma semente para tornar os resultados reproduzíveis
+set.seed(321)
+
+# simular os dados 
+X <- runif(50, min = -5, max = 5)
+u <- rnorm(50, sd = 1)  
+
+# a verdadeira relação 
+Y <- X^2 + 2 * X + u                
+
+# estimar um modelo de regressão simples, mas incorreto 
+mod_simple <- lm(Y ~ X)
+
+# estimar um modelo de regressão quadrático, correto
+mod_quadratic <- lm( Y ~ X + I(X^2) ) 
+
+# Previsão usando modelo quadrático
+prediction <- predict(lm(Y ~ X + I(X^2)), data.frame(X = sort(X)))
+
+# plot dos resultados
+par(mfrow=c(1,3))
+
+plot( Y ~ X, col = "steelblue", pch = 20, xlab = "X", ylab = "Y")       
+abline( mod_simple, col = "red") 
+
+#red line = incorrect linear regression (this violates the first OLS assumption)
+lines( sort(X), prediction)                                            
+# black line = correct quadratic regression
+plot( resid(mod_quadratic) ~ X , col = "steelblue", pch = 20, main=c("Quadratic regression","Residuals plotted against X"), ylim=c(-10,15) )
+
+plot( resid(mod_simple) ~ X , col = "steelblue", pch = 20, 
+main=c("Simple regression","Residuals plotted against X"), 
+ylim=c(-10,15) )
+```
+
+<br>
+
+O gráfico mostra o que significa $E(u_i|X_i)=0$ e por que não vale para o modelo linear: Usando o modelo quadrático (representado pela curva preta) se observa que não há desvios sistemáticos da observação da relação prevista. É plausível que a suposição não seja violada quando tal modelo é empregado. No entanto, usando um modelo de regressão linear simples, vemos que a suposição é provavelmente violada como $E(u_i|X_i)$.
+
+4) Dados distribuídos de forma independente e idêntica (iid): A maioria dos esquemas de amostragem usados ao coletar dados de populações produz amostras iid.. Por exemplo, pode-se usar o gerador de números aleatórios de R para selecionar aleatoriamente os números de matrículas dos alunos da FACAPE e registrar a idade e as remunerações $(X_i,Y_i)$ dos alunos correspondentes. Este é um exemplo típico de amostragem aleatória simples e garante que todos os $(X_i,Y_i)$ são sorteados aleatoriamente da mesma população.
+
+5) Grandes outliers (valores discrepantes) não são desejados: É fácil encontrar situações em que podem ocorrer observações extremas, ou seja, observações que se desviam consideravelmente da faixa usual dos dados. Tais observações são chamadas de *outliers*. Tecnicamente falando, esta suposição exige que $(X_i,Y_i)$ tenha uma curtose finita.
+
+Casos comuns em que se quer excluir ou (se possível) corrigir tais valores discrepantes são quando eles são aparentemente erros de digitação, erros de conversão ou erros de medição. Mesmo que pareça que as observações extremas foram registradas corretamente, é aconselhável excluí-las antes de estimar um modelo, pois o MQO sofre de sensibilidade a outliers.
+
+O que isto significa? Pode-se mostrar que observações extremas recebem grande peso na estimativa dos coeficientes de regressão desconhecidos ao usar MQO. Portanto, outliers podem levar a estimativas fortemente distorcidas de coeficientes de regressão.
+
+O código a seguir usa dados de amostra gerados usando as funções de número aleatório do R rnorm() e runif(). Estima-se dois modelos de regressão simples, um baseado no conjunto de dados original e outro usando um conjunto modificado onde uma observação é alterada para um outlier e, em seguida, plota-se os resultados. Para entender o código completo, a função sort() classifica as entradas de um vetor numérico em ordem crescente.
+
+O resultado é bastante impressionante: a linha de regressão estimada com o outlier (linha preta) difere muito daquela que ajusta bem os dados (linha vermelha)).
+
+<br>
+
+```{r aula5_2b, warning=FALSE, message=FALSE}
+# definir uma semente para tornar os resultados reproduzíveis
+set.seed(123)
+
+# gerar os dados
+X <- sort(runif(10, min = 30, max = 70))
+Y <- rnorm(10 , mean = 200, sd = 50)
+Y[9] <- 2000
+
+# estima o modelo sem outlier
+fit <- lm(Y ~ X)
+summary(fit)
+
+# estima o modelo com outlier
+fit2 <- lm(Y[-9] ~ X[-9])
+
+summary(fit2)
+
+# plota os resultados
+plot(Y ~ X)
+abline(fit)
+abline(fit2, col = "red")
+```
+
+<br>
 
 Com isso, é possível demonstrar que o estimador de MQO não é viesado: $E(\hat{\beta}_0)=\beta_0$ e $E(\hat{\beta}_1)=\beta_1$. 
 
@@ -225,6 +256,19 @@ que segue a distribuição de $\chi^2$ com 2 graus de liberdade. A **hipótese n
 <br>
 
 ```{r aula5_3, warning=FALSE, message=FALSE}
+#Limpa o Ambiente Global
+rm(list=ls())
+
+#Pode usar dados de outros softwares
+library(wooldridge)
+library(dplyr)
+library(htmltools)
+library(knitr)
+library(kableExtra)
+library(tseries)
+
+#Carregar dados no computador
+data('ceosal1')
 
 # Estimação do Modelo
 regressao1 <- lm(salary ~ roe, data=ceosal1)
@@ -290,3 +334,4 @@ qqnorm(residuos1)
 qqline(residuos1)
 
 hist(residuos1) #histograma dos resíduos
+```
