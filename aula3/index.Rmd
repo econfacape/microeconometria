@@ -16,7 +16,19 @@ output:
           smooth_scroll: yes 
 ---
 
-<br>
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo       = TRUE,
+  warning    = FALSE,
+  message    = FALSE,
+  fig.width  = 10, 
+  fig.height = 7,
+  fig.align  = "center",
+  comment    = "#",
+  size       = "normalsize"
+  )
+```
 
 # Variância e Erros-padrão dos estimadores de MQO
 
@@ -332,6 +344,16 @@ anova(regressao1)
 
 <br>
 
+As estimativas dos coeficientes de regressão $\beta_k$ estão sujeitos à incerteza de amostragem. Portanto, nunca estimaremos exatamente o valor real desses parâmetros a partir de dados de amostra em uma aplicação empírica. No entanto, podemos construir intervalos de confiança para o intercepto e o parâmetro de inclinação.
+
+Um ntervalo de confiança de 95% para um $\beta_k$ qualquer tem duas definições equivalentes:
+
+a) O intervalo é o conjunto de valores para os quais um teste de hipótese ao nível de 5% não pode ser rejeitado.
+
+b) O intervalo tem uma probabilidade de 95% para conter o verdadeiro valor de $\beta_k$. Então em 95% de todas as amostras que podem ser retiradas, o intervalo de confiança cobrirá o verdadeiro valor de $\beta_k$.
+
+Dizemos também que o intervalo tem um nível de confiança de 95%. 
+
 Alguns softwares (como o R), calculam um intervalo de confiança para cada coeficiente estimado da regressão.
 
 Um intervalo de confiança para um $\beta_k$ qualquer é dado por
@@ -358,12 +380,13 @@ A interpretação diz que se estimarmos esta equação 100 vezes, em 95 delas o 
 ```{r econ6, warning=FALSE, message=FALSE}
 
 #Intervalo de confiança dos betas estimados
-
+# compute 95% confidence interval for coefficients in 'linear_model' by hand
+lm_summ <- summary(regressao1)
 # Valor do t com alfa/2
-qt(.975, df=207)
+qt(.975, lm_summ$df[2])
 
-(18.50)-11.12*1.97149
-(18.50)+11.12*1.97149
+c("limite inferior" = lm_summ$coef[2,1] - qt(0.975, df = lm_summ$df[2]) * lm_summ$coef[2, 2],
+  "limite superior" = lm_summ$coef[2,1] + qt(0.975, df = lm_summ$df[2]) * lm_summ$coef[2, 2])
 ```
 
 <br>

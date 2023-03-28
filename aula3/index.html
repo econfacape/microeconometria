@@ -1731,7 +1731,6 @@ border-radius: 0px;
 </div>
 
 
-<p><br></p>
 <div id="variância-e-erros-padrão-dos-estimadores-de-mqo" class="section level1" number="1">
 <h1><span class="header-section-number">1</span> Variância e
 Erros-padrão dos estimadores de MQO</h1>
@@ -1834,7 +1833,7 @@ R</h2>
 <p><br></p>
 <pre class="r"><code>#Verificando o diretorio que o R está direcionado
 getwd()</code></pre>
-<pre><code>## [1] &quot;/Users/jricardofl/Dropbox/Facape/2023/2023.1/Econometria I/econ1_aula3/aula3&quot;</code></pre>
+<pre><code># [1] &quot;/Users/jricardofl/Dropbox/Facape/2023/2023.1/Econometria I/econ1_aula3/aula3&quot;</code></pre>
 <pre class="r"><code>#Direcionado o R para o Diretorio a ser trabalhado
 setwd(&#39;/Users/jricardofl/Dropbox/tempecon/Facape/econometria1&#39;)
 
@@ -1862,24 +1861,24 @@ regressao1 &lt;- lm(salary ~ roe, data=ceosal1)
 
 #Resultados da Regressao
 summary(regressao1)</code></pre>
-<pre><code>## 
-## Call:
-## lm(formula = salary ~ roe, data = ceosal1)
-## 
-## Residuals:
-##     Min      1Q  Median      3Q     Max 
-## -1160.2  -526.0  -254.0   138.8 13499.9 
-## 
-## Coefficients:
-##             Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)   963.19     213.24   4.517 1.05e-05 ***
-## roe            18.50      11.12   1.663   0.0978 .  
-## ---
-## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
-## 
-## Residual standard error: 1367 on 207 degrees of freedom
-## Multiple R-squared:  0.01319,    Adjusted R-squared:  0.008421 
-## F-statistic: 2.767 on 1 and 207 DF,  p-value: 0.09777</code></pre>
+<pre><code># 
+# Call:
+# lm(formula = salary ~ roe, data = ceosal1)
+# 
+# Residuals:
+#     Min      1Q  Median      3Q     Max 
+# -1160.2  -526.0  -254.0   138.8 13499.9 
+# 
+# Coefficients:
+#             Estimate Std. Error t value Pr(&gt;|t|)    
+# (Intercept)   963.19     213.24   4.517 1.05e-05 ***
+# roe            18.50      11.12   1.663   0.0978 .  
+# ---
+# Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+# 
+# Residual standard error: 1367 on 207 degrees of freedom
+# Multiple R-squared:  0.01319, Adjusted R-squared:  0.008421 
+# F-statistic: 2.767 on 1 and 207 DF,  p-value: 0.09777</code></pre>
 <pre class="r"><code>#Valores previstos pelo modelo
 salaryhat &lt;- predict(regressao1)
 
@@ -2193,24 +2192,24 @@ R^2=0,01319\]</span></p>
 <pre class="r"><code>#Resultados da Regressao
 resultado &lt;- summary(regressao1)
 resultado</code></pre>
-<pre><code>## 
-## Call:
-## lm(formula = salary ~ roe, data = ceosal1)
-## 
-## Residuals:
-##     Min      1Q  Median      3Q     Max 
-## -1160.2  -526.0  -254.0   138.8 13499.9 
-## 
-## Coefficients:
-##             Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)   963.19     213.24   4.517 1.05e-05 ***
-## roe            18.50      11.12   1.663   0.0978 .  
-## ---
-## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
-## 
-## Residual standard error: 1367 on 207 degrees of freedom
-## Multiple R-squared:  0.01319,    Adjusted R-squared:  0.008421 
-## F-statistic: 2.767 on 1 and 207 DF,  p-value: 0.09777</code></pre>
+<pre><code># 
+# Call:
+# lm(formula = salary ~ roe, data = ceosal1)
+# 
+# Residuals:
+#     Min      1Q  Median      3Q     Max 
+# -1160.2  -526.0  -254.0   138.8 13499.9 
+# 
+# Coefficients:
+#             Estimate Std. Error t value Pr(&gt;|t|)    
+# (Intercept)   963.19     213.24   4.517 1.05e-05 ***
+# roe            18.50      11.12   1.663   0.0978 .  
+# ---
+# Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+# 
+# Residual standard error: 1367 on 207 degrees of freedom
+# Multiple R-squared:  0.01319, Adjusted R-squared:  0.008421 
+# F-statistic: 2.767 on 1 and 207 DF,  p-value: 0.09777</code></pre>
 <pre class="r"><code># computar R^2 manualmente
 SQR &lt;- sum(resultado$residuals^2)
 SQT &lt;- sum((dados$salary - mean(dados$salary))^2)
@@ -2218,28 +2217,28 @@ R2 &lt;- 1 - SQR/SQT
 
 # Mostrar o valor
 R2</code></pre>
-<pre><code>## [1] 0.01318862</code></pre>
+<pre><code># [1] 0.01318862</code></pre>
 <pre class="r"><code># computar SER (Erro padrao da regressao) manualmente
 n &lt;- length(dados$roe)
 SER &lt;- sqrt(SQR / (n-2))
 
 # print the value to the console
 SER</code></pre>
-<pre><code>## [1] 1366.555</code></pre>
+<pre><code># [1] 1366.555</code></pre>
 <p><br></p>
 </div>
 <div id="quadro-da-anova" class="section level2" number="5.2">
 <h2><span class="header-section-number">5.2</span> Quadro da ANOVA</h2>
 <p><br></p>
 <pre class="r"><code>anova(regressao1)</code></pre>
-<pre><code>## Analysis of Variance Table
-## 
-## Response: salary
-##            Df    Sum Sq Mean Sq F value  Pr(&gt;F)  
-## roe         1   5166419 5166419  2.7665 0.09777 .
-## Residuals 207 386566563 1867471                  
-## ---
-## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre><code># Analysis of Variance Table
+# 
+# Response: salary
+#            Df    Sum Sq Mean Sq F value  Pr(&gt;F)  
+# roe         1   5166419 5166419  2.7665 0.09777 .
+# Residuals 207 386566563 1867471                  
+# ---
+# Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 <p><br></p>
 </div>
 </div>
@@ -2247,6 +2246,22 @@ SER</code></pre>
 <h1><span class="header-section-number">6</span> Intervalo de
 Confiança</h1>
 <p><br></p>
+<p>As estimativas dos coeficientes de regressão <span class="math inline">\(\beta_k\)</span> estão sujeitos à incerteza de
+amostragem. Portanto, nunca estimaremos exatamente o valor real desses
+parâmetros a partir de dados de amostra em uma aplicação empírica. No
+entanto, podemos construir intervalos de confiança para o intercepto e o
+parâmetro de inclinação.</p>
+<p>Um ntervalo de confiança de 95% para um <span class="math inline">\(\beta_k\)</span> qualquer tem duas definições
+equivalentes:</p>
+<ol style="list-style-type: lower-alpha">
+<li><p>O intervalo é o conjunto de valores para os quais um teste de
+hipótese ao nível de 5% não pode ser rejeitado.</p></li>
+<li><p>O intervalo tem uma probabilidade de 95% para conter o verdadeiro
+valor de <span class="math inline">\(\beta_k\)</span>. Então em 95% de
+todas as amostras que podem ser retiradas, o intervalo de confiança
+cobrirá o verdadeiro valor de <span class="math inline">\(\beta_k\)</span>.</p></li>
+</ol>
+<p>Dizemos também que o intervalo tem um nível de confiança de 95%.</p>
 <p>Alguns softwares (como o R), calculam um intervalo de confiança para
 cada coeficiente estimado da regressão.</p>
 <p>Um intervalo de confiança para um <span class="math inline">\(\beta_k\)</span> qualquer é dado por</p>
@@ -2263,21 +2278,22 @@ Intervalo de Confiança</h2>
 <p><br></p>
 <pre class="r"><code>#Intervalo de Confiança
 confint(regressao1) </code></pre>
-<pre><code>##                  2.5 %     97.5 %
-## (Intercept) 542.790219 1383.59245
-## roe          -3.428196   40.43057</code></pre>
+<pre><code>#                  2.5 %     97.5 %
+# (Intercept) 542.790219 1383.59245
+# roe          -3.428196   40.43057</code></pre>
 <p>A interpretação diz que se estimarmos esta equação 100 vezes, em 95
 delas o valor da estimativa do ROE estará entre -3.428196 e
 40.43057.</p>
 <pre class="r"><code>#Intervalo de confiança dos betas estimados
-
+# compute 95% confidence interval for coefficients in &#39;linear_model&#39; by hand
+lm_summ &lt;- summary(regressao1)
 # Valor do t com alfa/2
-qt(.975, df=207)</code></pre>
-<pre><code>## [1] 1.97149</code></pre>
-<pre class="r"><code>(18.50)-11.12*1.97149</code></pre>
-<pre><code>## [1] -3.422969</code></pre>
-<pre class="r"><code>(18.50)+11.12*1.97149</code></pre>
-<pre><code>## [1] 40.42297</code></pre>
+qt(.975, lm_summ$df[2])</code></pre>
+<pre><code># [1] 1.97149</code></pre>
+<pre class="r"><code>c(&quot;limite inferior&quot; = lm_summ$coef[2,1] - qt(0.975, df = lm_summ$df[2]) * lm_summ$coef[2, 2],
+  &quot;limite superior&quot; = lm_summ$coef[2,1] + qt(0.975, df = lm_summ$df[2]) * lm_summ$coef[2, 2])</code></pre>
+<pre><code># limite inferior limite superior 
+#       -3.428196       40.430569</code></pre>
 <p><br></p>
 </div>
 </div>
