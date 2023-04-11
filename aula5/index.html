@@ -1502,7 +1502,7 @@ border-radius: 0px;
 
 <h1 class="title toc-ignore">Aula 5 - Introdução à Econometria</h1>
 <h4 class="author">João Ricardo F. de Lima</h4>
-<h4 class="date">28 de Março de 2023.</h4>
+<h4 class="date">11 de Abril de 2023.</h4>
 
 </div>
 
@@ -1624,7 +1624,7 @@ X &lt;- sort(runif(10, min = 30, max = 70))
 Y &lt;- rnorm(10 , mean = 200, sd = 50)
 Y[9] &lt;- 2000
 
-# estima o modelo sem outlier
+# estima o modelo com outlier
 fit &lt;- lm(Y ~ X)
 summary(fit)</code></pre>
 <pre><code># 
@@ -1643,7 +1643,7 @@ summary(fit)</code></pre>
 # Residual standard error: 565.4 on 8 degrees of freedom
 # Multiple R-squared:  0.1221,  Adjusted R-squared:  0.01236 
 # F-statistic: 1.113 on 1 and 8 DF,  p-value: 0.3223</code></pre>
-<pre class="r"><code># estima o modelo com outlier
+<pre class="r"><code># estima o modelo sem outlier
 fit2 &lt;- lm(Y[-9] ~ X[-9])
 
 summary(fit2)</code></pre>

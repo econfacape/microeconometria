@@ -112,11 +112,11 @@ X <- sort(runif(10, min = 30, max = 70))
 Y <- rnorm(10 , mean = 200, sd = 50)
 Y[9] <- 2000
 
-# estima o modelo sem outlier
+# estima o modelo com outlier
 fit <- lm(Y ~ X)
 summary(fit)
 
-# estima o modelo com outlier
+# estima o modelo sem outlier
 fit2 <- lm(Y[-9] ~ X[-9])
 
 summary(fit2)
