@@ -1502,7 +1502,7 @@ border-radius: 0px;
 
 <h1 class="title toc-ignore">Aula 6 - Introdução à Econometria</h1>
 <h4 class="author">João Ricardo F. de Lima</h4>
-<h4 class="date">15 de Abril de 2023.</h4>
+<h4 class="date">25 de Abril de 2023.</h4>
 
 </div>
 
@@ -2305,7 +2305,9 @@ Modelos de Regressão Múltipla</h2>
 library(wooldridge)
 library(tseries)</code></pre>
 <pre class="r"><code># Puxando os dados do pacote Wooldridge
-data(&quot;wage1&quot;)
+data(&quot;wage2&quot;)
+
+sal &lt;- na.omit(wage2)
 
 #Estimando a 1 Regressão Multipla Modelo Irrestrito
 

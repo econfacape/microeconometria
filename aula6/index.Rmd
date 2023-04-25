@@ -806,7 +806,9 @@ library(tseries)
 ``` {r aula6_5, warning=FALSE, message=FALSE}
 
 # Puxando os dados do pacote Wooldridge
-data("wage1")
+data("wage2")
+
+sal <- na.omit(wage2)
 
 #Estimando a 1 Regressão Multipla Modelo Irrestrito
 
