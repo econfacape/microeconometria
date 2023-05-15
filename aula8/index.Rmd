@@ -97,7 +97,9 @@ $$
 
 <br>
 
-em que Y é o custo total e X a quantidade produzida
+em que Y é o custo total e X a quantidade produzida.
+
+Se o modelo conter regressores perfeitamente correlacionados, o R produzirá um aviso na primeira linha da seção de coeficientes da saída (1 não definido por causa das singularidades) e ignorará o(s) regressor(es) que é(são) assumido(s) como uma combinação linear do(s) outro(s).
 
 <br>
 
