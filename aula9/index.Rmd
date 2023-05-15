@@ -27,12 +27,64 @@ output:
 
 <br>
 
-Ocorre quando a variância do termo de erro não é constante $(\sigma^2_i)$. As fontes principais são: presença de *outliers*, modelo incorretamente especificado, assimetria na distribuição de um ou mais regressores e erros de digitação dos dados. 
+Ocorre quando a variância do termo de erro não é constante $Var(u_i|X_i=x)=\sigma^2_i$, para todas as observações na amostra. As fontes principais são: presença de *outliers*, modelo incorretamente especificado, assimetria na distribuição de um ou mais regressores e erros de digitação dos dados. 
 
 É mais comum em dados de seção cruzada.
 
-
 Com as relação às propriedades dos estimadores de MQO, na presença de **heterocedasticidade** continuam não-viesados e consistentes, mas não são mais eficientes. O estimador eficiente, ou seja, com variância mínima é o de Mínimos Quadrados Generalizados (MQG).
+
+<br>
+
+```{r aula9_0, warning=FALSE, message=FALSE, fig.width=8, fig.height=6}
+
+# Carregar Pacote
+library(scales)
+
+# Geração de dados heterocedásticos:
+# confirgurar semente para garantir reprodutibilidade
+set.seed(123) 
+
+# Vetor de x
+x <- rep(c(10, 15, 20, 25), each = 25)
+e <- c()
+
+# Amostra 100 erros cuja variancia aumenta com o x
+e[1:25] <- rnorm(25, sd = 10)
+e[26:50] <- rnorm(25, sd = 15)
+e[51:75] <- rnorm(25, sd = 20)
+e[76:100] <- rnorm(25, sd = 25)
+
+# Vetir de Y
+y <- 720 - 3.3 * x + e
+
+# Estima o modelo 
+mod <- lm(y ~ x)
+
+# Plota os dados
+plot(x = x, 
+     y = y, 
+     main = "Um Exemplo of Heterocedasticidade",
+     xlab = "Razão estudante-professor",
+     ylab = "Nota no Teste",
+     cex = 0.5, 
+     pch = 19, 
+     xlim = c(8, 27), 
+     ylim = c(600, 710))
+
+#  Linha de regressão
+abline(mod, col = "darkred")
+
+# Adiciona os boxplots no gráfico
+boxplot(formula = y ~ x, 
+        add = TRUE, 
+        at = c(10, 15, 20, 25), 
+        col = alpha("gray", 0.4), 
+        border = "black")
+```
+
+<br>
+
+Para esses dados artificiais, as variações de erro condicional diferem. Especificamente, observa-se que a variância nas pontuações dos testes (e, portanto, a variância dos erros cometidos) aumenta com a proporção aluno-professor.
 
 <br>
 
