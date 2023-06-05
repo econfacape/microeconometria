@@ -536,14 +536,22 @@ ggplot(newdata3, aes(x = gre, y = PredictedProb)) + geom_ribbon(aes(ymin = LL,
 
 <br>
 
-```{r  aula11_11, warning=FALSE, message=FALSE}
+```{r  aula11_11a, warning=FALSE, message=FALSE}
 library(margins)
 #Stata=margins, dydx(*) para calculo dos efeitos marginais
 mydata <- read.csv("https://stats.idre.ucla.edu/stat/data/binary.csv")
 mylogit <- glm(admit ~ gre + gpa + rank, data = mydata, family = "binomial")
 m <- margins(mylogit)
 summary(m, type= "response")
+```
 
+<br>
+
+A interpretação do efeito marginal para gpa é que com o aumento de uma unidade na nota média (gpa), a probabilidade de entrar na pós-graduação aumenta 0,15 pontos percentuais. 
+
+<br>
+
+```{r  aula11_11b, warning=FALSE, message=FALSE}
 m1 <- margins(mylogit, at=list(rank=3:4))
 summary(m1, type= "response")
 
