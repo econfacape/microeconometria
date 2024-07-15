@@ -1,0 +1,665 @@
+---
+title: "INTRODUÇÃO AO PYTHON"
+author: "João Ricardo F. de Lima"
+date: "today"
+editor: source
+lang: pt
+language: 
+  toc-title-document: '<a href="https://www.facape.br/" target="_blank"><img src="https://github.com/econfacape/macroeconometria/blob/main/logofacape.jpg?raw=true" alt="Logotipo Facape" width="150"></a>'
+format: 
+  html:
+    toc: true
+    toc_float:
+      collapsed: yes
+      smooth_scroll: yes
+    toc-location: left
+    code-fold: false
+    embed-resources: true
+    page-layout: full
+    fig-asp: 0.618
+    fig-width: 8
+    fig-height: 5
+    fig-dpi: 300
+    fig-align: center
+    df-print: paged
+    fontsize: 13pt
+theme:
+  light: flatly
+execute:
+  echo: TRUE
+  message: false
+  warning: false
+#jupyter: python3
+---
+
+# Introdução
+
+<br>
+
+[^1]Há duas principais maneiras de chegar a esse ambiente de programação:
+
+- **Localmente**: é preciso instalar o Python e uma IDE no seu computador.
+
+- **Na nuvem**: acessa pelo navegador um ambiente já pronto e configurado para rodar Python.
+
+[^1]: Todo este material foi retirado de diversas postagens e cursos da Análise Macro (www.analisemacro.com.br)
+
+Um ambiente na nuvem pode ser o `Jupyter Notebook/Google Colab` e um ambiente local pode ser o `VsCode` ou `Anaconda`, mas a opção aqui é o Quarto do RStudio.
+
+<br>
+
+## Jupyter Notebook/Google Colab
+
+O Jupyter Notebook é uma interface para programar em uma estrutura de "caderno de anotação": você pode escrever textos, inserir imagens, etc. e adicionar blocos de código, assim como exibir os resultados do código, tudo em um mesmo arquivo. Suas principais vantagens se referem a interface simples e intuitiva para iniciantes, além da facilidade de compartilhar códigos.
+
+Para usar a interface do Jupyter na nuvem, basta seguir estes passos:
+
+1. Ter uma conta no [Google](https://www.google.com.br/);
+2. Acessar o [Google Drive](https://drive.google.com/);
+3. Clicar em Novo (*New*) > Mais (*More*) > Google Colaboratory.
+
+E com isso já se tem um ambiente de programação em Python. 
+
+O que estes procedimentos fazem é criar um arquivo "*Untitled0.ipynb*" no seu Google Drive. Dessa forma, você pode escolher onde criar o arquivo e organizar seus códigos em pastas, se preferir.
+
+O ponto forte está na sua capacidade de fácil integração (Google Drive, Github, entre outros), além de não ser necessário ter instalado a linguagem na máquina.
+
+Para acessar, basta ir no site https://colab.research.google.com/, ter uma conta Google e criar um novo notebook.
+
+A outra possibilidade é ir no site do Python (https://www.python.org/), fazer download do arquivo e depois ir no terminal do Mac/OS ou no Prompt do Windows e instalar o Jupiter (python3 -m pip install jupyter). Depois de instalado, no termina/prompt é digitar `python3 -m notebook` para abrir um Jupyter no navegador e usar em uma interface muito parecida com a do Google Colab.
+ 
+<br>
+
+## Quarto
+
+O uso no Quarto se torna mais tranquilo para quem já usa o RStudio e trabalha tanto com o R quanto o Python. Para inserir os códigos a única diferença é que os `chunks` passam agora a iniciar com `{python}` ao invés de `{r}` depois das três crases. 
+
+E ainda existe a possibilidade de rodar Python dentro do R, desde que seja usado o pacote `reticulate`. 
+
+Um bom post sobre como preparar o ambiente de trabalho deve ser lido nesta página (https://analisemacro.com.br/data-science/python/introducao-ao-python-como-preparar-o-ambiente-de-trabalho/).
+
+```{r}
+#install.packages("reticulate")
+reticulate::py_config()
+```
+
+```{python}
+#py -m pip install jupyter
+1 + 1
+```
+
+<br>
+
+# Instalações de Pacotes
+
+```{r}
+#reticulate::py_install("pandas")
+```
+
+```{python, eval=FALSE}
+#!pip install python-bcb #Google Colab
+#py -m pip install python-bcb #Terminal Windows
+#python3 -m pip install python-bcb #Terminal Mac
+```
+
+<br>
+
+## Pacotes pandas e numpy
+
+::: grid
+::: g-col-6
+### **Pandas**
+
+- É uma biblioteca para **análise e tratamento de dados** no Python.<br><br>
+- Oferece uma **sintaxe** e **estrutura de dados** flexível.<br><br>
+- Cobre (quase) tudo que você precisa para **analisar dados**.<br><br>
+- É **gratuito** e de **código aberto**.
+
+Saiba mais: [https://pandas.pydata.org/](https://pandas.pydata.org/)
+
+:::
+
+::: g-col-6
+### **Numpy**
+
+- É uma biblioteca para **computação numérica** no Python;<br><br>
+- Oferece uma **estrutura vetorial e matricial** para dados numéricos;<br><br>
+- É a **base de muitas bibliotecas**;<br><br>
+- É **gratuito** e de **código aberto**.
+
+Saiba mais: [https://numpy.org/](https://numpy.org/)
+
+:::
+:::
+
+<br>
+
+### Unboxing do pandas
+
+::: grid
+::: g-col-6
+<br>
+
+### Estrutura de dados tabulares
+```{r, echo=FALSE, out.width="45%"}
+knitr::include_graphics("imgs/pd_dataframe.svg")
+```
+
+:::
+::: g-col-6
+
+### Leitura e escrita de arquivos *offline*
+```{r, echo=FALSE, out.width="95%"}
+knitr::include_graphics("imgs/pd_import_export.svg")
+```
+
+:::
+:::
+
+
+::: grid
+::: g-col-6
+
+###  Manipulação de dados facilitada
+```{r, echo=FALSE, out.width="85%"}
+knitr::include_graphics("imgs/pd_wrangle.svg")
+```
+
+:::
+::: g-col-6
+
+###  Módulo para visualização de dados
+```{r, echo=FALSE, out.width="95%"}
+knitr::include_graphics("imgs/pd_dataviz.svg")
+```
+
+:::
+:::
+
+## Para fazer isso:
+
+O ciclo de análise de dados...
+
+```{r, echo=FALSE, out.width="100%"}
+knitr::include_graphics("imgs/ciclo_dados.png")
+```
+
+<br>
+
+## Com o pandas, numpy e o Python, usa-se isso:
+
+As principais bibliotecas usados para análise de dados.
+
+```{r, echo=FALSE, out.width="100%"}
+knitr::include_graphics("imgs/ciclo_dados_bibliotecas.png")
+```
+
+<br>
+
+## Panda Series
+
+```{python}
+import pandas as pd
+
+series_obj = pd.Series([4,5,6,3])
+
+series_obj
+```
+
+sendo possível criar os valores dos índices
+
+```{python}
+series_obj2 = pd.Series([4,7,8,-2], index = ['a', 'b', 'c', 'd'])
+series_obj2
+```
+
+```{python}
+series_obj2.mean()
+series_obj2 * 2
+series_obj2['a']
+```
+
+
+## Panda DataFrame
+
+```{python}
+data_raw = {'cursos': ['machine learning', 'econometria', 'séries', 'visualização'],
+            'carga horaria': [90, 60, 90, 40],
+            'desconto': [True, False, True, False]}
+            
+data_raw
+```
+
+
+# Importando Arquivos
+
+Para importar um arquivo CSV *offline* pode-se usar a biblioteca `pandas` no Python:
+
+```{python, message=TRUE, warning=TRUE}
+# Importa o arquivo "dados.csv" salvo na pasta "dados" a partir da pasta atual
+import pandas as pd
+tabela = pd.read_csv(filepath_or_buffer = "dados/dados.csv")
+```
+
+A função `read_csv()` importa o arquivo para um objeto `DataFrame` no Python, basta apontar a localização.
+
+Por padrão, a função tenta adivinhar os tipos das colunas e utiliza a primeira linha como nome das colunas da tabela.
+
+```{python}
+tabela
+tabela.describe()
+tabela.columns
+tabela.index
+tabela.head()
+```
+
+<br>
+
+## Importando CSV com ponto e vírgula (;) de separador
+
+O padrão de arquivos CSV é usar a vírgula como separador dos valores, mas em alguns casos o arquivo CSV pode ter sido gerado com um separador diferente.
+
+No caso de separador ponto e vírgula (;) em um arquivo CSV, o padrão é que os decimais sejam, então, uma vírgula. Para importar nesse formato use os argumentos da função `read_csv()`:
+
+```{python}
+# Importa arquivo CSV com separador ;
+tabela = pd.read_csv(filepath_or_buffer = "dados/dados_pv.csv", 
+        sep = ";", decimal = ",")
+tabela.head()
+```
+
+<br>
+
+## Lidando com codificação de caracteres
+
+O padrão do pacote `pandas` é utilizar a mesma codificação de caracteres de fábrica do Python, que é a UTF-8. Se o arquivo CSV foi gerado com outra codificação pode ser que a importação dos dados saia do resultado desejado. O principal problema que pode acontecer é caracteres especiais, como "ç", não serem reconhecidos ou a importação gerar um erro. Por exemplo (dados do TSE):
+
+```{python, error=TRUE}
+# Importa arquivo CSV com separador ; e encoding padrão (gera um erro)
+tse_codificacao_eua = pd.read_csv(
+  filepath_or_buffer = "dados/tse.csv", 
+  sep = ";"
+  )
+```
+
+Para lidar com esses problemas deve-se apontar uma codificação compatível com o arquivo no momento da importação. Basta informar no argumento `encoding` qual é a codificação correta:
+
+```{python}
+# Importa arquivo CSV com separador ; e encoding latin1
+tse_codificacao_br = pd.read_csv(
+  filepath_or_buffer = "dados/tse.csv",
+  sep = ";",
+  encoding = "latin_1"
+  )
+tse_codificacao_br.iloc[range(3), range(6)]
+```
+
+<br>
+
+## Importando Excel
+
+Para importar um arquivo Excel *offline* também pode usar a biblioteca **pandas** no Python:
+
+```{python, message=TRUE, warning=TRUE}
+import pandas as pd
+tabela_excel = pd.read_excel(io = "dados/dados.xlsx")
+tabela_excel
+```
+
+<br>
+
+## Importando determinada Planilha do arquivo Excel
+
+Para importar uma *sheet* específica do arquivo Excel no Python basta apontar o nome ou um *int* com sua posição (índice começa no 0):
+  
+```{python}
+tabela_ibcbr1 = pd.read_excel(
+  io = "dados/dados.xlsx", 
+  sheet_name = "ibc_br"
+  )
+tabela_ibcbr1
+```
+
+
+```{python}
+tabela_ibcbr2 = pd.read_excel(
+  io = "dados/dados.xlsx", 
+  sheet_name = 1
+)
+tabela_ibcbr2
+```
+
+<br>
+
+## Introdução ao NumPy
+
+O NumPy, abreviatura de Numerical Python, é a biblioteca básica mais importante para o uso da análise de dados com Python. Os recursos do uso desse pacote permitem ao usuário realizar operações matemáticas, manipulação de vetores e dados entre outras diversas funcionalidade. Abaixo são mostrados os pontos básicos mais importante do NumPy.
+
+Entre os principais recursos que pode se encontrar com NumPy, estão:
+
+
+*   ndarray: um vetor multidimensional, que oferece operações aritméticas rápidas;
+*   funções matemáticas para operações com vetores;
+*   alinhamento e manipulação de dados.
+
+### ndarray
+
+o objeto ndarray é uma classe de objeto no Python que permite a utilização de conjunto de dados como um vetor ou um conjunto de vetores, ou seja, permite realizar operações matemáticas e estatísticas, bem como também é possível manejar os dados de forma mais facilitada.
+
+Um exemplo de calculo que pode-se utilizar é multiplicar um número inteiro com um vetor de dados. Assim como na matemática, o valor escalar repete a operação em todos os valores do vetores (algo que não ocorre sem o NumPy sem definir uma operação de fluxo com for), isto é chamado de vetorização.
+
+```{python}
+import numpy as np
+
+data = np.random.randn(2, 3)
+
+data
+
+data * 5
+
+data + data
+
+data.dtype
+```
+
+Para controlar o array, um modo simples de criar um vetor ordenado é utilizar arange. Para fatiar os valores, utiliza-se o colchete define o fatiamento conforme a coodernada do valor dentro do array.
+
+```{python}
+arr1 =  np.array([1, 2, 3, 4, 5])
+
+arr1
+
+np.arange(10)
+
+arr1[1:3]
+
+arr3d = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9], [10, 11, 12]])
+
+arr3d
+```
+
+Para realizar cálculos estatístico, o próprio NumPy oferece meios de realizar os cálculos.
+
+```{python}
+arr1.mean()
+
+# Soma
+arr1.sum()
+
+# Desvio Padrão
+arr1.std()
+
+# Mínimo
+arr1.min()
+
+# Máximo
+arr1.max()
+```
+
+# Trabalhando com Tabelas no Python
+
+Aqui são exploradas as **operações básicas do pandas** para trabalhar com tabelas:
+
+- Colunas:
+  - **Renomear colunas** 
+  - Selecionar colunas
+  - Criar e alterar colunas
+- Linhas:
+  - Filtrar linhas
+- Linhas e Colunas:
+  - Sumarizar valores
+
+Estas são operações do dia a dia de uma análise de dados e será visto como utilizar **a biblioteca `pandas`** para facilitar o trabalho.
+
+Grande parte dos procedimentos necessários fazer para **transformar dados brutos em informação útil** podem ser feitos com funções da biblioteca `pandas`, através dos objetos `Series` ou `DataFrame`.
+
+Algumas **funções a serem exploradas** adiante, por componente de uma tabela sobre o qual o verbo se aplica:
+
+- Colunas:
+  - **`rename()` muda o nome das colunas**
+  - `filter()` seleciona as colunas
+  - `assign()` adiciona e altera valores das colunas
+- Linhas:
+  - `query()` filtra linhas baseado em valores de colunas
+- Linhas e Colunas:
+  - `groupby()` em conjunto com outras funções (i.e., matemáticas), sumarizam valores de colunas por grupos de linhas
+
+Esse é um resumo, para saber detalhes veja a documentação da biblioteca.
+
+## Exemplo Prático
+
+```{python, results='hide'}
+# Importar bibliotecas
+import pandas as pd
+import numpy as np
+from bcb import sgs
+
+# Dados do IDP/BP - acum. 12m - US$ (milhões) (SGS/BCB)
+dados_sgs = sgs.get(codes = {"valor": 24422}, start = "2023-01-01", end = "2024-03-01")
+
+# Exibe dados
+dados_sgs.tail()
+```
+
+## Como renomear colunas?
+
+Para renomear colunas usa-se a função `rename()` através da sintaxe `tabela.rename(columns = {"nome_anterior": "novo_nome")`. Por exemplo, para renomear uma única coluna:
+
+```{python}
+# Renomeando uma coluna
+dados_sgs.rename(columns = {"valor": "idp"}).tail()
+```
+
+Seguindo a mesma sintaxe, pode-se renomear quantas colunas forem desejadas:
+
+```{python}
+# Dados de expectativas do IPCA (Focus/BCB)
+dados_focus = pd.read_csv(
+  filepath_or_buffer = "https://olinda.bcb.gov.br/olinda/servico/Expectativas/versao/v1/odata/ExpectativasMercadoAnuais?$top=200&$filter=Indicador%20eq%20'IPCA'%20and%20Data%20gt%20'2024-01-01'%20and%20DataReferencia%20eq%20'2024'%20and%20baseCalculo%20gt%200%20or%20Indicador%20eq%20'IGP-M'%20and%20Data%20gt%20'2024-01-01'%20and%20DataReferencia%20eq%20'2024'%20and%20baseCalculo%20gt%200&$format=text/csv&$select=Indicador,Data,DataReferencia,Media,baseCalculo",
+  decimal = ","
+  )
+
+
+dados_focus.tail()
+```
+
+```{python}
+# Renomeando N colunas
+dados_focus.rename(
+  columns = {"Indicador": "indic", "Data": "data"}
+  )
+```
+
+Para renomear diversas colunas pode ser útil utilizar uma lista com os novos nomes das colunas que irão substituir os nomes antigos, sem necessidade de dizer explicitamente os nomes antigos. A função `set_axis()` é interessante para isso, basta apontar a lista de novos nomes e sobre qual eixo da tabela ela deve ser aplicada:
+
+```{python}
+# Renomeando todas as colunas com um vetor
+dados_focus.set_axis(
+  labels = ["indicador", "data", "data_ref", "media", "base_calc"], 
+  axis = "columns"
+  ).tail()
+```
+
+Uma dica bastante útil para quando existir nomes de colunas mal formatados ou pouco convencionais: usar a biblioteca `pyjanitor` para converter e limpar, com algumas convenções e boas práticas, todos os nomes de colunas automaticamente:
+
+```{python}
+import janitor #!pip install pyjanitor ou python3 -m pip install pyjanitor
+dados_focus.clean_names()
+```
+
+## Como selecionar colunas?
+
+Existem duas principais formas de selecionar colunas de um `DataFrame`, que podem ser sumarizadas por estas sintaxes:
+
+- `tabela["nome_da_coluna"]` ou `tabela[["nome_da_coluna1", "nome_da_coluna2", "etc"]]`
+- `tabela.filter(items = ["nome_da_coluna1", "nome_da_coluna2", "etc"], axis = "columns")`
+
+Existe ainda outras alternativas para acessar uma coluna de um `DataFrame` — por exemplo, o acesso direto do atributo com a sintaxe `tabela.nome_da_coluna`. Veja a [documentação](https://pandas.pydata.org/docs/user_guide/) para explorar todas as possibilidades.
+
+Para selecionar uma única coluna de um `DataFrame` pelo nome use:
+
+```{python}
+# Selecionando uma coluna
+dados_focus["Data"] # retorna pandas Series
+```
+
+
+De forma similar, para selecionar várias colunas pelo nome use:
+
+```{python}
+# Selecionando várias colunas
+dados_focus[["DataReferencia", "Indicador", "Media"]] # retorna pandas DataFrame
+```
+
+O método anterior é simples e prático, mas se for necessário encadear operações (primeiro renomear colunas, depois selecionar, etc...), pode ser mais interessante utilizar o `filter()` e ir encadeando as operações com o ponto (`.`):
+
+```{python}
+# Selecionando várias colunas
+dados_focus.filter(items = ["DataReferencia", "Indicador", "Media"], axis = "columns")
+```
+
+## Como criar e alterar colunas?
+
+Para criar ou alterar colunas de uma tabela pode-se usar a função `assign()` com a sintaxe `tabela.assign(nome_coluna = valores_coluna)`, onde `nome_coluna` pode ser uma coluna nova ou preexistente e `valores_coluna` deve ser uma pandas `Series`, um `scalar` ou um `callable`, ou seja, uma função que é executada e retorna os valores para serem atribuídos na coluna. 
+
+Por exemplo, suponha que se queira adicionar uma coluna que identifica os valores com o nome da variável:
+
+```{python}
+dados_sgs.assign(variavel = "IDP")
+```
+
+Seguindo a mesma lógica, pode-se criar quantas colunas forem necessárias, com novos valores ou valores modificados de colunas preexistentes. 'Repare que você pode. É possível usar funções `lambda` que fazem referência às colunas e retornam uma `Series` de valores:
+
+```{python}
+# Criando N colunas
+dados_sgs.assign(
+  variavel   = "IDP",                           # com escalar
+  idp_bilhao = dados_sgs["valor"] / 1000,       # atribuindo uma pandas Series
+  idp_log    = lambda x: np.log(x.idp_bilhao),  # com função lambda que retorna pandas Series
+  idp_lag1   = lambda x: x.valor.shift(1),
+  idp_lag2   = lambda x: x.valor.shift(2),
+  )
+```
+
+Além de criar novas colunas, pode-se alterar os valores de uma coluna preexistente:
+
+```{python}
+# Alterando colunas
+dados_sgs.assign(
+  valor_copia     = dados_sgs["valor"],
+  valor           = lambda x: np.log(x.valor), # coluna original alterada
+  valor_revertido = lambda x: np.exp(x.valor)
+  )
+```
+
+Uma outra opção é fazer:
+
+```{python}
+dados_sgs['nova_coluna'] = dados_sgs['valor'] + dados_sgs['valor']
+dados_sgs
+```
+
+Para alterar diversas colunas com uma mesma operação (por exemplo, arredondar todas as colunas numéricas) e mantendo as demais colunas da tabela inalteradas, é possível utilizar diversas abordagens de códigos. Talvez a forma mais simples seja utilizar a função `pipe()` em conjunto com `assign()`:
+
+```{python, echo=FALSE}
+pd.set_option("display.max_columns", None)
+```
+
+```{python}
+# Lista com nomes das colunas que quero arrendondar
+colunas = ["Media"]
+
+# Aplica np.round() sobre colunas do DataFrame
+dados_focus.pipe(
+  lambda y: y.assign(**y[colunas].applymap(np.round))
+  )
+```
+
+Entendendo o código anterior:
+
+- `colunas` é a lista das colunas que queremos modificar
+- `dados_focus.pipe()` serve para aplicar uma função sobre o `DataFrame` ou suas `Series` (colunas)
+- `lambda y: ` é a função temporária que estamos definindo e que será aplicada sobre `colunas`
+- `y.assign()` chama a função de modificar/criar colunas sobre o `DataFrame` `y`, ou seja, é a "referência" ao objeto `dados_focus`
+- `y[colunas].applymap(np.round)` seleciona as `colunas` para aplicar a modificação de arredondamento, isso é feito iterativamente com `applymap(np.round)`
+- `**` serve para "descompactar" o resultado do código à direita, ou seja, `assign()` espera pares de argumentos (`nome_coluna = valores_coluna`) e `**` transforma o resultado de `applymap()` em um dicionário de argumentos nomeados.
+
+Há alternativas para este código, sendo que a abordagem exposta é preferível em rotinas onde são necessárias operações encadeadas (sequências de tratamentos de dados), com uma função sendo aplicada sobre o resultado da anterior. 
+
+## Como excluir uma coluna de um DataFrame?
+
+```{python}
+dados_focus.drop('baseCalculo', axis = 1) #axis para informar que é coluna e não linha
+```
+
+
+## Como Ordenar os valores de uma coluna?
+
+```{python}
+dados_focus.sort_values(by = ['Media'])
+```
+
+
+## Como aplicar filtros em linhas?
+
+Para filtrar determinadas linhas de uma tabela usa-se a função `query()` com a sintaxe `tabela.query("condicao")`, onde `condicao` é uma expressão lógica dentro de uma *string*, na linguagem interna do `pandas`, aplicada aos valores de uma coluna. As linhas que serão mantidas após o `query()` são as linhas onde `condicao` é verdadeiro (`True`). Para exemplificar, suponha que se queira todas as linhas de uma tabela que possui o valor `IPCA` na coluna `Indicador`. Para tal filtro deve ser usado uma condição de igualdade:
+
+```{python, echo=FALSE}
+pd.set_option("display.max_columns", None)
+```
+
+```{python}
+# Filtrando por uma condição
+dados_focus.query("Indicador == 'IPCA'")
+```
+
+outra opção é fazer:
+
+```{python}
+filtro = dados_focus['Indicador'] == 'IGP-M'
+dados_focus[filtro] 
+```
+
+É possível definir múltiplas condições para uma ou mais colunas, separando-as por operadores lógicos como `&`, `|` ou seus nomes no inglês `and` e `or`, respectivamente. Somente as linhas onde todas as condições são verdadeiras serão retornadas:
+
+```{python}
+# Filtrando por múltiplas condições
+dados_focus.query("Indicador != 'IPCA' and Data >= Data.max()")
+```
+
+## Operações com Grupos de Dados
+
+A função groupby() divide o DataFrame de modo que uma operação (função) aplicada na sequência é realiza pelos grupos definidos. Por exemplo, a seguir aplica-se um filtro para obter as primeiras linhas de cada grupo com a função head():
+
+```{python}
+# Define grupos e filtra linhas dos grupos
+dados_focus.groupby(by = "Indicador").head()
+```
+
+## Como sumarizar os dados?
+
+Para obter a média de uma determinada coluna numérica
+
+```{python}
+import pandas as pd
+import numpy as np
+
+# Define grupos e filtra linhas dos grupos
+dados_focus.groupby(by = "Indicador").describe()['Media']
+```
+
+```{python}
+np.mean(dados_focus["Media"])
+```
+
+Ao usar groupby e agg() em conjunto, as operações que poderiam parecer complicadas se tornam bastante simples. Por exemplo, se quer obter a média mensal de expectativa do IPCA no Focus. Para isto, basta definir o(s) grupo(s), acessar a coluna sobre a qual deve ser aplicada a operação e apontar a função em agg():
+
+```{python}
+(
+  dados_focus
+  .assign(ano_mes = lambda x: pd.to_datetime(x.Data).dt.to_period("M"))
+  .groupby("ano_mes")
+  .Media
+  .agg(media_mensal = np.mean)
+)
+```
