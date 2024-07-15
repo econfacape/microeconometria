@@ -17,9 +17,9 @@ format:
     embed-resources: true
     page-layout: full
     fig-asp: 0.618
-    fig-width: 8
+    fig-width: 10
     fig-height: 5
-    fig-dpi: 300
+    fig-dpi: 100
     fig-align: center
     df-print: paged
     fontsize: 13pt
@@ -420,10 +420,6 @@ ceosal1.info()
 ceosal1["salary"].describe()
 ceosal1["roe"].describe()
 
-# Covariância e Correlação
-ceosal1.cov
-ceosal1.cor
-
 # Gráfico
 
 # plot
@@ -468,10 +464,13 @@ plt.figure(figsize = (20,8))
 
 sns.regplot(x = 'roe', y = 'salary', data = ceosal1).set(title='Modelo Linear Estimado')
 
+```
+
+```{python}
 # Fazer Previsão com o modelo estimado
 
 nova_obs = pd.DataFrame({"roe": [30]})
 result.predict(nova_obs)
-results.get_prediction(novas_obs).summary_frame(alpha=0.05)
+result.get_prediction(nova_obs).summary_frame(alpha=0.05)
 ```
 
