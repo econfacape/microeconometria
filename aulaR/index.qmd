@@ -1,5 +1,5 @@
 ---
-title: "FUNDAMENTOS DE ANÁLISES DE DADOS"
+title: "INTRODUÇÃO AO R"
 author: "João Ricardo F. de Lima"
 date: "today"
 editor: source
@@ -26,7 +26,7 @@ format:
 theme:
   light: flatly
 execute:
-  echo: false
+  echo: true
   message: false
   warning: false
 ---
