@@ -1,0 +1,395 @@
+---
+title: "Aula 9 - Introdução à Econometria"
+author: "João Ricardo F. de Lima"
+date: "today"
+editor: source
+lang: pt
+language: 
+  toc-title-document: '<a href="https://www.facape.br/" target="_blank"><img src="https://github.com/econfacape/macroeconometria/blob/main/logofacape.jpg?raw=true" alt="Logotipo Facape" width="150"></a>'
+format: 
+  html:
+    toc: true
+    toc_float:
+      collapsed: yes
+      smooth_scroll: yes
+    toc-location: left
+    code-fold: false
+    embed-resources: true
+    page-layout: full
+    fig-asp: 0.618
+    fig-width: 10
+    fig-height: 5
+    fig-dpi: 100
+    fig-align: center
+    df-print: paged
+    fontsize: 13pt
+theme:
+  light: flatly
+execute:
+  echo: TRUE
+  message: false
+  warning: false
+---
+
+# Quebra de Pressupostos do Modelo Clássico de Regressão Linear
+
+<br>
+
+## Heterocedasticidade
+
+<br>
+
+Ocorre quando a variância do termo de erro não é constante $Var(u_i|X_i=x)=\sigma^2_i$, para todas as observações na amostra. As fontes principais são: presença de *outliers*, modelo incorretamente especificado, assimetria na distribuição de um ou mais regressores e erros de digitação dos dados. 
+
+É mais comum em dados de seção cruzada.
+
+Com as relação às propriedades dos estimadores de MQO, na presença de **heterocedasticidade** continuam não-viesados e consistentes, mas não são mais eficientes. O estimador eficiente, ou seja, com variância mínima é o de Mínimos Quadrados Generalizados (MQG).
+
+<br>
+
+```{r aula9_0, warning=FALSE, message=FALSE, fig.width=8, fig.height=6}
+
+# Carregar Pacote
+library(scales)
+
+# Geração de dados heterocedásticos:
+# confirgurar semente para garantir reprodutibilidade
+set.seed(123) 
+
+# Vetor de x
+x <- rep(c(10, 15, 20, 25), each = 25)
+e <- c()
+
+# Amostra 100 erros cuja variancia aumenta com o x
+e[1:25] <- rnorm(25, sd = 10)
+e[26:50] <- rnorm(25, sd = 15)
+e[51:75] <- rnorm(25, sd = 20)
+e[76:100] <- rnorm(25, sd = 25)
+
+# Vetir de Y
+y <- 720 - 3.3 * x + e
+
+# Estima o modelo 
+mod <- lm(y ~ x)
+
+# Plota os dados
+plot(x = x, 
+     y = y, 
+     main = "Um Exemplo of Heterocedasticidade",
+     xlab = "Razão estudante-professor",
+     ylab = "Nota no Teste",
+     cex = 0.5, 
+     pch = 19, 
+     xlim = c(8, 27), 
+     ylim = c(600, 710))
+
+#  Linha de regressão
+abline(mod, col = "darkred")
+
+# Adiciona os boxplots no gráfico
+boxplot(formula = y ~ x, 
+        add = TRUE, 
+        at = c(10, 15, 20, 25), 
+        col = alpha("gray", 0.4), 
+        border = "black")
+```
+
+<br>
+
+Para esses dados artificiais, as variações de erro condicional diferem. Especificamente, observa-se que a variância nas pontuações dos testes (e, portanto, a variância dos erros cometidos) aumenta com a proporção aluno-professor.
+
+<br>
+
+## Consequências da Heterocedasticidade
+
+<br>
+
+O uso do método de MQO na presença de **heterocedasticidade** leva a resultados incorretos das significâncias (Testes t e F), levando a conclusões e inferências que podem estar equivocadas.
+ 
+<br>
+
+## Como detectar a Heterocedasticidade?
+
+<br>
+
+
+Sempre uma boa análise gráfica dos resíduos é importante. Contudo, existem testes formais para análise de heterocedasticidade. Os principais são os de White e Breusch-Pagan-Godfrey (BPG).
+
+<br>
+
+
+## Exemplo no R - Estimação do Modelo e Verificação de Normalidade e Multicolinearidade
+
+<br>
+
+```{r aula9_1, warning=FALSE, message=FALSE}
+#Direcionado o R para o Diretorio a ser trabalhado
+#setwd('/Users/jricardofl/Dropbox/tempecon/facape/')
+
+#Limpa o Ambiente Global
+rm(list=ls())
+
+#Inicio do Script
+#Pacotes a serem utilizados
+library(car)
+library(lmtest)
+library(sandwich)
+library(corrplot)
+library(FinTS)
+library(tseries)
+library(wooldridge)
+
+data("smoke")
+dados <- na.omit(smoke)
+
+#Regressao Multipla
+regressao1 <- lm(cigs ~ log(income) + log(cigpric)
+                 + educ + age + I(age^2) +
+                   restaurn, data=dados)
+summary(regressao1)
+
+#Teste de Normalidade dos residuos
+jarque.bera.test(regressao1$residuals)
+shapiro.test(regressao1$residuals)
+
+#Analise de Multicolinearidade
+#Matriz de Correlacoes das variaveis explicativas
+x <- dados[, c(1,2,4,5,7)]
+cor(x)
+corrplot(cor(x), order="hclust", tl.col="black", tl.cex = .75)
+
+#Calculo do Fator de Inflacao da Variancia
+vif(lm(cigs ~ income + cigpric
+                 + educ + age +
+                   restaurn, data=dados))
+```
+
+<br>
+
+## Verificação dos resíduos
+
+<br>
+
+```{r aula9_2, warning=FALSE, message=FALSE}
+#Analise dos residuos do modelo
+par(mfrow=c(2,2))
+plot(regressao1)
+
+#Salvando os residuos do modelo e os valores estimados
+resid_sq <- (regressao1$residuals)^2
+ajustados1 <- regressao1$fitted.values
+par(mfrow=c(1,1))
+plot(ajustados1, resid_sq)
+```
+
+<br>
+
+## Heterocedasticidade: teste de White
+
+<br>
+
+A **hipótese nula** do Teste de White é os **resíduos são homocedásticos**. Após a regressão, pegar os resíduos ao quadrado e estimar contra os regressores e estes ao quadrado. é possível incluir produtos cruzados também. A estatística de teste $nR^2$ segue uma distribuição de qui-quadrado com graus de liberdade igual ao numero de parâmetros estimados. É um teste para grandes amostras.
+
+<br>
+
+```{r aula9_3, warning=FALSE, message=FALSE, fig.width=8, fig.height=6}
+#Testes de Heterocedasticidade de White
+#Caso especial do BPG
+#H0: Residuos sao homocedasticos.
+regres_white <- lm(cigs ~ log(income) + log(cigpric)
+                 + educ + age + I(age^2) + 
+                   I(log(income^2)) + I(log(cigpric^2))
+                 + I(educ^2) + restaurn, data=dados)
+bptest(regres_white) 
+```
+
+<br>
+
+## Heterocedasticidade: teste de BPG 
+
+<br>
+
+Semelhante ao Teste de White, mas os resíduos ao quadrado são estimados no teste BPG contra os regressores originais apenas. Na estatística de teste é possível usar o valor do F ou então o $R^2$ multiplicado pelo tamanho da amostra "n". A estatística de teste segue a distribuição de qui-quadrado com graus de liberdade igual ao número de regressores no modelo. **A hipótese nula é homocedasticidade**.
+
+<br>
+
+```{r aula9_4, warning=FALSE, message=FALSE, fig.width=8, fig.height=6}
+#Testes de Heterocedasticidade de White
+#Caso especial do BPG
+#H0: Residuos sao homocedasticos.
+#Testes de Heterocedasticidade de Breusch-Pagan
+bptest(regressao1)
+
+#Testes de Heterocedasticidade NCV
+ncvTest(regressao1)
+```
+
+<br>
+
+## Uso do pacote {performance}
+
+<br>
+
+
+```{r aula9_5, warning=FALSE, message=FALSE, fig.width=10, fig.height=16}
+
+pacman::p_load(
+"performance",
+"lme4",
+"see",
+"qqplotr"
+)
+
+model_performance(regressao1)
+
+check_model(regressao1)
+```
+
+<br>
+
+## Heterocedasticidade: como corrigir?
+
+<br>
+
+Usar mínimos quadrados ponderados se conhecer a verdadeira variância heterocedástica $\sigma^2_i$. Contudo, raramente isto ocorre. O que mais se usa é transformação logarítmica de variáveis com grande variância e o procedimento de White para estimar erros-padrão robustos. O procedimento não altera a estimação no ponto, apenas os erros-padrão corrigindo a heterocedasticidade.
+
+A correção clássica de White para a matriz de variância dos coeficientes é dada por:
+
+$$
+Var(\hat \beta|X)=(X'X)^{-1}X'diag(e^2)X(X'X)^{-1}
+$$
+em que $e^2$ são os resíduos ao quadrado e $X$ é a matriz de variáveis explicativas do modelo. 
+
+Contudo, existem diversos outros métodos de ajustamento desta fórmula para a matriz de var-cov dos resíduos, denotada por $\Omega$. No R, a opção "const" retorna os resultados de $\sigma^2(X'X)^{-1}$. As outras opções retornam estimadores de White na forma da expressão  e diferem em termos de $(X'X)^{-1}X' \Omega X(X'X)^{-1}$ e diferem em como é $\Omega$. A diagonal de $\Omega$ será formada pelos elementos $\omega_i$ exposto para cada opção de HC (hc0, hc1, hc2, hc3, hc4):
+
+<br>
+
+1) const = $\omega_i= \hat \sigma^2$ 
+2) HC0 = $\omega_i= \hat u_i^2$ é matriz clássica de correção de Eicker (1963) e popularizada por White (1980);
+3) HC1 = $\omega_i= \frac {n}{n-k}\hat u_i^2$
+4) HC2 = $\omega_i= \frac {\hat u_i^2}{1-h_i}$
+5) HC3 = $\omega_i= \frac {\hat u_i^2}{(1-h_i)^2}$
+6) HC4 = $\omega_i= \frac {\hat u_i^2}{(1-h_i)^{\delta_i}}$ é a matriz de correção conforme Cribari-Neto (2004) para aperfeiçoar a performance em pequenas amostras com presença de observações influentes.
+
+"hc1", "hc2" e "hc3" as matrizes de correção sugeridas por MacKinnon e White (1985) e aperfeiçoadas para pequenas amostras conforme Long e Ervin (2000).
+
+para $h_i=H_{ii}$ como os elementos diagonais da matriz estimada, $\bar h$ é sua média é $\delta_i=min {\{4, h_i/ \bar h}\}$. A opção que retorna os mesmos resultados que o "padrão" de correção de White no Stata e Eviews é a "hc1". 
+
+<br>
+
+```{r aula9_6, warning=FALSE, message=FALSE}
+
+#Correcao da Heterocedasticidade
+regressao1 <- lm(cigs ~ log(income) + log(cigpric)
+                 + educ + age + I(age^2) +
+                   restaurn, data=dados)
+coeftest(regressao1, vcov=vcovHC, type='HC0') 
+coeftest(regressao1, vcov=vcovHC, type='HC1') #(Eviews)
+coeftest(regressao1, vcov=vcovHC, type='HC2') 
+coeftest(regressao1, vcov=vcovHC, type='HC3') 
+coeftest(regressao1, vcov=vcovHC, type='HC4') #sugerido (2011)
+```
+
+
+## Exemplo no Python
+
+```{python aula9_6a, warning=FALSE, message=FALSE}
+
+import wooldridge
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+import statsmodels.api as sm
+import statsmodels.formula.api as smf
+from statsmodels.stats.outliers_influence import variance_inflation_factor
+import scipy.stats as stats
+from statsmodels.stats.diagnostic import het_white
+from statsmodels.stats.diagnostic import het_breuschpagan
+
+# Load the dataset
+smoke = wooldridge.data('smoke')
+smoke = smoke.dropna()
+
+#Estimando a 1 Regressão Multipla Modelo Irrestrito
+reg1 = smf.ols('cigs ~ np.log(income) + np.log(cigpric) + educ + age + I(age**2) + restaurn', data=smoke)
+
+#Output de Resultado
+result1 = reg1.fit()
+print(result1.summary())
+
+
+# Cria um subgrupo
+smoke2 = smoke[["educ", "cigpric", "age", "income", "restaurn"]]
+
+# Calcula a matriz de correlações 
+correlation_matrix = smoke2.corr()
+
+# Mostra a matriz de correlações 
+print(correlation_matrix)
+
+# Define o tamanho do gráfico
+plt.figure(figsize=(12, 10))
+
+# Cria um heatmap (representaçao por cores) da matriz de correlações
+sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', fmt='.2f')
+
+# Mostra o Gráfico das Correlações
+plt.show()
+
+#Fator de Inflacao da Variancia (FIV)
+
+# Adiciona o intercepto 
+X = smoke2
+X = sm.add_constant(X)
+
+# Calcula o VIF para cada variável
+vif = pd.DataFrame()
+vif["Variable"] = X.columns
+vif["VIF"] = [variance_inflation_factor(X.values, i) for i in range(X.shape[1])]
+
+# Mostra o VIF
+print(vif)
+
+#Testes de Heterocedasticidade de White
+#Caso especial do BPG
+#H0: Residuos sao homocedasticos.
+
+# Roda o teste de White
+
+reg1 = smf.ols('cigs ~ np.log(income) + np.log(cigpric) + educ + age + I(age**2) + restaurn', data=smoke)
+result1 = reg1.fit()
+
+white_test = het_white(result1.resid, result1.model.exog)
+
+# Mostra os resultados
+labels = ['Test Statistic', 'Test Statistic p-value', 'F-Statistic', 'F-Test p-value']
+results_white = dict(zip(labels, white_test))
+print("White's Test Results:", results_white)
+
+# Roda o teste de Breusch-Pagan
+bp_test = het_breuschpagan(result1.resid, result1.model.exog)
+
+# Output the test results
+labels = ['Lagrange multiplier statistic', 'p-value', 'f-value', 'f p-value']
+results_bp = dict(zip(labels, bp_test))
+results_bp
+
+# Estima o modelo com erros padrao robustos
+robust_model_HC0 = result1.get_robustcov_results(cov_type='HC0')
+
+# Mostra os resultados da estimação do modelo robusto
+print(robust_model_HC0.summary())
+
+# Estima o modelo com erros padrao robustos usando HC1
+robust_model_HC1 = result1.get_robustcov_results(cov_type='HC1')
+print(robust_model_HC1.summary())
+
+# Estima o modelo com erros padrao robustos usando HC2
+robust_model_HC2 = result1.get_robustcov_results(cov_type='HC2')
+print(robust_model_HC2.summary())
+
+# Estima o modelo com erros padrao robustos usando HC3
+robust_model_HC3 = result1.get_robustcov_results(cov_type='HC3')
+print(robust_model_HC3.summary())
+```
