@@ -381,7 +381,7 @@ A outra possibilidade é verificar um indicador de qualidade do ajustamento cham
 
 	
 
-## Exemplo no R
+## Exemplo Modelo Logit no R
 
 O exemplo abaixo foi retirado do site (https://stats.oarc.ucla.edu/r/dae/logit-regression/). Um pesquisador está interessado em como variáveis, como GRE (Graduate Record Exam scores), GPA (nota média) e prestígio da instituição de graduação, afetam a admissão na pós-graduação. A variável de resposta, admitir/não admitir, é uma variável binária.
 
@@ -418,10 +418,6 @@ xtabs(~admit + rank, data = mydata)
 O código abaixo estima um modelo de regressão logística usando a função glm (modelo linear generalizado). Primeiro, convertemos rank em um fator para indicar que rank deve ser tratado como uma variável categórica.
 
 
-
-### Exemplo com o Modelo Logit
-
-
 ```{r  aula11_3, warning=FALSE, message=FALSE}
 
 mydata$rank <- factor(mydata$rank)
@@ -429,7 +425,6 @@ mylogit <- glm(admit ~ gre + gpa + rank, data = mydata, family = "binomial")
 summary(mylogit)
 
 ```
-
 
 
 Na saída acima, a primeira coisa que vemos é a chamada, isso é R nos lembrando qual era o modelo que rodamos, quais opções especificamos, etc.
@@ -462,7 +457,7 @@ confint.default(mylogit)
 
 
 
-Você também pode exponenciar os coeficientes e interpretá-los como odds-ratios. R fará esse cálculo para você. Para obter os coeficientes exponenciados, você diz a R que deseja exponenciar (exp), e que o objeto que deseja exponenciar é chamado de coeficientes e faz parte de mylogit (coef(mylogit)). Podemos usar a mesma lógica para obter as razões de chances e seus intervalos de confiança, expondo os intervalos de confiança anteriores. Para colocar tudo em uma tabela, usamos cbind para vincular os coeficientes e intervalos de confiança em coluna.
+Pode-se exponenciar os coeficientes e interpretá-los como odds-ratios. R fará esse cálculo para você. Para obter os coeficientes exponenciados, você diz a R que deseja exponenciar (exp), e que o objeto que deseja exponenciar é chamado de coeficientes e faz parte de mylogit (coef(mylogit)). Podemos usar a mesma lógica para obter as razões de chances e seus intervalos de confiança, expondo os intervalos de confiança anteriores. Para colocar tudo em uma tabela, usamos cbind para vincular os coeficientes e intervalos de confiança em coluna.
 
 
 
@@ -478,7 +473,7 @@ exp(cbind(OR = coef(mylogit), confint(mylogit)))
 
 Agora podemos dizer que para um aumento de uma unidade no gpa, as chances de ser admitido na pós-graduação (versus não ser admitido) aumentam por um fator de 2,23. Observe que, enquanto R o produz, a razão de chances para o intercepto geralmente não é interpretada.
 
-Você também pode usar probabilidades previstas para ajudá-lo a entender o modelo. As probabilidades previstas podem ser calculadas para variáveis preditoras categóricas e contínuas. Para criar probabilidades previstas, primeiro precisamos criar um novo quadro de dados com os valores que queremos que as variáveis independentes assumam para criar nossas previsões.
+Pode-se usar probabilidades previstas para ajudá-lo a entender o modelo. As probabilidades previstas podem ser calculadas para variáveis preditoras categóricas e contínuas. Para criar probabilidades previstas, primeiro precisamos criar um novo quadro de dados com os valores que queremos que as variáveis independentes assumam para criar nossas previsões.
 
 Começaremos calculando a probabilidade prevista de admissão em cada valor de classificação, mantendo gre e gpa em suas médias. Primeiro, criamos e visualizamos o quadro de dados.
 
@@ -572,23 +567,28 @@ m2 <- margins(mylogit, at=list(rank=1:2, gpa=3))
 summary(m2, type= "response")
 ```
 
-### Exemplo com o Modelo Probit no R
+## Exemplo Modelo Probit no R
 
 ```{r  aula11_12, warning=FALSE, message=FALSE}
-myprobit <- glm(admit ~ gre + gpa + rank, family = binomial(link = "probit"), 
-    data = mydata)
+mydata <- read.csv("https://stats.idre.ucla.edu/stat/data/binary.csv")
+mydata$rank <- factor(mydata$rank)
+
+myprobit <- glm(admit ~ gre + gpa + rank, family = binomial(link = "probit"), data = mydata)
 
 summary(myprobit)
 
 confint.default(myprobit)
 
-newdata1prob <- with(mydata, data.frame(rank=3 , gpa=4, gre=650))
-newdata1prob$rankP <- predict(myprobit, newdata1prob, type = "response")
-newdata1prob
+# Previsao com dados novos 
+newdata1 <- data.frame(gre = 650, gpa = 4, rank = factor(1, levels = levels(mydata$rank)))
+
+# Previsão com valores especificos
+newdata1$prob <- predict(myprobit, newdata1, type = "response")
+newdata1
 
 ```
 
-## Exemplo no Python do Modelo Logit
+## Exemplo Modelo Logit no Python
 
 ```{python aula11_12a}
 
@@ -602,36 +602,34 @@ import statsmodels.api as sm
 from scipy.stats import norm
 
 # Importação de dados
-dados = pd.read_csv(
-        filepath_or_buffer = "https://stats.idre.ucla.edu/stat/data/binary.csv")
-        
-# Converte 'rank' em variável categorica
-dados['rank'] = dados['rank'].astype('category')
-
-# Cria dummies para 'rank' e retira a primeira categoria para evitar multicolinearidade
-dados = pd.get_dummies(dados, columns=['rank'], drop_first=True)
-
-#Verifica os dados
-print(dados.dtypes)
-
-# Converte de boolean para inteiro
-dados = dados.astype(int)
-
-# Mantem 'gpa' como float
-dados['gpa'] = dados['gpa'].astype(float)
+url = "https://stats.idre.ucla.edu/stat/data/binary.csv"
+dados = pd.read_csv(url)
 
 # Estatísticas Descritivas
-dados.info()
-dados.head()
-dados.describe()
+print("\nEstatísticas Descritivas:")
+print(dados.info())
+print(dados.head())
+print(dados.describe())
 
-dados['intercept'] = 1  # adiciona o intercepto
-X = dados[['intercept', 'gre', 'gpa', 'rank_2', 'rank_3', 'rank_4']]
-y = dados['admit']
+# Contagens de frequência para a variável categórica 'rank' 
+rank_counts = dados['rank'].value_counts()
+print("\nContagens de frequência para 'rank':")
+print(rank_counts)
+
+# Proporçoes para a variável categórica 'rank'
+rank_proportions = dados['rank'].value_counts(normalize=True)
+print("\nProporções para 'rank':")
+print(rank_proportions)
+
+# Tabulação cruzada entre 'rank' e 'admit'
+rank_admit_crosstab = pd.crosstab(dados['rank'], dados['admit'])
+print("\nTabulação cruzada entre 'rank' e 'admit':")
+print(rank_admit_crosstab)
 
 # Estimação do Modelo
-modelo_logit = sm.Logit(y, X)
+modelo_logit = smf.logit('admit ~ gre + gpa + C(rank)', data=dados)
 result = modelo_logit.fit()
+print("\nResultado do Modelo Logit")
 print(result.summary())
 
 
@@ -640,106 +638,179 @@ odds_ratios = np.exp(result.params)
 print("\nOdds Ratios:")
 print(odds_ratios)
 
-# Calcula as medias para gre e gpa
-mean_gre = dados['gre'].mean()
-mean_gpa = dados['gpa'].mean()
+# Calculando os efeitos marginais na média dos preditores
+margeff_mean = result.get_margeff(at='mean')
+print("\nEfeitos Marginais com a média:")
+print(margeff_mean.summary())
 
-# Crie novos pontos de dados para cada categoria de rank com as médias de gre e gpa
-new_data = pd.DataFrame({
-    'intercept': [1] * 4,
-    'gre': [mean_gre] * 4,
-    'gpa': [mean_gpa] * 4,
-    'rank_2': [0, 1, 0, 0],
-    'rank_3': [0, 0, 1, 0],
-    'rank_4': [0, 0, 0, 1]
+# Calculando as os efeitos marginais e as probabilidades previstas em valores específicos
+specific_values = pd.DataFrame({
+    'gre': [600] * 4,
+    'gpa': [3.5] * 4,
+    'rank': [1, 2, 3, 4]
 })
 
+# Calculando as probabilidades previstas
+#params = result.params
+predictions = result.predict(specific_values)
+specific_values['Probabilidades'] = predictions
 
-# Calcula as probabilidades previstas para os dados novos
-probabilities = result.predict(new_data)
+# Obtendo os nomes dos coeficientes
+coef_names = result.params.index
 
-# Mostra os resultados
-new_data['probability'] = probabilities
-print(new_data)
+# Calculando os efeitos marginais manualmente
+marginal_effects = {}
 
-# Define especificos valores para gre e gpa
-specific_values = {
-    'gre': [220, 800],  # Exemplo de valores
-    'gpa': [2.0, 4.0]   # Exemplo de valores
-}
+# Efeitos marginais para variáveis contínuas
+for var in ['gre', 'gpa']:
+    marginal_effects[var] = result.params[var] * predictions * (1 - predictions)
 
-# Create new DataFrame for predictions
-new_data = []
-for gre in specific_values['gre']:
-    for gpa in specific_values['gpa']:
-        for rank in ['rank_2', 'rank_3', 'rank_4']:
-            row = {
-                'intercept': 1,
-                'gre': gre,
-                'gpa': gpa,
-                'rank_2': 1 if rank == 'rank_2' else 0,
-                'rank_3': 1 if rank == 'rank_3' else 0,
-                'rank_4': 1 if rank == 'rank_4' else 0
-            }
-            new_data.append(row)
+# Efeitos marginais para variáveis categóricas
+for rank in [2, 3, 4]:  # Nota: Rank 1 é a categoria de referência e não está incluída nos coeficientes
+    coef_name = f'C(rank)[T.{rank}]'
+    if coef_name in result.params:
+        marginal_effects[f'rank_{rank}'] = result.params[coef_name] * predictions * (1 - predictions)
+    else:
+        print(f"Coeficiente '{coef_name}' não encontrado na saída do modelo.")
 
-new_data_df = pd.DataFrame(new_data)
+# Convertendo para DataFrame para visualização
+marginal_effects_df = pd.DataFrame(marginal_effects, index=[1, 2, 3, 4])
+print("\nEfeitos Marginais em Valores Específicos:")
+print(marginal_effects_df)
 
-# Calcula as probabilidades previstas para os novos dados
-predicted_probabilities = result.predict(new_data_df)
 
-print(new_data_df)
-print(predicted_probabilities)
+print("\nProbabilidades previstas em valores específicos:")
+print(specific_values)
+
+print("\nGráfico das Probabilidades previstas")
+
+# Define a range of GRE values
+gre_values = np.linspace(200, 800, 100)  # GRE values from 200 to 800
+gpa_value = 3.5  # Constant GPA value
+ranks = [1, 2, 3, 4]  # Different ranks
+
+# Cria uma DataFrame para armazenar probabilidades previstas
+predicted_probs = pd.DataFrame()
+
+for rank in ranks:
+    specific_values = pd.DataFrame({
+        'gre': gre_values,
+        'gpa': gpa_value,
+        'rank': rank
+    })
+    predictions = result.predict(specific_values)
+    predicted_probs[f'Rank {rank}'] = predictions
+
+# Plota as probabilidades previstas
+plt.figure(figsize=(10, 6))
+for rank in ranks:
+    plt.plot(gre_values, predicted_probs[f'Rank {rank}'], label=f'Rank {rank}')
+
+plt.xlabel('GRE')
+plt.ylabel('Probabilidade de Admissão')
+plt.title('Probabilidade de Admissão por escore de GRE e Rank')
+plt.legend(title='Rank')
+plt.grid(False)
+plt.ylim(0, 1)
+
+# Mostra o plot
+plt.show()
 ```
 
-Cada linha na saída corresponde a uma combinação específica de `gre` e `gpa` e mostra o efeito marginal para a variável categórica `rank`. Por exemplo, se gre for 220 e gpa for 2, a probabilidade prevista de rank_2 é 0,125779. Isto significa que, com esses valores de gre e gpa, o efeito de estar em rank_2 na probabilidade de admit é de 0,125779 ou 12,57%.
+No output do Logit, o p-value de LLR (Teste da Razão de Verossimilhança ou RV) foi significativo, indicando um modelo bem ajustado. Este resultado sugere que as variáveis independentes contribuem significativamente para explicar a variável independente.
 
-```{python aula11_12b}
-#Calcula os Efeitos Marginais
-margeff = result.get_margeff(at='mean')
-print(margeff.summary())
-```
+**Interpretação das razões de chance da variável categórica:**
+
+a) **Rank 2 (0,508931):** As chances de ser admitido para alguém no rank 2 são aproximadamente 50,9% das chances de ser admitido para alguém no rank 1. Em outras palavras, as chances de admissão para o rank 2 são cerca de 49,1% menores em comparação com classificação 1, mantendo outras variáveis constantes.
+
+b) **Rank 3 (0,261792):** As chances de ser admitido para alguém no rank 3 são de aproximadamente 26,2% das chances de ser admitido para alguém no rank 1. Assim, as chances de admissão para rank 3 são cerca de 73,8% menores em comparação com rank 1 , mantendo outras variáveis constantes.
+
+c) **Rank 4 (0,211938):** As chances de ser admitido para alguém no rank 4 são aproximadamente 21,2% das chances de ser admitido para alguém no rank 1. Portanto, as chances de admissão para a rank 4 são cerca de 78,8% menores em comparação com rank 1, mantendo outras variáveis constantes.
+
+**Interpretação de efeitos marginais**
+
+**Efeito Marginal para Variáveis Categóricas (rank):**
+
+a) **C(rank)[T.2] (-0,1415):** Para alguém no rank 2, a probabilidade de ser admitido diminui aproximadamente 0,1415 pontos percentuais em comparação com alguém na categoria de referência (rank 1), mantendo outras variáveis constante. Um valor negativo indica uma diminuição na probabilidade de admissão.
+
+b) **C(classificação)[T.3] (-0,2807):** Para alguém no rank 3, a probabilidade de ser admitido diminui aproximadamente 0,2807 pontos percentuais em comparação com alguém no rank 1, mantendo as outras variáveis constantes.
+
+c) **C(classificação)[T.4] (-0,3250):** Para alguém no rank 4, a probabilidade de ser admitido diminui aproximadamente 0,3250 pontos percentuais em comparação com alguém no rank 1, mantendo as outras variáveis constantes.
+
+Quanto mais negativo for o efeito marginal, maior será a redução da probabilidade de admissão para determinado posto face ao posto de referência.
+
+**Efeito Marginal para Variáveis Contínuas:**
+
+a) **gre (0,0005):** Para cada aumento de uma unidade na pontuação GRE, a probabilidade de ser admitido aumenta aproximadamente 0,0005 pontos percentuais, mantendo as outras variáveis constantes. Embora pequeno, este efeito marginal positivo indica que pontuações mais altas no GRE aumentam ligeiramente a probabilidade de admissão.
+
+b) **gpa (0,1684):** Para cada aumento de uma unidade no GPA, a probabilidade de ser admitido aumenta aproximadamente 0,1684 pontos percentuais, mantendo as demais variáveis constantes. Isto sugere que um GPA mais elevado tem um impacto positivo significativo na probabilidade de admissão.
+
+**Efeito Marginal de Valores Específicos**
+
+a) Rank 1 
+
+- gre(0,000533) um aumento de uma unidade no gre resulta em um aumento de 0,000533 na probabilidade de admissão, mantendo o gpa e a classificação constantes.
+- gpa(0,189291) um aumento de uma unidade no gpa resulta em um aumento de 0,189291 na probabilidade de admissão, mantendo gre e classificação constantes.
+- rank_2(-0,159016) passar de rank 1 para rank 2 diminui a probabilidade de admissão em 0,159016, mantendo gre e gpa constantes.
+- rank_3(-0,315517) passar de rank 1 para rank 3 diminui a probabilidade de admissão em 0,315517, mantendo gre e gpa constantes.
+- rank_4(-0,365253) passar de rank 1 para rank 4 diminui a probabilidade de admissão em 0,365253, mantendo gre e gpa constantes.
+
+b) Rank 2
+- gre(0,000412) um aumento de uma unidade no gre resulta num aumento de 0,000412 na probabilidade de admissão.
+- gpa(0,146297) um aumento de uma unidade no gpa resulta num aumento de 0,146297 na probabilidade de admissão.
+- rank_2(-0.122898) o quanto a probabilidade de ser admitido reduz por estar no Rank 2, sem comparação com o Rank 1, assumindo que o efeito da categoria de referência já está contabilizado no modelo.
+- rank_3(-0,243853) passar de rank 2 para rank 3 diminui a probabilidade de admissão em 0,243853.
+- rank_4(-0,282293) passar de rank 2 para rank 4 diminui a probabilidade de admissão em 0,282293.
+
+c) Rank 4 - Valores faltantes (NaN) indicam que o software não conseguiu calcular efeitos marginais confiáveis para esta categoria.
 
 
-### Exemplo do Modelo Probit no Python
+**Probabilidades com valores específicos por Rank:**
+
+a) **Rank 1:** A probabilidade de ser admitido é aproximadamente 0,546 ou 
+54,6% para alguém com pontuação gre de 600 e gpa de 3,5.
+
+b) **Rank 2:** A probabilidade de ser admitido diminui para aproximadamente 
+0,379 ou37,9% para o mesmo gre e gpa, mas com rank 2.
+
+c) **Rank 3:** A probabilidade de ser admitido diminui ainda mais para aproximadamente 0,239 ou  23,9% para rank 3.
+
+d) **Rank 4:** A probabilidade de ser admitido é a mais baixa, aproximadamente 0,203 ou 20,3 % para rank 4.
+
+## Exemplo Modelo Probit no Python
 
 ```{python aula11_12c}
 import pandas as pd
 import statsmodels.api as sm
+import statsmodels.formula.api as smf
+
 #from statsmodels.discrete.discrete_model import Probit
 
-# Import the dataset
-dados = pd.read_csv("https://stats.idre.ucla.edu/stat/data/binary.csv")
+# Importação de dados
+url = "https://stats.idre.ucla.edu/stat/data/binary.csv"
+dados = pd.read_csv(url)
 
-# Convert 'rank' to categorical and create dummy variables
-dados['rank'] = dados['rank'].astype('category')
-dados = pd.get_dummies(dados, columns=['rank'], drop_first=True)  # Drop the first category (rank_1)
-
-#Verifica os dados
-print(dados.dtypes)
-
-# Converte de boolean para inteiro
-dados = dados.astype(int)
-
-# Mantem 'gpa' como float
-dados['gpa'] = dados['gpa'].astype(float)
-
-# Add intercept term
-dados['intercept'] = 1
-
-# Prepare the data
-X = dados[['intercept', 'gre', 'gpa', 'rank_2', 'rank_3', 'rank_4']]
-y = dados['admit']
-
-# Fit the Probit regression model
-probit_model = sm.Probit(y, X)
-probit_result = probit_model.fit()
+# Estimação do Modelo Probit
+probit = smf.probit('admit ~ gre + gpa + C(rank)', data=dados)
+probit_result = probit.fit()
 
 # Print the summary of the Probit model
 print(probit_result.summary())
 
-# Predict probabilities
-predicted_probabilities = probit_result.predict(X)
-print(predicted_probabilities.head())
+# Calculando as probabilidades previstas em valores específicos
+specific_values = pd.DataFrame({
+    'gre': [650],
+    'gpa': [4.0],
+    'rank': [1]
+})
+
+# Ajusta a variável 'rank' para ser categórica com os mesmos níveis dos dados originais
+specific_values['rank'] = pd.Categorical(specific_values['rank'], categories=[1, 2, 3, 4])
+
+
+# Prevê a probabilidade de admit para os valores específicos
+specific_values['pred_prob'] = probit_result.predict(specific_values)
+print("\nPredicted Probability at Specific Values:")
+print(specific_values)
 ```
 
