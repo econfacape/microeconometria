@@ -1,0 +1,545 @@
+---
+title: "Aula 12 - Introdução à Econometria"
+author: "João Ricardo F. de Lima"
+date: "today"
+editor: source
+lang: pt
+language: 
+  toc-title-document: '<a href="https://www.facape.br/" target="_blank"><img src="https://github.com/econfacape/macroeconometria/blob/main/logofacape.jpg?raw=true" alt="Logotipo Facape" width="150"></a>'
+format: 
+  html:
+    toc: true
+    toc_float:
+      collapsed: yes
+      smooth_scroll: yes
+    toc-location: left
+    code-fold: false
+    embed-resources: true
+    page-layout: full
+    fig-asp: 0.618
+    fig-width: 8
+    fig-height: 5
+    fig-dpi: 300
+    fig-align: center
+    df-print: paged
+    fontsize: 13pt
+theme:
+  light: flatly
+execute:
+  echo: TRUE
+  message: false
+  warning: false
+---
+
+# Modelos de Dados em Painel
+
+## As Estruturas de Dados
+
+**Corte transversal** (seção cruzada): amostra de indivíduos, consumidores, empresas, países, etc., tomada em um instante do tempo;
+
+**Série Temporal**: observações sobre uma variável ou muitas variáveis ao longo do tempo;
+
+**Cortes transversais independentes agrupados**: tem características tanto de corte transversal quanto de série temporal. Ocorre quando se agrupa cortes transversais coletados em diferentes instantes do tempo;
+
+```{r aula12_1, warning=FALSE, message=FALSE}
+#Cortes transversais agrupados: 2 anos de preços de imóveis.
+
+data(hprice3, package='wooldridge')
+
+head(hprice3[c(175:184),c(1:9)],10)
+```
+
+**Dados em Painel** (longitudinais): consiste em uma série temporal para cada registro do corte transversal do conjunto de dados. Em outras palavras, modelos de regressão com dados em painel são os que estudam o *mesmo grupo} de "entidades" ao longo do tempo.
+
+```{r aula12_2, warning=FALSE, message=FALSE}
+#Conjunto de Dados em Painel: Estatisticas Crime em estados dos USA
+
+data(murder, package='wooldridge')
+
+head(murder[,c(1:6)],9)
+```
+
+
+
+## A Importância dos Dados em Painel
+
+
+
+Baltagi (1995) lista os seguintes fatores como sendo vantagens dos dados em painel:  
+
+1) Trata com indivíduos, empresas, estados, países ao longo do tempo. É necessário que exista uma heterogeneidade nestas unidades, na qual pode ser frequentemente não observada; 
+
+2) Quando se combina cortes transversais e séries temporais, se tem dados com maior informação, maior variabilidade e menor colinearidade, mais graus de liberdade e eficiência.
+
+3) Quando se estuda as observações do corte transversal ao longo do tempo, os dados em painel são mais adequados para se estudar as dinâmicas de mudanças; 
+
+4) Dados em painel podem detectar melhor e medir efeitos que não podem ser observados com dados empilhados de cross-section (cortes transversais agrupados) ou séries temporais.
+
+
+
+## Notação Básica
+
+
+
+Considere a indexação de todas as variáveis com $i$ para para o indivíduo $i = 1, ..., N$ e $t$ para o período $t = 1, ..., T$. Assim, o modelo de regressão linear clássico pode ser escrito como abaixo, 
+
+
+
+$$
+y_{it} = \beta_0 + x_{it}^{'} \beta + \varepsilon_{it} 
+\tag{1}
+$$
+
+
+
+onde $x_{it}$ é um vetor de dimensão $K$ contendo as variáveis explicativas, sem considerar o termo constante. Esse tipo de modelo impõe que o intercepto $\beta_0$ e o coeficiente de inclinação em $\beta$ sejam idênticos para todos os indivíduos e períodos. O termo de erro em (1) varia ao longo dos indivíduos e tempo, capturando todos os fatores não observados que afetam $y_{it}$.
+
+O modelo dado em (1) possui as premissas usuais requeridas para se ter estimadores não viesados, consistentes e eficientes.
+
+
+
+$$
+E[\epsilon_{it}|x_{i1}, x_{i2}, \dots, x_{iT}]=0
+$$
+
+$$
+Var[\epsilon_{it}|x_{i1}, x_{i2}, \dots, x_{iT}]=\sigma^2_\epsilon
+$$
+
+$$
+Cov[\epsilon_{it},\epsilon_{js} |x_{i1}, x_{i2}, \dots, x_{iT}]=0 \quad \forall i \neq j \quad ou \quad t\neq s
+$$
+
+
+## Cortes Transversais Agrupados
+
+
+
+Uma razão para usar agrupamentos independentes de cortes transversais é aumentar o N. Com isso, pode-se obter estimadores mais precisos e estatísticas de teste mais poderosas;
+
+Para refletir o fato de que a população pode ter distribuições diferentes em períodos de tempo distintos, é permitido ao intercepto diferir ao longo dos períodos; 
+
+Isso pode ser implementado através da adição de variáveis *dummies* para os $n-1$ períodos da amostra. 
+
+
+
+## Cortes Transversais Agrupados - Exemplo no R
+
+
+
+O dataset cps contém dados de 1978 e 1985 da **Current Population Surveys**. O código abaixo importa os dados e estima o modelo sugerido em Wooldridge (2016).
+
+
+```{r aula12_3, warning=FALSE, message=FALSE}
+# Usando o R para verificar mudanças no retorno da eduação e a diferença salarial por gênero
+
+data(cps78_85, package='wooldridge')
+
+cps <- cps78_85
+
+reg1 <- lm(lwage~y85*(educ+female)+exper
+           +I((exper^2)/100)+union, data=cps)
+
+summary(reg1)
+```
+
+O ano base é 1978. y85 é uma variável dummy igual a um se a observação se refere ao ano de 1985 e 0, caso contrário, ou seja, do ano de 1978. A constante é o intercepto do ano base. A constante mais o coeficiente de y85 é o intercepto de 1985. 
+
+O retorno da educação em 1978 é estimado (forma não precisa) em 7,5% e para o ano de 1985 é cerca de 1,846 mais elevado (7,5 + 1,846=9,346%).
+
+Em 1978, tudo o mais constante, uma mulher ganhava precisamente ``r (exp(-0.316709)-1)*100``% a menos do que um homem. Em 1985 o valor é ``r (exp(-0.316709+0.085052)-1)*100``%.
+
+## O Estimador de Diferenças em Diferenças
+
+O *estimador de diferença em diferenças* é um tipo de corte transversal agrupado que pode ser muito útil para avaliar o impacto de um determinado evento ou decisão política (em termos gerais);
+
+Suponha que exista um evento exógeno que altere "x". A ideia é comparar a mudança ao longo do tempo de um resultado de interesse entre um grupo de observações impactado e outro não impactado.
+
+Um modelo simples de comparação dos resultados é a avaliação de um grupo antes e depois do evento, em uma regressão da forma
+
+
+$$ 
+y_{it} = \alpha_0 + \beta D_t+ \varepsilon_{it}, \quad i=1, \dots, N, \quad t=0,1 \tag{2} 
+$$ 
+onde $D_t=1$ no período 1 (pós-evento) e $D_t=0$ no período 0, e $y_{it}$ mede o resultado;
+
+Esta regressão com dados agrupados vai gerar uma estimativa do impacto da política igual a $\beta$ 
+
+$$
+\hat{\beta} = N^{-1} \sum_{i}^{max}(y_{i1}-y_{i0})=\bar{y}_1-\bar{y}_0 \tag{3} 
+$$
+
+No entanto, esta especificação de um único grupo antes e após a intervenção tem o pressuposto forte de que o grupo permanece comparável no tempo;
+
+Uma maneira de melhorar esta especificação consiste na inclusão de um grupo adicional que não sofreu tratamento, e para o qual se tenha observações nos dois períodos.
+
+A especificação passa a ser então 
+
+$$
+y_{it}^j = \alpha + \alpha_1D_t+ \alpha^1D^J+\beta D_t^j+ \varepsilon_{it}^j
+\tag{4}
+$$
+
+onde j é para os grupos, t o tempo e $\varepsilon$ é o termo de erro homocedástico. A equação (4) pode ter a inclusão de covariadas.
+
+Esta relação implica que para o grupo de tratamento, tem-se o pré-evento dado por 
+
+$$ 
+y_{i0}^1 = \alpha + \alpha^1D^1+ \varepsilon_{i0}^1 
+\tag{5} 
+$$ 
+e pós-evento 
+
+$$ 
+y_{i1}^1 = \alpha + \alpha_1+\alpha^1D^1+ \beta+\varepsilon_{i1}^1
+\tag{6} 
+$$ 
+e o impacto é 
+
+$$
+y_{i1}^1 - y_{i0}^1= \alpha_1 + \beta+\varepsilon_{i1}^1 - \varepsilon_{i0}^1 
+\tag{7} 
+$$
+
+
+As equações correspondentes para o grupo não-tratado são 
+
+$$
+y_{i0}^0= \alpha + \varepsilon_{i0}^0 
+\tag{8} 
+$$ 
+
+$$ 
+y_{i1}^0= \alpha + \alpha_1+\varepsilon_{i1}^0 
+\tag{9} 
+$$
+e a diferença é
+
+$$
+y_{i1}^0 - y_{i0}^0= \alpha_1 + \varepsilon_{i1}^0 - \varepsilon_{i0}^0
+\tag{10}
+$$
+
+
+O estimador de Diff-in-Diff vêm, então, da diferença entre as equações (7) e (10) 
+
+$$
+(y_{i1}^1 - y_{i0}^1)-(y_{i1}^0 - y_{i0}^0)= \beta+ (\varepsilon_{i1}^1 - \varepsilon_{i0}^1) - (\varepsilon_{i1}^0 - \varepsilon_{i0}^0) 
+\tag{11} 
+$$
+
+E assumindo que $E[(\varepsilon_{i1}^1 - \varepsilon_{i0}^1) - (\varepsilon_{i1}^0 - \varepsilon_{i0}^0)]=0$, obtém-se uma estimativa não viesada de $\beta$.
+
+
+```{r aula12_4, warning=FALSE, message=FALSE}
+# Usando o R para verificar efeito da localização de um incinerador sobre os preços de imóveis
+
+data(kielmc, package='wooldridge')
+
+kielmc <- kielmc
+
+# Regressões separadas para 1978 e 1981
+
+reg2 <- lm(rprice~nearinc, data=kielmc, subset=(year==1978))
+summary(reg2)
+```
+
+O intercepto mostra o valor médio dos imóveis e o coeficiente da variável dummy indica que mesmo antes da existência do incinerador, os imóveis daquela localidade era cerca de 18,8 mil dólares mais baixos do que o de outro distante do local.
+
+```{r aula12_5, warning=FALSE, message=FALSE}
+reg3 <- lm(rprice~nearinc, data=kielmc, subset=(year==1981))
+summary(reg3)
+```
+
+No caso da regressão no ano de 1981 os resultados mostram que os preços dos imóveis subiram para 101 mil dólares aproximadamente e que os imóveis localizados perto de onde foi instalado o incinerador estão cerca de 30,7 mil dólares mais baratos.
+
+Como se pode avaliar se a instalação do incinerador reduziu os preços dos imóveis? Para isto é preciso verificar como mudou o coeficiente da variável dummy nos dois períodos. 
+
+
+```{r aula12_6, warning=FALSE, message=FALSE}
+#Diferença entre os coeficientes
+coef.78<-coef(lm(rprice~nearinc, data=kielmc, subset=(year==1978)))
+coef.81<-coef(lm(rprice~nearinc, data=kielmc, subset=(year==1981)))
+coef.81[2]-coef.78[2]
+
+#Mesmos Resultados, outra forma
+library(lmtest)
+coeftest(lm(rprice~nearinc*y81, data=kielmc))
+```
+
+
+Assim, por duas maneiras distintas de estimar o modelo, é possível verificar que a diferença entre os dois coefientes é de -11.863,9 dólares. Esta é a estimativa do efeito do incinerador sobre os preços dos imóveis pertos de sua localização. O valor da estimativa ficou conhecido na econometria como estimador de diferença em diferenças.
+
+$$
+\hat{\delta}_1 = (\bar{rprice_{81,pr}} - \bar{rprice_{81,af}}) - (\bar{rprice_{78,pr}} - \bar{rprice_{78,af}})=-11.863,9
+$$
+
+Contudo, precisa-se saber se este valor é ou não estatisticamente igual a zero. Como pode ser visto na segunda forma de estimar o valor, o valor de probabilidade é maior do que 0,10, não rejeitando a hipótese nula. Assim, não se pode afirmar que a instalação do incinerador alterou as diferenças de preços de imóveis mais distantes.
+
+
+```{r aula12_7, warning=FALSE, message=FALSE}
+
+coeftest(lm(log(rprice)~nearinc*y81, data=kielmc))
+#Inclusão de covariaveis
+coeftest(lm(log(price)~nearinc*y81+lintst+lland+larea+rooms, data=kielmc) )
+```
+
+As estimativas acima são para mostrar que logaritimizando a variável dependente se tem um efeito percentual do efeito do incinerador sobre os preços dos imóveis. O coeficiente mostra que os imóveis próximos do incinerador reduziram cerca de 6,3% no seu valor. Contudo, não é estatisticamente significativo. 
+
+Ao se inserir outras variáveis explicativas no modelo como a distância para a rodovia interestadual (instst), área do terreno (land), área construida (area) e o número de quartos (rooms), a redução passa a ser de aproximadamente 11,2% e estatisticamente significativo a 10% de probabilidade. 
+
+Diferentemente de um experimento estatístico verdadeiro, no qual os grupos de controle e de tratamento são obtidos de forma aleatória, no caso em análise os grupos surgem da mudança em um fator exógeno;
+
+Assim, de forma a controlar diferenças sistemáticas entre os grupos, é preciso ter um amostra com dois anos de dados, uma anterior e outra posterior à mudança. 
+
+A amostra fica dividida em quatro grupos: o grupo de controle antes e depois da mudança e o grupo de tratamento antes e depois da mudança. 
+
+Como em Wooldridge(2016), considere que $A$ seja o grupo de controle e $B$ seja o grupo de tratamento. Assim, $dB$ é igual a 1 para as observações do grupo $B$ (tratamento) e zero, caso contrário. A variável **dummy** para o segundo período é dada por $d2$, de modo que a equação passa a ser
+
+
+$$
+y = \beta_0 + \delta_0 d2 + \beta_1 dB + \delta_1 d2 dB + \text{outros fatores}
+\tag{12}
+$$ 
+
+
+onde $y$ é a variável de interesse, $\delta_1$ vai medir o efeito da decisão ou do evento exógeno;
+
+Sem outros fatores, $\hat{\delta}_1$ será o estimador de diferenciamento:
+
+$$
+\hat{\delta_1} = (\bar{y_{2,B}} - \bar{y_{2,A}}) - (\bar{y_{1,B}} - \bar{y_{1,A}})
+$$
+
+## Controle Sintético
+
+### Método de Controle Sintético: Formulação Matemática
+
+### Notação
+
+- **Unidades Tratadas**: Denotada como $( J+1 )$.
+- **Unidades de Controle**: Denotada como $( 1, 2, \ldots, J )$.
+- **Pre-tratamento Periodo**: $( t = 1, 2, \ldots, T_0 )$.
+- **Pós-tratamento Periodo**: $( t = T_0 + 1, T_0 + 2, \ldots, T )$.
+- **Variável de Resultado**: $( Y_{it} )$ para a unidade $( i)$ no tempo $( t)$.
+
+### Objetivo
+
+Construa um controle sintético que se aproxime do resultado da unidade tratada $( Y_{J+1, t})$ no período pré-tratamento. Em seguida, utilize este controle sintético para estimar o resultado contrafactual no período pós-tratamento.
+
+## Passos
+
+### 1. Escolha preditores e resultados
+
+- **Preditores**: $( X_{i} = (X_{i1}, X_{i2}, \ldots, X_{iK})')$, onde $( X_{ik} )$ são características pré-tratamento da unidade $( i )$ (por exemplo, variáveis demográficas e econômicas).
+- **Resultados**: $( Y_{it} )$ para $( t = 1, 2, \ldots, T_0 )$.
+
+### 2. Construa o controle sintético
+
+Encontre pesos $( W = (w_1, w_2, \ldots, w_J) )$ tais que a média ponderada das unidades de controle se aproxime da unidade tratada no período de pré-tratamento.
+
+$$
+\sum_{j=1}^J w_j X_j \approx X_{J+1} 
+$$
+
+Os pesos $( W )$ não são negativos e somam um:
+
+$$
+w_j \geq 0 \quad \text{and} \quad \sum_{j=1}^J w_j = 1 
+$$
+
+### 3. Minimize a distância
+
+Os pesos $( W )$ são escolhidos para minimizar a distância entre os preditores da unidade tratada e o controle sintético:
+
+$$
+\min_W \left\| X_{J+1} - \sum_{j=1}^J w_j X_j \right\|_V 
+$$
+
+onde $( V )$ é uma matriz diagonal que atribui pesos às variáveis preditoras.
+
+### 4. Estime o resultado do controle sintético
+
+Use os pesos otimizados para estimar o resultado do controle sintético para a unidade tratada no período pós-tratamento:
+
+$$
+\hat{Y}_{J+1, t}^\text{synthetic} = \sum_{j=1}^J w_j Y_{j, t} \quad \text{for} \quad t = T_0 + 1, T_0 + 2, \ldots, T 
+$$
+
+### 5. Estime o efeito do tratamento
+
+O efeito do tratamento é a diferença entre o resultado real e o resultado do controle sintético para a unidade tratada no período pós-tratamento:
+
+$$ 
+\tau_{J+1, t} = Y_{J+1, t} - \hat{Y}_{J+1, t}^\text{synthetic} \quad \text{for} \quad t = T_0 + 1, T_0 + 2, \ldots, T 
+$$
+
+
+### Exemplo no R
+
+Neste exemplo, se quer estudar o impacto de um evento significativo na esperança de vida de um país. Especificamente, o exame do impacto do genocídio de 1994 em Ruanda, na esperança de vida de sua população. Ao utilizar o método de controle sintético, pretende-se construir uma "versão sintética" de Ruanda, que represente o que teria acontecido à esperança de vida do país se o genocídio não tivesse ocorrido. Isto permite estimar o efeito causal do genocídio na esperança de vida.
+
+```{r aula12_8}
+library(gapminder)
+library(dplyr)
+library(Synth)
+
+# Carrega o dataset
+data("gapminder", package = "gapminder")
+
+# Inspeciona o dataset
+head(gapminder)
+summary(gapminder)
+
+# Check the available years
+unique(gapminder$year)
+
+# Choose a country for treatment (e.g., Rwanda due to the 1994 genocide affecting life expectancy)
+treated_country <- "Rwanda"
+treatment_year <- 1994
+
+# Create a numeric identifier for each country
+gapminder <- gapminder %>%
+  mutate(country_id = as.numeric(as.factor(country)),
+         treatment = ifelse(country == treated_country & year >= treatment_year, 1, 0))
+
+# Verify the country_id
+head(gapminder)
+
+# Get the numeric identifier for the treated country
+treated_country_id <- gapminder %>%
+  filter(country == treated_country) %>%
+  pull(country_id) %>%
+  unique()
+
+# Ensure the identifier is numeric
+gapminder <- gapminder %>%
+  mutate(country_id = as.numeric(country_id))
+
+# Prepare data for Synth package with correct years
+dataprep.out <- dataprep(
+  foo = as.data.frame(gapminder),
+  predictors = c("gdpPercap", "pop"),
+  predictors.op = "mean",
+  time.predictors.prior = c(1952, 1957, 1962, 1967, 1972, 1977, 1982, 1987, 1992),
+  dependent = "lifeExp",
+  unit.variable = "country_id",
+  time.variable = "year",
+  treatment.identifier = treated_country_id,
+  controls.identifier = setdiff(unique(gapminder$country_id), treated_country_id),
+  time.optimize.ssr = c(1952, 1957, 1962, 1967, 1972, 1977, 1982, 1987, 1992),
+  time.plot = c(1952, 1957, 1962, 1967, 1972, 1977, 1982, 1987, 1992, 1997, 2002, 2007)
+)
+
+# Fit the synthetic control model
+synth.out <- synth(dataprep.out)
+
+# Extract the results
+synth.tables <- synth.tab(dataprep.res = dataprep.out, synth.res = synth.out)
+
+# Print the results
+print(synth.tables$tab.w)
+print(synth.tables$tab.pred)
+
+# Plot the synthetic control results
+path.plot(synth.res = synth.out, dataprep.res = dataprep.out,
+          Ylab = "Life Expectancy", Xlab = "Year",
+          Legend = c("Rwanda", "Synthetic Rwanda"),
+          Legend.position = "bottomright")
+
+
+```
+
+
+# Exemplo no Python
+
+```{python aula12_9}
+import pandas as pd
+import wooldridge
+from linearmodels.panel import PanelOLS, RandomEffects
+import statsmodels.api as sm
+import statsmodels.formula.api as smf
+
+#Cortes transversais agrupados: 2 anos de preços de imóveis.
+#Carregar dados no computador
+hprice3 = wooldridge.data('hprice3')
+#Observar a estrutura dos dados
+wooldridge.data('hprice3', description=True)
+# Selecione as linhas e colunas necessárias
+selected_data = hprice3.iloc[174:184, 0:9]  #Lembre-se de que Python usa indexação baseada em zero e não mostra o ultimo valor selecionado.
+
+# Mostra as 10 primeiras linhas
+print(selected_data.head(10))
+
+#Conjunto de Dados em Painel: Estatisticas Crime em estados dos USA
+murder = wooldridge.data('murder')
+#Observar a estrutura dos dados
+wooldridge.data('murder', description=True)
+
+# Selecione as linhas e colunas necessárias
+selected_data = murder.iloc[:, 0:6]  #Lembre-se de que Python usa indexação baseada em zero e não mostra o ultimo valor selecionado.
+
+# Mostra as 9 primeiras linhas
+print(selected_data.head(9))
+
+# Usando o Python para verificar mudanças no retorno da eduação e a diferença salarial por gênero
+
+cps = wooldridge.data('cps78_85')
+
+# Define a as variáveis do modelo
+formula = 'lwage ~ y85 * (educ + female) + exper + I((exper**2) / 100) + union'
+
+# Fit the linear regression model
+reg1 = smf.ols(formula, data=cps).fit()
+
+# Display the summary of the regression
+print(reg1.summary())
+```
+
+## O Estimador de Diferenças em Diferenças no Python
+
+```{python aula12_10}
+# Usando o Python para verificar efeito da localização de um incinerador sobre os preços de imóveis
+
+kielmc = wooldridge.data('kielmc')
+
+# Regressões separadas para 1978 e 1981
+
+reg2 = smf.ols('rprice ~ nearinc', data=kielmc, subset=kielmc['year'] == 1978).fit()
+
+print(reg2.summary())
+
+reg3 = smf.ols('rprice ~ nearinc', data=kielmc, subset=kielmc['year'] == 1981).fit()
+
+print(reg3.summary())
+
+# Extrai os coeficientes
+coef_78 = reg2.params
+coef_81 = reg3.params
+
+# Diferença entre os coeficientes de 'nearinc'
+diff = coef_81['nearinc'] - coef_78['nearinc']
+
+# Mostra a diferença
+print(f"Diferença entre coeficientes 'nearinc' : {diff:.0f}")
+
+#Mesmos Resultados, outra forma
+reg4 = smf.ols('rprice ~ nearinc * y81', data=kielmc).fit()
+
+print(reg4.summary())
+```
+
+
+```{python aula12_11, echo=FALSE}
+#import pandas as pd
+#import matplotlib.pyplot as plt
+#from SyntheticControlMethods import Synth
+
+# Load the gapminder dataset
+#url = 'https://raw.githubusercontent.com/resbaz/r-novice-gapminder-files/master/data/gapminder-FiveYearData.csv'
+#gapminder = pd.read_csv(url)
+
+
+#gapminder.describe()
+```
+
