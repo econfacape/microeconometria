@@ -43,6 +43,7 @@ execute:
 
 ```{r aula12_1, warning=FALSE, message=FALSE}
 #Cortes transversais agrupados: 2 anos de preços de imóveis.
+library(wooldridge)
 
 data(hprice3, package='wooldridge')
 
@@ -59,11 +60,7 @@ data(murder, package='wooldridge')
 head(murder[,c(1:6)],9)
 ```
 
-
-
 ## A Importância dos Dados em Painel
-
-
 
 Baltagi (1995) lista os seguintes fatores como sendo vantagens dos dados em painel:  
 
@@ -76,10 +73,7 @@ Baltagi (1995) lista os seguintes fatores como sendo vantagens dos dados em pain
 4) Dados em painel podem detectar melhor e medir efeitos que não podem ser observados com dados empilhados de cross-section (cortes transversais agrupados) ou séries temporais.
 
 
-
 ## Notação Básica
-
-
 
 Considere a indexação de todas as variáveis com $i$ para para o indivíduo $i = 1, ..., N$ e $t$ para o período $t = 1, ..., T$. Assim, o modelo de regressão linear clássico pode ser escrito como abaixo, 
 
@@ -89,8 +83,6 @@ $$
 y_{it} = \beta_0 + x_{it}^{'} \beta + \varepsilon_{it} 
 \tag{1}
 $$
-
-
 
 onde $x_{it}$ é um vetor de dimensão $K$ contendo as variáveis explicativas, sem considerar o termo constante. Esse tipo de modelo impõe que o intercepto $\beta_0$ e o coeficiente de inclinação em $\beta$ sejam idênticos para todos os indivíduos e períodos. O termo de erro em (1) varia ao longo dos indivíduos e tempo, capturando todos os fatores não observados que afetam $y_{it}$.
 
@@ -110,10 +102,7 @@ $$
 Cov[\epsilon_{it},\epsilon_{js} |x_{i1}, x_{i2}, \dots, x_{iT}]=0 \quad \forall i \neq j \quad ou \quad t\neq s
 $$
 
-
 ## Cortes Transversais Agrupados
-
-
 
 Uma razão para usar agrupamentos independentes de cortes transversais é aumentar o N. Com isso, pode-se obter estimadores mais precisos e estatísticas de teste mais poderosas;
 
@@ -121,10 +110,7 @@ Para refletir o fato de que a população pode ter distribuições diferentes em
 
 Isso pode ser implementado através da adição de variáveis *dummies* para os $n-1$ períodos da amostra. 
 
-
-
 ## Cortes Transversais Agrupados - Exemplo no R
-
 
 
 O dataset cps contém dados de 1978 e 1985 da **Current Population Surveys**. O código abaixo importa os dados e estima o modelo sugerido em Wooldridge (2016).
@@ -311,7 +297,101 @@ $$
 \hat{\delta_1} = (\bar{y_{2,B}} - \bar{y_{2,A}}) - (\bar{y_{1,B}} - \bar{y_{1,A}})
 $$
 
+###  Suposição de tendências paralelas
+
+A suposição de tendências paralelas (também conhecida como suposição de caminhos paralelos) é a suposição fundamental para a validade dos modelos Diff-in-Diff. Afirma que, na ausência do tratamento, a diferença nos resultados médios entre os grupos de tratamento e de controle teria permanecido constante ao longo do tempo. Isto implica que ambos os grupos teriam seguido a mesma tendência ao longo do tempo se o tratamento não tivesse sido implementado.
+
+A suposição de tendências paralelas garante que quaisquer diferenças no resultado após o tratamento possam ser atribuídas ao próprio tratamento, e não a outros fatores. Se esta suposição for válida, o estimador Diff-in-Diff pode fornecer uma estimativa válida do efeito causal do tratamento.
+
+Se a suposição de tendências paralelas for violada, as estimativas Diff-in-Diff podem ser tendenciosas. Nesses casos, deve-se considerar:
+
+**Ajustando o Modelo:** Controle dos fatores que podem estar causando a divergência nas tendências.
+
+**Métodos Alternativos:** Utilize outras técnicas econométricas, tais como Métodos de Controle Sintético.
+
+### Exemplo no R
+
+```{r aula12_7a}
+# Load necessary libraries
+library(ggplot2)
+library(dplyr)
+
+# Create a pre-treatment period indicator
+kielmc$pre_period <- ifelse(kielmc$year < 1981, 1, 0)
+
+# Create interaction terms for the pre-treatment period
+kielmc$pre_nearinc <- kielmc$pre_period * kielmc$nearinc
+
+# Visual Inspection
+# Calculate average log(price) by year and nearinc
+avg_log_price <- kielmc %>%
+  group_by(year, nearinc) %>%
+  summarize(avg_log_price = mean(log(price), na.rm = TRUE))
+
+# Plot the trends
+ggplot(avg_log_price, aes(x = year, y = avg_log_price, color = factor(nearinc))) +
+  geom_line() +
+  labs(title = "Log(Price) Trends by Year and Nearinc",
+       x = "Year",
+       y = "Average Log(Price)",
+       color = "Nearinc")
+
+# Formal Statistical Test
+# Run a regression with interaction terms for the pre-treatment period
+model <- lm(log(price) ~ pre_period * nearinc + lintst + lland + larea + rooms, data = kielmc)
+summary(model)
+
+# Test the interaction term for significance
+coeftest(model)
+
+```
+
+Conclusão: O valor p de 0,0635153 sugere que há alguma evidência contra a hipótese nula de não haver diferença nas tendências (ou seja, que as tendências pré-tratamento são diferentes entre os grupos de tratamento e de controle). No entanto, não é fortemente significativo. Embora o valor p esteja acima de 0,05, ainda está abaixo de 0,1, indicando que a evidência contra a suposição de tendências paralelas não é forte, mas vale a pena considerar.
+
 ## Controle Sintético
+
+O Método de Controle Sintético (SCM) é uma técnica de inferência causal usada em estudos observacionais para avaliar o impacto de uma intervenção ou tratamento quando um ensaio tradicional de controle randomizado não é viável. É particularmente útil quando o tratamento é aplicado a uma **única unidade** (por exemplo, uma região, país ou organização) e existem múltiplas unidades de controle potenciais disponíveis.
+
+**Conceitos chave**
+
+1) Unidade Tratada: A unidade que recebe o tratamento ou intervenção.
+
+2) Unidades de Controle: As unidades que não recebem o tratamento.
+
+3) Controle Sintético: Uma combinação ponderada de unidades de controle construídas para se assemelhar às características da unidade tratada antes da intervenção.
+
+### Etapas do Método de Controle Sintético
+
+**Correspondência do período de pré-tratamento:** Selecione um conjunto de unidades de controle e use uma combinação ponderada dessas unidades para construir um controle sintético que corresponda melhor às características da unidade tratada durante o período de pré-tratamento.
+
+**Comparação pós-tratamento:** Compare os resultados da unidade tratada e da unidade de controle sintética no período pós-tratamento para estimar o efeito do tratamento.
+Fundamentação teórica.
+
+O SCM baseia-se na ideia de criar um cenário contrafactual para a unidade tratada, utilizando uma combinação de unidades de controle. As principais etapas envolvem:
+
+1) Escolhendo Variáveis Preditoras: Selecione variáveis preditoras que influenciam a variável de resultado. Esses preditores são usados para combinar a unidade tratada com as unidades de controle.
+
+2) Otimização: Determine os pesos das unidades de controle que minimizem a diferença entre a unidade tratada e o controle sintético em termos de variáveis preditoras durante o período pré-tratamento.
+
+3) Estimativa do efeito do tratamento: No período pós-tratamento, a diferença entre o resultado real da unidade tratada e o resultado do controle sintético é atribuída ao efeito do tratamento.
+
+### Vantagens do SCM
+
+1) Flexibilidade: o SCM não requer um grande número de unidades tratadas e pode atender casos com uma única unidade tratada.
+
+2) Nenhuma suposição de tendências paralelas: Ao contrário da diferença em diferenças (Diff-in-Diff), o SCM não depende muito da suposição de tendências paralelas, tornando-o mais robusto em determinados contextos.
+
+3) Transparente e Intuitivo: O método fornece uma forma clara e interpretável de construir um cenário contrafactual e estimar o efeito do tratamento.
+
+### Considerações práticas
+
+**Seleção de Preditores:** A escolha das variáveis preditoras é crucial. Eles devem ser relevantes e prever com precisão a variável resultado.
+
+**Otimização de peso:** O processo de otimização para determinar os pesos deve garantir que o controle sintético corresponda de perto à unidade tratada no período de pré-tratamento.
+
+**Testes de Placebo:** Realize testes de placebo aplicando o SCM a outras unidades de controle para verificar a robustez do efeito estimado do tratamento.
+
+O Método de Controle Sintético é uma ferramenta poderosa para inferência causal, especialmente quando se trata de uma única unidade tratada e de múltiplas unidades de controle. Ao selecionar cuidadosamente os preditores e otimizar os pesos, os pesquisadores podem construir um cenário contrafactual confiável e estimar o efeito do tratamento com maior precisão e robustez.
 
 ### Método de Controle Sintético: Formulação Matemática
 
@@ -529,17 +609,15 @@ reg4 = smf.ols('rprice ~ nearinc * y81', data=kielmc).fit()
 print(reg4.summary())
 ```
 
-
 ```{python aula12_11, echo=FALSE}
-#import pandas as pd
-#import matplotlib.pyplot as plt
-#from SyntheticControlMethods import Synth
 
-# Load the gapminder dataset
-#url = 'https://raw.githubusercontent.com/resbaz/r-novice-gapminder-files/master/data/gapminder-FiveYearData.csv'
-#gapminder = pd.read_csv(url)
+import pandas as pd
+from wooldridge import data
+import matplotlib.pyplot as plt
 
+# Load the dataset
+gapminder = pd.read_csv('https://raw.githubusercontent.com/resbaz/r-novice-gapminder-files/master/data/gapminder-FiveYearData.csv')
 
-#gapminder.describe()
+gapminder.describe()
 ```
 
