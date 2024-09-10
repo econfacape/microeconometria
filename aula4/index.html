@@ -4435,7 +4435,7 @@ window.Quarto = {
     <div>
     <div class="quarto-title-meta-heading">Data de Publicação</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">15 de julho de 2024</p>
+      <p class="date">10 de setembro de 2024</p>
     </div>
   </div>
   
@@ -4600,8 +4600,8 @@ Henry Farber when he and I were colleagues at MIT in 1988.</code></pre>
 Dep. Variable:                   wage   R-squared:                       0.013
 Model:                            OLS   Adj. R-squared:                  0.011
 Method:                 Least Squares   F-statistic:                     6.766
-Date:                Seg, 15 Jul 2024   Prob (F-statistic):            0.00955
-Time:                        14:54:34   Log-Likelihood:                -1429.7
+Date:                Ter, 10 Set 2024   Prob (F-statistic):            0.00955
+Time:                        12:50:22   Log-Likelihood:                -1429.7
 No. Observations:                 526   AIC:                             2863.
 Df Residuals:                     524   BIC:                             2872.
 Df Model:                           1                                         
@@ -4633,8 +4633,8 @@ Notes:
 Dep. Variable:           np.log(wage)   R-squared:                       0.055
 Model:                            OLS   Adj. R-squared:                  0.053
 Method:                 Least Squares   F-statistic:                     30.42
-Date:                Seg, 15 Jul 2024   Prob (F-statistic):           5.47e-08
-Time:                        14:54:34   Log-Likelihood:                -398.60
+Date:                Ter, 10 Set 2024   Prob (F-statistic):           5.47e-08
+Time:                        12:50:22   Log-Likelihood:                -398.60
 No. Observations:                 526   AIC:                             801.2
 Df Residuals:                     524   BIC:                             809.7
 Df Model:                           1                                         
@@ -4780,8 +4780,8 @@ Name: educ, dtype: float64</code></pre>
 Dep. Variable:           np.log(wage)   R-squared:                       0.149
 Model:                            OLS   Adj. R-squared:                  0.147
 Method:                 Least Squares   F-statistic:                     91.12
-Date:                Seg, 15 Jul 2024   Prob (F-statistic):           5.19e-20
-Time:                        14:54:35   Log-Likelihood:                -370.08
+Date:                Ter, 10 Set 2024   Prob (F-statistic):           5.19e-20
+Time:                        12:50:23   Log-Likelihood:                -370.08
 No. Observations:                 524   AIC:                             744.2
 Df Residuals:                     522   BIC:                             752.7
 Df Model:                           1                                         
@@ -4830,8 +4830,8 @@ Name: educ, dtype: float64</code></pre>
 Dep. Variable:           np.log(wage)   R-squared:                       0.018
 Model:                            OLS   Adj. R-squared:                  0.016
 Method:                 Least Squares   F-statistic:                     9.724
-Date:                Seg, 15 Jul 2024   Prob (F-statistic):            0.00192
-Time:                        14:54:35   Log-Likelihood:                -408.60
+Date:                Ter, 10 Set 2024   Prob (F-statistic):            0.00192
+Time:                        12:50:24   Log-Likelihood:                -408.60
 No. Observations:                 526   AIC:                             821.2
 Df Residuals:                     524   BIC:                             829.7
 Df Model:                           1                                         
@@ -4906,31 +4906,31 @@ F-statistic: 8.207 on 1 and 524 DF,  p-value: 0.004341</code></pre>
 <h3 class="anchored" data-anchor-id="exemplo-no-python-2">Exemplo no Python</h3>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Resultado da Regressão</span></span>
-<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>reg5 <span class="op">=</span> smf.ols(<span class="st">&#39;np.log(wage) ~ np.log(educ)&#39;</span>, data<span class="op">=</span>dados2)</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>reg5 <span class="op">=</span> smf.ols(<span class="st">&#39;wage ~ np.log(educ)&#39;</span>, data<span class="op">=</span>dados2)</span>
 <span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>result_log5 <span class="op">=</span> reg5.fit()</span>
 <span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(result_log5.summary())</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>                            OLS Regression Results                            
 ==============================================================================
-Dep. Variable:           np.log(wage)   R-squared:                       0.018
-Model:                            OLS   Adj. R-squared:                  0.016
-Method:                 Least Squares   F-statistic:                     9.724
-Date:                Seg, 15 Jul 2024   Prob (F-statistic):            0.00192
-Time:                        14:54:36   Log-Likelihood:                -408.60
-No. Observations:                 526   AIC:                             821.2
-Df Residuals:                     524   BIC:                             829.7
+Dep. Variable:                   wage   R-squared:                       0.015
+Model:                            OLS   Adj. R-squared:                  0.014
+Method:                 Least Squares   F-statistic:                     8.207
+Date:                Ter, 10 Set 2024   Prob (F-statistic):            0.00434
+Time:                        12:50:25   Log-Likelihood:                -1429.0
+No. Observations:                 526   AIC:                             2862.
+Df Residuals:                     524   BIC:                             2870.
 Df Model:                           1                                         
 Covariance Type:            nonrobust                                         
 ================================================================================
                    coef    std err          t      P&gt;|t|      [0.025      0.975]
 --------------------------------------------------------------------------------
-Intercept        1.4539      0.059     24.645      0.000       1.338       1.570
-np.log(educ)     0.0693      0.022      3.118      0.002       0.026       0.113
+Intercept        4.8132      0.410     11.727      0.000       4.007       5.620
+np.log(educ)     0.4428      0.155      2.865      0.004       0.139       0.746
 ==============================================================================
-Omnibus:                       14.884   Durbin-Watson:                   1.838
-Prob(Omnibus):                  0.001   Jarque-Bera (JB):               15.656
-Skew:                           0.375   Prob(JB):                     0.000398
-Kurtosis:                       3.390   Cond. No.                         7.65
+Omnibus:                      227.103   Durbin-Watson:                   1.830
+Prob(Omnibus):                  0.000   Jarque-Bera (JB):              885.805
+Skew:                           2.000   Prob(JB):                    4.47e-193
+Kurtosis:                       7.942   Cond. No.                         7.65
 ==============================================================================
 
 Notes:
@@ -5023,8 +5023,8 @@ F-statistic: 119.6 on 1 and 524 DF,  p-value: &lt; 2.2e-16</code></pre>
 Dep. Variable:           np.log(wage)   R-squared:                       0.186
 Model:                            OLS   Adj. R-squared:                  0.184
 Method:                 Least Squares   F-statistic:                     119.6
-Date:                Seg, 15 Jul 2024   Prob (F-statistic):           3.27e-25
-Time:                        14:54:36   Log-Likelihood:                -359.38
+Date:                Ter, 10 Set 2024   Prob (F-statistic):           3.27e-25
+Time:                        12:50:25   Log-Likelihood:                -359.38
 No. Observations:                 526   AIC:                             722.8
 Df Residuals:                     524   BIC:                             731.3
 Df Model:                           1                                         

@@ -252,7 +252,7 @@ summary(reg5)
 ```{python econ4a, message=FALSE, warning=FALSE}
 
 #Resultado da Regressão
-reg5 = smf.ols('np.log(wage) ~ np.log(educ)', data=dados2)
+reg5 = smf.ols('wage ~ np.log(educ)', data=dados2)
 result_log5 = reg5.fit()
 print(result_log5.summary())
 ```
