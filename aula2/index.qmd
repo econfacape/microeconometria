@@ -17,9 +17,9 @@ format:
     embed-resources: true
     page-layout: full
     fig-asp: 0.618
-    fig-width: 10
+    fig-width: 8
     fig-height: 5
-    fig-dpi: 100
+    fig-dpi: 300
     fig-align: center
     df-print: paged
     fontsize: 13pt
@@ -45,7 +45,7 @@ $$
 
 A equação acima é válida para a população de interesse e chamada de **modelo de regressão linear simples**. Pode ser também chamada de regressão bivariada ou de duas variáveis.
 
-Quando relacionadas como acima, as variáveis *x* e *y* podem ser denominadas de diversas formas:
+Quando relacionadas como acima, as variáveis *x e *y* podem ser denominadas de diversas formas:
 
 ``` {r, include=FALSE}
 #https://tableconvert.com/latex-to-markdown
@@ -65,7 +65,7 @@ Quando relacionadas como acima, as variáveis *x* e *y* podem ser denominadas de
 
 O termo covariável também pode ser usado para x. O mais comum é variável dependente e independente.
 
-A variável *u*, chamada de termo de erro ou resíduo da regressão representa outros fatores, além de x, que afetam y, mas que não sao observados. Se os outros fatores forem mantidos fixos, sua variação é zero, ou seja, $\Delta u=0$. Assim, x tem um efeito linear sobre y:
+Se os outros fatores são fixos, sua variação é zero, ou seja, $\Delta u=0$. Assim, x tem um efeito linear sobre y:
 
 $$
 \Delta y=\beta_1 \Delta x \quad se \quad \Delta u=0
@@ -230,72 +230,7 @@ $$
 \sum(X)(X-\overline{X})=\sum(X-\overline{X})^2
 $$
 
-A prova disto é mostrada abaixo. Em relação a primeira equação, tem-se:
-
-$$
-\sum (X - \overline{X})(Y - \overline{Y}) = \sum X(Y - \overline{Y}) - \overline{X} \sum(Y - \overline{Y})
-$$
-
-como o desvio da média é zero
-
-$$
-\sum(Y - \overline{Y}) = 0
-$$
-
-a equação fica reduzida para 
-
-$$
-\sum (X - \overline{X})(Y - \overline{Y}) = \sum X(Y - \overline{Y})
-$$
-
-No caso da segunda equação, tem-se
-
-$$
-\sum X(X - \overline{X}) = \sum (X^2 - \overline{X}X)
-$$
-
-$$
-\sum X(X - \overline{X}) = \sum X^2 - \sum \overline{X}X
-$$
-
-Como $(\overline{X})$ é a média de $X$, uma constante, tem-se:
-
-$$
-\sum X(X - \overline{X}) = \sum X^2 - \overline{X} \sum X
-$$
-
-Além disso, considerando a parte a direita da igualdade, 
-
-$$
-\sum (X - \overline{X})^2 = \sum (X^2 - 2X\overline{X} + \overline{X}^2)
-$$
-
-
-$$
-\sum (X - \overline{X})^2 = \sum X^2 - 2\overline{X}\sum X + \sum \overline{X}^2
-$$
-
-Sendo $(\overline{X})$ uma constante, $(\sum \overline{X}^2)$ é igual a $(n\overline{X}^2)$, onde $(n)$ é a quantidade de termos:
-
-$$
-\sum (X - \overline{X})^2 = \sum X^2 - 2\overline{X}\sum X + n\overline{X}^2
-$$
-
-Como $(n\overline{X}^2 = \overline{X}\sum X)$ pois $(\overline{X} = \frac{\sum X}{n})$, então:
-
-$$
-\sum (X - \overline{X})^2 = \sum X^2 - 2\overline{X}\sum X + \overline{X}\sum X
-$$
-
-Simplificando
-
-$$
-\sum (X - \overline{X})^2 = \sum X^2 - \overline{X}\sum X
-$$
-
-Exatamente o que foi obtido anteriormente para $(\sum X(X - \overline{X}))$.
-
-Continuando, então, a demostração de como encontrar a fórmula de cálculo do $\beta_1$, desde que $\sum(X-\overline{X})^2>0$, a inclinação estimada é
+Então, desde que $\sum(X-\overline{X})^2>0$, a inclinação estimada é
 
 $$
 \hat{\beta_1}=\frac{\sum(X-\overline{X})(Y-\overline{Y})}{\sum(X-\overline{X})^2}
@@ -307,7 +242,7 @@ $$
 
 com $x=X-\overline{X}$ e $y=Y-\overline{Y}$.
 
-A equação dada em acima é a covariância amostral de x e y dividida pela variância amostral de x. Pode-se reescrever a forma de encontrar o $\hat{\beta}_1$ como abaixo:
+A equação dada em acima é a covariância amostral de x e y dividida pela variância amostral de x. Podemos reescrever a forma de encontrar o $\hat{\beta}_1$ como abaixo:
 
 $$
 \hat{\beta_1}=\frac{cov(xy)}{\hat{\sigma}_x     \hat{\sigma}_x}\frac{\hat{\sigma}_y}{\hat{\sigma}_y}
@@ -466,7 +401,7 @@ predict(regressao1, data.frame(roe = 30))
 
 ## Exemplo no Python
 
-```{python}
+```{python econ6, warning=FALSE, message=FALSE}
 import wooldridge
 import pandas as pd
 import numpy as np
@@ -484,6 +419,10 @@ wooldridge.data('ceosal1', description=True)
 ceosal1.info()
 ceosal1["salary"].describe()
 ceosal1["roe"].describe()
+
+# Covariância e Correlação
+ceosal1.cov
+ceosal1.corr
 
 # Gráfico
 
@@ -529,9 +468,6 @@ plt.figure(figsize = (20,8))
 
 sns.regplot(x = 'roe', y = 'salary', data = ceosal1).set(title='Modelo Linear Estimado')
 
-```
-
-```{python}
 # Fazer Previsão com o modelo estimado
 
 nova_obs = pd.DataFrame({"roe": [30]})
