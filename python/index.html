@@ -4412,7 +4412,7 @@ window.onload = function() {
     <div>
     <div class="quarto-title-meta-heading">Data de Publicação</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">15 de julho de 2024</p>
+      <p class="date">7 de agosto de 2025</p>
     </div>
   </div>
   
@@ -4459,14 +4459,14 @@ window.onload = function() {
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">#install.packages(&quot;reticulate&quot;)</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>reticulate<span class="sc">::</span><span class="fu">py_config</span>()</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>python:         /Library/Frameworks/Python.framework/Versions/3.12/bin/python3
+<pre><code>python:         /Users/jricardofl/.virtualenvs/r-reticulate/bin/python
 libpython:      /Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/config-3.12-darwin/libpython3.12.dylib
-pythonhome:     /Library/Frameworks/Python.framework/Versions/3.12:/Library/Frameworks/Python.framework/Versions/3.12
+pythonhome:     /Users/jricardofl/.virtualenvs/r-reticulate:/Users/jricardofl/.virtualenvs/r-reticulate
 version:        3.12.3 (v3.12.3:f6650f9ad7, Apr  9 2024, 08:18:48) [Clang 13.0.0 (clang-1300.0.29.30)]
-numpy:          /Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/numpy
+numpy:          /Users/jricardofl/.virtualenvs/r-reticulate/lib/python3.12/site-packages/numpy
 numpy_version:  1.26.4
 
-NOTE: Python version was forced by RETICULATE_PYTHON_FALLBACK</code></pre>
+NOTE: Python version was forced by VIRTUAL_ENV</code></pre>
 </div>
 </div>
 <div class="cell">
@@ -7617,18 +7617,18 @@ max    177.060000</code></pre>
 <span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>data</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>array([[ 0.70393572, -0.81710731,  2.25451134],
-       [ 0.53206664, -0.37118523, -0.78910458]])</code></pre>
+<pre><code>array([[-0.20456292,  2.56247818, -0.81146339],
+       [ 0.54958846,  0.47961033,  0.06818309]])</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb44"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>data <span class="op">*</span> <span class="dv">5</span></span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>array([[ 3.51967859, -4.08553655, 11.27255671],
-       [ 2.66033321, -1.85592613, -3.9455229 ]])</code></pre>
+<pre><code>array([[-1.02281461, 12.81239092, -4.05731693],
+       [ 2.7479423 ,  2.39805163,  0.34091543]])</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb46"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>data <span class="op">+</span> data</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>array([[ 1.40787144, -1.63421462,  4.50902268],
-       [ 1.06413328, -0.74237045, -1.57820916]])</code></pre>
+<pre><code>array([[-0.40912584,  5.12495637, -1.62292677],
+       [ 1.09917692,  0.95922065,  0.13636617]])</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb48"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>data.dtype</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -7754,11 +7754,11 @@ max    177.060000</code></pre>
 <div class="cell-output cell-output-stdout">
 <pre><code>                idp
 Date               
-2023-11-01  62197.4
-2023-12-01  64229.7
-2024-01-01  66439.5
-2024-02-01  64283.4
-2024-03-01  66529.8</code></pre>
+2023-11-01  63954.8
+2023-12-01  62441.9
+2024-01-01  66581.3
+2024-02-01  64558.6
+2024-03-01  64094.6</code></pre>
 </div>
 </div>
 <p>Seguindo a mesma sintaxe, pode-se renomear quantas colunas forem desejadas:</p>
@@ -7773,11 +7773,11 @@ Date
 <span id="cb71-8"><a href="#cb71-8" aria-hidden="true" tabindex="-1"></a>dados_focus.tail()</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>    Indicador        Data  DataReferencia   Media  baseCalculo
-195      IPCA  2024-04-01            2024  3.7642            1
-196      IPCA  2024-04-02            2024  3.7609            1
-197      IPCA  2024-04-03            2024  3.7733            1
-198      IPCA  2024-04-04            2024  3.7703            1
-199      IPCA  2024-04-05            2024  3.7842            1</code></pre>
+195     IGP-M  2024-10-08            2024  4.1360            1
+196     IGP-M  2024-10-09            2024  4.1665            1
+197     IGP-M  2024-10-10            2024  4.1686            1
+198     IGP-M  2024-10-11            2024  4.3059            1
+199     IGP-M  2024-10-14            2024  4.3265            1</code></pre>
 </div>
 </div>
 <div class="cell">
@@ -7793,11 +7793,11 @@ Date
 3    IGP-M  2024-01-05            2024  4.3983            1
 4    IGP-M  2024-01-08            2024  4.1291            1
 ..     ...         ...             ...     ...          ...
-195   IPCA  2024-04-01            2024  3.7642            1
-196   IPCA  2024-04-02            2024  3.7609            1
-197   IPCA  2024-04-03            2024  3.7733            1
-198   IPCA  2024-04-04            2024  3.7703            1
-199   IPCA  2024-04-05            2024  3.7842            1
+195  IGP-M  2024-10-08            2024  4.1360            1
+196  IGP-M  2024-10-09            2024  4.1665            1
+197  IGP-M  2024-10-10            2024  4.1686            1
+198  IGP-M  2024-10-11            2024  4.3059            1
+199  IGP-M  2024-10-14            2024  4.3265            1
 
 [200 rows x 5 columns]</code></pre>
 </div>
@@ -7811,11 +7811,11 @@ Date
 <span id="cb75-5"><a href="#cb75-5" aria-hidden="true" tabindex="-1"></a>  ).tail()</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>    indicador        data  data_ref   media  base_calc
-195      IPCA  2024-04-01      2024  3.7642          1
-196      IPCA  2024-04-02      2024  3.7609          1
-197      IPCA  2024-04-03      2024  3.7733          1
-198      IPCA  2024-04-04      2024  3.7703          1
-199      IPCA  2024-04-05      2024  3.7842          1</code></pre>
+195     IGP-M  2024-10-08      2024  4.1360          1
+196     IGP-M  2024-10-09      2024  4.1665          1
+197     IGP-M  2024-10-10      2024  4.1686          1
+198     IGP-M  2024-10-11      2024  4.3059          1
+199     IGP-M  2024-10-14      2024  4.3265          1</code></pre>
 </div>
 </div>
 <p>Uma dica bastante útil para quando existir nomes de colunas mal formatados ou pouco convencionais: usar a biblioteca <code>pyjanitor</code> para converter e limpar, com algumas convenções e boas práticas, todos os nomes de colunas automaticamente:</p>
@@ -7830,11 +7830,11 @@ Date
 3       IGP-M  2024-01-05            2024  4.3983            1
 4       IGP-M  2024-01-08            2024  4.1291            1
 ..        ...         ...             ...     ...          ...
-195      IPCA  2024-04-01            2024  3.7642            1
-196      IPCA  2024-04-02            2024  3.7609            1
-197      IPCA  2024-04-03            2024  3.7733            1
-198      IPCA  2024-04-04            2024  3.7703            1
-199      IPCA  2024-04-05            2024  3.7842            1
+195     IGP-M  2024-10-08            2024  4.1360            1
+196     IGP-M  2024-10-09            2024  4.1665            1
+197     IGP-M  2024-10-10            2024  4.1686            1
+198     IGP-M  2024-10-11            2024  4.3059            1
+199     IGP-M  2024-10-14            2024  4.3265            1
 
 [200 rows x 5 columns]</code></pre>
 </div>
@@ -7859,11 +7859,11 @@ Date
 3      2024-01-05
 4      2024-01-08
           ...    
-195    2024-04-01
-196    2024-04-02
-197    2024-04-03
-198    2024-04-04
-199    2024-04-05
+195    2024-10-08
+196    2024-10-09
+197    2024-10-10
+198    2024-10-11
+199    2024-10-14
 Name: Data, Length: 200, dtype: object</code></pre>
 </div>
 </div>
@@ -7879,11 +7879,11 @@ Name: Data, Length: 200, dtype: object</code></pre>
 3              2024     IGP-M  4.3983
 4              2024     IGP-M  4.1291
 ..              ...       ...     ...
-195            2024      IPCA  3.7642
-196            2024      IPCA  3.7609
-197            2024      IPCA  3.7733
-198            2024      IPCA  3.7703
-199            2024      IPCA  3.7842
+195            2024     IGP-M  4.1360
+196            2024     IGP-M  4.1665
+197            2024     IGP-M  4.1686
+198            2024     IGP-M  4.3059
+199            2024     IGP-M  4.3265
 
 [200 rows x 3 columns]</code></pre>
 </div>
@@ -7900,11 +7900,11 @@ Name: Data, Length: 200, dtype: object</code></pre>
 3              2024     IGP-M  4.3983
 4              2024     IGP-M  4.1291
 ..              ...       ...     ...
-195            2024      IPCA  3.7642
-196            2024      IPCA  3.7609
-197            2024      IPCA  3.7733
-198            2024      IPCA  3.7703
-199            2024      IPCA  3.7842
+195            2024     IGP-M  4.1360
+196            2024     IGP-M  4.1665
+197            2024     IGP-M  4.1686
+198            2024     IGP-M  4.3059
+199            2024     IGP-M  4.3265
 
 [200 rows x 3 columns]</code></pre>
 </div>
@@ -7919,21 +7919,21 @@ Name: Data, Length: 200, dtype: object</code></pre>
 <div class="cell-output cell-output-stdout">
 <pre><code>              valor variavel
 Date                        
-2023-01-01  77099.4      IDP
-2023-02-01  74833.6      IDP
-2023-03-01  75258.3      IDP
-2023-04-01  67399.0      IDP
-2023-05-01  68317.9      IDP
-2023-06-01  66992.4      IDP
-2023-07-01  66916.6      IDP
-2023-08-01  64444.0      IDP
-2023-09-01  60436.5      IDP
-2023-10-01  60360.3      IDP
-2023-11-01  62197.4      IDP
-2023-12-01  64229.7      IDP
-2024-01-01  66439.5      IDP
-2024-02-01  64283.4      IDP
-2024-03-01  66529.8      IDP</code></pre>
+2023-01-01  75508.8      IDP
+2023-02-01  73429.1      IDP
+2023-03-01  77208.8      IDP
+2023-04-01  71005.8      IDP
+2023-05-01  72825.9      IDP
+2023-06-01  71914.9      IDP
+2023-07-01  71619.0      IDP
+2023-08-01  68619.1      IDP
+2023-09-01  65215.0      IDP
+2023-10-01  63830.4      IDP
+2023-11-01  63954.8      IDP
+2023-12-01  62441.9      IDP
+2024-01-01  66581.3      IDP
+2024-02-01  64558.6      IDP
+2024-03-01  64094.6      IDP</code></pre>
 </div>
 </div>
 <p>Seguindo a mesma lógica, pode-se criar quantas colunas forem necessárias, com novos valores ou valores modificados de colunas preexistentes. ’Repare que você pode. É possível usar funções <code>lambda</code> que fazem referência às colunas e retornam uma <code>Series</code> de valores:</p>
@@ -7949,21 +7949,21 @@ Date
 <div class="cell-output cell-output-stdout">
 <pre><code>              valor variavel  idp_bilhao   idp_log  idp_lag1  idp_lag2
 Date                                                                  
-2023-01-01  77099.4      IDP     77.0994  4.345095       NaN       NaN
-2023-02-01  74833.6      IDP     74.8336  4.315267   77099.4       NaN
-2023-03-01  75258.3      IDP     75.2583  4.320926   74833.6   77099.4
-2023-04-01  67399.0      IDP     67.3990  4.210630   75258.3   74833.6
-2023-05-01  68317.9      IDP     68.3179  4.224172   67399.0   75258.3
-2023-06-01  66992.4      IDP     66.9924  4.204579   68317.9   67399.0
-2023-07-01  66916.6      IDP     66.9166  4.203447   66992.4   68317.9
-2023-08-01  64444.0      IDP     64.4440  4.165797   66916.6   66992.4
-2023-09-01  60436.5      IDP     60.4365  4.101593   64444.0   66916.6
-2023-10-01  60360.3      IDP     60.3603  4.100332   60436.5   64444.0
-2023-11-01  62197.4      IDP     62.1974  4.130313   60360.3   60436.5
-2023-12-01  64229.7      IDP     64.2297  4.162466   62197.4   60360.3
-2024-01-01  66439.5      IDP     66.4395  4.196292   64229.7   62197.4
-2024-02-01  64283.4      IDP     64.2834  4.163301   66439.5   64229.7
-2024-03-01  66529.8      IDP     66.5298  4.197650   64283.4   66439.5</code></pre>
+2023-01-01  75508.8      IDP     75.5088  4.324249       NaN       NaN
+2023-02-01  73429.1      IDP     73.4291  4.296320   75508.8       NaN
+2023-03-01  77208.8      IDP     77.2088  4.346513   73429.1   75508.8
+2023-04-01  71005.8      IDP     71.0058  4.262762   77208.8   73429.1
+2023-05-01  72825.9      IDP     72.8259  4.288072   71005.8   77208.8
+2023-06-01  71914.9      IDP     71.9149  4.275483   72825.9   71005.8
+2023-07-01  71619.0      IDP     71.6190  4.271360   71914.9   72825.9
+2023-08-01  68619.1      IDP     68.6191  4.228571   71619.0   71914.9
+2023-09-01  65215.0      IDP     65.2150  4.177690   68619.1   71619.0
+2023-10-01  63830.4      IDP     63.8304  4.156230   65215.0   68619.1
+2023-11-01  63954.8      IDP     63.9548  4.158177   63830.4   65215.0
+2023-12-01  62441.9      IDP     62.4419  4.134237   63954.8   63830.4
+2024-01-01  66581.3      IDP     66.5813  4.198424   62441.9   63954.8
+2024-02-01  64558.6      IDP     64.5586  4.167573   66581.3   62441.9
+2024-03-01  64094.6      IDP     64.0946  4.160360   64558.6   66581.3</code></pre>
 </div>
 </div>
 <p>Além de criar novas colunas, pode-se alterar os valores de uma coluna preexistente:</p>
@@ -7977,21 +7977,21 @@ Date
 <div class="cell-output cell-output-stdout">
 <pre><code>                valor  valor_copia  valor_revertido
 Date                                               
-2023-01-01  11.252851      77099.4          77099.4
-2023-02-01  11.223022      74833.6          74833.6
-2023-03-01  11.228681      75258.3          75258.3
-2023-04-01  11.118385      67399.0          67399.0
-2023-05-01  11.131927      68317.9          68317.9
-2023-06-01  11.112334      66992.4          66992.4
-2023-07-01  11.111202      66916.6          66916.6
-2023-08-01  11.073552      64444.0          64444.0
-2023-09-01  11.009349      60436.5          60436.5
-2023-10-01  11.008087      60360.3          60360.3
-2023-11-01  11.038068      62197.4          62197.4
-2023-12-01  11.070221      64229.7          64229.7
-2024-01-01  11.104047      66439.5          66439.5
-2024-02-01  11.071057      64283.4          64283.4
-2024-03-01  11.105405      66529.8          66529.8</code></pre>
+2023-01-01  11.232004      75508.8          75508.8
+2023-02-01  11.204076      73429.1          73429.1
+2023-03-01  11.254269      77208.8          77208.8
+2023-04-01  11.170517      71005.8          71005.8
+2023-05-01  11.195827      72825.9          72825.9
+2023-06-01  11.183239      71914.9          71914.9
+2023-07-01  11.179116      71619.0          71619.0
+2023-08-01  11.136326      68619.1          68619.1
+2023-09-01  11.085445      65215.0          65215.0
+2023-10-01  11.063985      63830.4          63830.4
+2023-11-01  11.065932      63954.8          63954.8
+2023-12-01  11.041992      62441.9          62441.9
+2024-01-01  11.106179      66581.3          66581.3
+2024-02-01  11.075329      64558.6          64558.6
+2024-03-01  11.068115      64094.6          64094.6</code></pre>
 </div>
 </div>
 <p>Uma outra opção é fazer:</p>
@@ -8001,21 +8001,21 @@ Date
 <div class="cell-output cell-output-stdout">
 <pre><code>              valor  nova_coluna
 Date                            
-2023-01-01  77099.4     154198.8
-2023-02-01  74833.6     149667.2
-2023-03-01  75258.3     150516.6
-2023-04-01  67399.0     134798.0
-2023-05-01  68317.9     136635.8
-2023-06-01  66992.4     133984.8
-2023-07-01  66916.6     133833.2
-2023-08-01  64444.0     128888.0
-2023-09-01  60436.5     120873.0
-2023-10-01  60360.3     120720.6
-2023-11-01  62197.4     124394.8
-2023-12-01  64229.7     128459.4
-2024-01-01  66439.5     132879.0
-2024-02-01  64283.4     128566.8
-2024-03-01  66529.8     133059.6</code></pre>
+2023-01-01  75508.8     151017.6
+2023-02-01  73429.1     146858.2
+2023-03-01  77208.8     154417.6
+2023-04-01  71005.8     142011.6
+2023-05-01  72825.9     145651.8
+2023-06-01  71914.9     143829.8
+2023-07-01  71619.0     143238.0
+2023-08-01  68619.1     137238.2
+2023-09-01  65215.0     130430.0
+2023-10-01  63830.4     127660.8
+2023-11-01  63954.8     127909.6
+2023-12-01  62441.9     124883.8
+2024-01-01  66581.3     133162.6
+2024-02-01  64558.6     129117.2
+2024-03-01  64094.6     128189.2</code></pre>
 </div>
 </div>
 <p>Para alterar diversas colunas com uma mesma operação (por exemplo, arredondar todas as colunas numéricas) e mantendo as demais colunas da tabela inalteradas, é possível utilizar diversas abordagens de códigos. Talvez a forma mais simples seja utilizar a função <code>pipe()</code> em conjunto com <code>assign()</code>:</p>
@@ -8035,11 +8035,11 @@ Date
 3       IGP-M  2024-01-05            2024    4.0            1
 4       IGP-M  2024-01-08            2024    4.0            1
 ..        ...         ...             ...    ...          ...
-195      IPCA  2024-04-01            2024    4.0            1
-196      IPCA  2024-04-02            2024    4.0            1
-197      IPCA  2024-04-03            2024    4.0            1
-198      IPCA  2024-04-04            2024    4.0            1
-199      IPCA  2024-04-05            2024    4.0            1
+195     IGP-M  2024-10-08            2024    4.0            1
+196     IGP-M  2024-10-09            2024    4.0            1
+197     IGP-M  2024-10-10            2024    4.0            1
+198     IGP-M  2024-10-11            2024    4.0            1
+199     IGP-M  2024-10-14            2024    4.0            1
 
 [200 rows x 5 columns]</code></pre>
 </div>
@@ -8067,11 +8067,11 @@ Date
 3       IGP-M  2024-01-05            2024  4.3983
 4       IGP-M  2024-01-08            2024  4.1291
 ..        ...         ...             ...     ...
-195      IPCA  2024-04-01            2024  3.7642
-196      IPCA  2024-04-02            2024  3.7609
-197      IPCA  2024-04-03            2024  3.7733
-198      IPCA  2024-04-04            2024  3.7703
-199      IPCA  2024-04-05            2024  3.7842
+195     IGP-M  2024-10-08            2024  4.1360
+196     IGP-M  2024-10-09            2024  4.1665
+197     IGP-M  2024-10-10            2024  4.1686
+198     IGP-M  2024-10-11            2024  4.3059
+199     IGP-M  2024-10-14            2024  4.3265
 
 [200 rows x 4 columns]</code></pre>
 </div>
@@ -8082,18 +8082,18 @@ Date
 <div class="cell">
 <div class="sourceCode cell-code" id="cb97"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb97-1"><a href="#cb97-1" aria-hidden="true" tabindex="-1"></a>dados_focus.sort_values(by <span class="op">=</span> [<span class="st">&#39;Media&#39;</span>])</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>   Indicador        Data  DataReferencia   Media  baseCalculo
-73     IGP-M  2024-04-17            2024  1.9644            1
-74     IGP-M  2024-04-18            2024  1.9822            1
-64     IGP-M  2024-04-04            2024  1.9932            1
-72     IGP-M  2024-04-16            2024  2.0229            1
-65     IGP-M  2024-04-05            2024  2.0560            1
-..       ...         ...             ...     ...          ...
-10     IGP-M  2024-01-16            2024  4.2187            1
-3      IGP-M  2024-01-05            2024  4.3983            1
-0      IGP-M  2024-01-02            2024  4.4756            1
-2      IGP-M  2024-01-04            2024  4.4803            1
-1      IGP-M  2024-01-03            2024  4.5418            1
+<pre><code>    Indicador        Data  DataReferencia   Media  baseCalculo
+73      IGP-M  2024-04-17            2024  1.9644            1
+74      IGP-M  2024-04-18            2024  1.9822            1
+64      IGP-M  2024-04-04            2024  1.9932            1
+72      IGP-M  2024-04-16            2024  2.0229            1
+65      IGP-M  2024-04-05            2024  2.0560            1
+..        ...         ...             ...     ...          ...
+199     IGP-M  2024-10-14            2024  4.3265            1
+3       IGP-M  2024-01-05            2024  4.3983            1
+0       IGP-M  2024-01-02            2024  4.4756            1
+2       IGP-M  2024-01-04            2024  4.4803            1
+1       IGP-M  2024-01-03            2024  4.5418            1
 
 [200 rows x 5 columns]</code></pre>
 </div>
@@ -8106,20 +8106,9 @@ Date
 <div class="sourceCode cell-code" id="cb99"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb99-1"><a href="#cb99-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Filtrando por uma condição</span></span>
 <span id="cb99-2"><a href="#cb99-2" aria-hidden="true" tabindex="-1"></a>dados_focus.query(<span class="st">&quot;Indicador == &#39;IPCA&#39;&quot;</span>)</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>    Indicador        Data  DataReferencia   Media  baseCalculo
-134      IPCA  2024-01-02            2024  3.8701            1
-135      IPCA  2024-01-03            2024  3.8328            1
-136      IPCA  2024-01-04            2024  3.8161            1
-137      IPCA  2024-01-05            2024  3.8287            1
-138      IPCA  2024-01-08            2024  3.8130            1
-..        ...         ...             ...     ...          ...
-195      IPCA  2024-04-01            2024  3.7642            1
-196      IPCA  2024-04-02            2024  3.7609            1
-197      IPCA  2024-04-03            2024  3.7733            1
-198      IPCA  2024-04-04            2024  3.7703            1
-199      IPCA  2024-04-05            2024  3.7842            1
-
-[66 rows x 5 columns]</code></pre>
+<pre><code>Empty DataFrame
+Columns: [Indicador, Data, DataReferencia, Media, baseCalculo]
+Index: []</code></pre>
 </div>
 </div>
 <p>outra opção é fazer:</p>
@@ -8134,13 +8123,13 @@ Date
 3       IGP-M  2024-01-05            2024  4.3983            1
 4       IGP-M  2024-01-08            2024  4.1291            1
 ..        ...         ...             ...     ...          ...
-129     IGP-M  2024-07-08            2024  3.6214            1
-130     IGP-M  2024-07-09            2024  3.6413            1
-131     IGP-M  2024-07-10            2024  3.6161            1
-132     IGP-M  2024-07-11            2024  3.5987            1
-133     IGP-M  2024-07-12            2024  3.5603            1
+195     IGP-M  2024-10-08            2024  4.1360            1
+196     IGP-M  2024-10-09            2024  4.1665            1
+197     IGP-M  2024-10-10            2024  4.1686            1
+198     IGP-M  2024-10-11            2024  4.3059            1
+199     IGP-M  2024-10-14            2024  4.3265            1
 
-[134 rows x 5 columns]</code></pre>
+[200 rows x 5 columns]</code></pre>
 </div>
 </div>
 <p>É possível definir múltiplas condições para uma ou mais colunas, separando-as por operadores lógicos como <code>&amp;</code>, <code>|</code> ou seus nomes no inglês <code>and</code> e <code>or</code>, respectivamente. Somente as linhas onde todas as condições são verdadeiras serão retornadas:</p>
@@ -8149,7 +8138,7 @@ Date
 <span id="cb103-2"><a href="#cb103-2" aria-hidden="true" tabindex="-1"></a>dados_focus.query(<span class="st">&quot;Indicador != &#39;IPCA&#39; and Data &gt;= Data.max()&quot;</span>)</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>    Indicador        Data  DataReferencia   Media  baseCalculo
-133     IGP-M  2024-07-12            2024  3.5603            1</code></pre>
+199     IGP-M  2024-10-14            2024  4.3265            1</code></pre>
 </div>
 </div>
 </section>
@@ -8160,17 +8149,12 @@ Date
 <div class="sourceCode cell-code" id="cb105"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb105-1"><a href="#cb105-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define grupos e filtra linhas dos grupos</span></span>
 <span id="cb105-2"><a href="#cb105-2" aria-hidden="true" tabindex="-1"></a>dados_focus.groupby(by <span class="op">=</span> <span class="st">&quot;Indicador&quot;</span>).head()</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>    Indicador        Data  DataReferencia   Media  baseCalculo
-0       IGP-M  2024-01-02            2024  4.4756            1
-1       IGP-M  2024-01-03            2024  4.5418            1
-2       IGP-M  2024-01-04            2024  4.4803            1
-3       IGP-M  2024-01-05            2024  4.3983            1
-4       IGP-M  2024-01-08            2024  4.1291            1
-134      IPCA  2024-01-02            2024  3.8701            1
-135      IPCA  2024-01-03            2024  3.8328            1
-136      IPCA  2024-01-04            2024  3.8161            1
-137      IPCA  2024-01-05            2024  3.8287            1
-138      IPCA  2024-01-08            2024  3.8130            1</code></pre>
+<pre><code>  Indicador        Data  DataReferencia   Media  baseCalculo
+0     IGP-M  2024-01-02            2024  4.4756            1
+1     IGP-M  2024-01-03            2024  4.5418            1
+2     IGP-M  2024-01-04            2024  4.4803            1
+3     IGP-M  2024-01-05            2024  4.3983            1
+4     IGP-M  2024-01-08            2024  4.1291            1</code></pre>
 </div>
 </div>
 </section>
@@ -8184,21 +8168,19 @@ Date
 <span id="cb107-4"><a href="#cb107-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Define grupos e filtra linhas dos grupos</span></span>
 <span id="cb107-5"><a href="#cb107-5" aria-hidden="true" tabindex="-1"></a>dados_focus.groupby(by <span class="op">=</span> <span class="st">&quot;Indicador&quot;</span>).describe()[<span class="st">&#39;Media&#39;</span>]</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>           count      mean       std     min       25%      50%       75%  \
-Indicador                                                                   
-IGP-M      134.0  3.060883  0.680075  1.9644  2.561675  3.09535  3.535525   
-IPCA        66.0  3.782171  0.051560  3.6737  3.744425  3.77435  3.815325   
+<pre><code>           count      mean       std     min       25%      50%     75%  \
+Indicador                                                                 
+IGP-M      200.0  3.312008  0.668367  1.9644  2.735375  3.53545  3.8028   
 
               max  
 Indicador          
-IGP-M      4.5418  
-IPCA       3.8871  </code></pre>
+IGP-M      4.5418  </code></pre>
 </div>
 </div>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb109"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb109-1"><a href="#cb109-1" aria-hidden="true" tabindex="-1"></a>np.mean(dados_focus[<span class="st">&quot;Media&quot;</span>])</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>3.298908</code></pre>
+<pre><code>3.312008</code></pre>
 </div>
 </div>
 <p>Ao usar groupby e agg() em conjunto, as operações que poderiam parecer complicadas se tornam bastante simples. Por exemplo, se quer obter a média mensal de expectativa do IPCA no Focus. Para isto, basta definir o(s) grupo(s), acessar a coluna sobre a qual deve ser aplicada a operação e apontar a função em agg():</p>
@@ -8213,13 +8195,16 @@ IPCA       3.8871  </code></pre>
 <div class="cell-output cell-output-stdout">
 <pre><code>         media_mensal
 ano_mes              
-2024-01      3.979030
-2024-02      3.551018
-2024-03      3.157590
-2024-04      2.420759
+2024-01      4.118373
+2024-02      3.333689
+2024-03      2.580245
+2024-04      2.113982
 2024-05      2.693610
 2024-06      3.285575
-2024-07      3.582420</code></pre>
+2024-07      3.649078
+2024-08      3.817273
+2024-09      3.749438
+2024-10      4.142050</code></pre>
 </div>
 </div>
 </section>
