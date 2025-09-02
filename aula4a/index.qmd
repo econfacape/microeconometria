@@ -1,0 +1,156 @@
+---
+title: "Taxa Crescimento das Exportações de Mangas e Uvas"
+author: "João Ricardo F. de Lima"
+date: "today"
+editor: source
+lang: pt
+language: 
+  toc-title-document: '<a href="https://www.facape.br/" target="_blank"><img src="https://github.com/econfacape/macroeconometria/blob/main/logofacape.jpg?raw=true" alt="Logotipo Facape" width="150"></a>'
+format: 
+  html:
+    toc: true
+    toc_float:
+      collapsed: yes
+      smooth_scroll: yes
+    toc-location: left
+    code-fold: false
+    embed-resources: true
+    page-layout: full
+    fig-asp: 0.618
+    fig-width: 8
+    fig-height: 5
+    fig-dpi: 300
+    fig-align: center
+    df-print: paged
+    fontsize: 13pt
+theme:
+  light: flatly
+execute:
+  echo: TRUE
+  message: false
+  warning: false
+---
+
+# Análise da evolução das exportações de mangas no Brasil.
+
+## Importação e Tratamento dos Dados
+
+```{python exp1, warning=FALSE, message=FALSE}
+import pandas as pd
+import numpy as np
+import statsmodels.formula.api as smf
+from plotnine import *
+
+#  Importar dados
+df = pd.read_csv("dados/export_manga.csv", sep=";")
+
+# Converter kg -> toneladas
+df["toneladas"] = pd.to_numeric(df["Quilograma Líquido"]) / 1000000
+
+# Criar tendência
+df["tendencia"] = np.arange(1, len(df) + 1)
+```
+
+## Gráfico da evolução com Plotnine
+
+```{python exp2, warning=FALSE, message=FALSE}
+plot = (
+    ggplot(df, aes(x="Ano", y="toneladas"))
+    + geom_line()
+    + labs(title="Evolução das Exportações de Manga (t)", x="Anos", y="Volume (Mil toneladas)")
+    + scale_y_continuous(limits=(0, None), expand=(0, 0)) 
+    + scale_x_continuous(breaks=range(2012, 2025))
+    + theme_minimal()
+    + theme(
+        legend_position='bottom',
+        legend_title=element_blank(),
+        legend_text=element_text(size=18),
+        axis_title_x=element_text(weight='bold', size=18),
+        axis_title_y=element_text(weight='bold', size=18),
+        axis_text_x=element_text(size=18),
+        axis_text_y=element_text(size=18),
+        plot_caption=element_text(ha='left', size=18),
+        figure_size=(14, 6.5)
+    )
+)
+plot.show()
+```
+
+## Estimação do Modelo log-linear para Taxa de Crescimento
+
+```{python exp3, warning=FALSE, message=FALSE}
+# Estimação do modelo
+reg1 = smf.ols('np.log(toneladas) ~ tendencia', data=df)
+result = reg1.fit()
+print(result.summary())
+```
+
+## Calculo da Taxa Geométrica de Crescimento
+
+```{python exp4, warning=FALSE, message=FALSE}
+#Calculo da Taxa de Crescimento Geometrica
+beta = reg1.fit().params['tendencia']
+taxa = (np.exp(beta) - 1) * 100
+print(f"A taxa de crescimento do volume exportado de mangas do Brasil é de {taxa:.2f}% ao ano.")
+```
+
+# Análise da evolução das exportações de uvas no Brasil.
+
+```{python exp5, warning=FALSE, message=FALSE}
+import pandas as pd
+import numpy as np
+import statsmodels.formula.api as smf
+from plotnine import *
+
+#  Importar dados
+df = pd.read_csv("dados/export_uva.csv", sep=";")
+
+# Converter kg -> toneladas
+df["toneladas"] = pd.to_numeric(df["Quilograma Líquido"]) / 1000000
+
+# Criar tendência
+df["tendencia"] = np.arange(1, len(df) + 1)
+```
+
+## Gráfico da evolução com Plotnine
+
+```{python exp6, warning=FALSE, message=FALSE}
+plot = (
+    ggplot(df, aes(x="Ano", y="toneladas"))
+    + geom_line()
+    + labs(title="Evolução das Exportações de Uva (t)", x="Anos", y="Volume (Mil toneladas)")
+    + scale_y_continuous(limits=(0, None), expand=(0, 0)) 
+    + scale_x_continuous(breaks=range(2012, 2025))
+    + theme_minimal()
+    + theme(
+        legend_position='bottom',
+        legend_title=element_blank(),
+        legend_text=element_text(size=18),
+        axis_title_x=element_text(weight='bold', size=18),
+        axis_title_y=element_text(weight='bold', size=18),
+        axis_text_x=element_text(size=18),
+        axis_text_y=element_text(size=18),
+        plot_caption=element_text(ha='left', size=18),
+        figure_size=(14, 6.5)
+    )
+)
+plot.show()
+```
+
+## Estimação do Modelo log-linear para Taxa de Crescimento
+
+```{python exp7, warning=FALSE, message=FALSE}
+# Estimação do modelo
+reg2 = smf.ols('np.log(toneladas) ~ tendencia', data=df)
+result = reg2.fit()
+print(result.summary())
+```
+
+## Calculo da Taxa Geométrica de Crescimento
+
+```{python exp8, warning=FALSE, message=FALSE}
+#Calculo da Taxa de Crescimento Geometrica
+beta = reg2.fit().params['tendencia']
+taxa = (np.exp(beta) - 1) * 100
+print(f"A taxa de crescimento do volume exportado de uvas do Brasil é de {taxa:.2f}% ao ano.")
+```
