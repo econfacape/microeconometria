@@ -56,9 +56,9 @@ df["tendencia"] = np.arange(1, len(df) + 1)
 ```{python exp2, warning=FALSE, message=FALSE}
 plot = (
     ggplot(df, aes(x="Ano", y="toneladas"))
-    + geom_line()
+    + geom_line(size=2)
     + labs(title="Evolução das Exportações de Manga (t)", x="Anos", y="Volume (Mil toneladas)")
-    + scale_y_continuous(limits=(0, None), expand=(0, 0)) 
+    + scale_y_continuous(limits=(0, 300), expand=(0, 0)) 
     + scale_x_continuous(breaks=range(2012, 2025))
     + theme_minimal()
     + theme(
@@ -117,9 +117,9 @@ df["tendencia"] = np.arange(1, len(df) + 1)
 ```{python exp6, warning=FALSE, message=FALSE}
 plot = (
     ggplot(df, aes(x="Ano", y="toneladas"))
-    + geom_line()
+    + geom_line(size=2)
     + labs(title="Evolução das Exportações de Uva (t)", x="Anos", y="Volume (Mil toneladas)")
-    + scale_y_continuous(limits=(0, None), expand=(0, 0)) 
+    + scale_y_continuous(limits=(0, 90), expand=(0, 0)) 
     + scale_x_continuous(breaks=range(2012, 2025))
     + theme_minimal()
     + theme(
