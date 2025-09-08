@@ -292,7 +292,10 @@ W=\frac{(\sum_{i=1}^{n}a_ix_i)^2}{(\sum_{i=1}^{n}x_i-\bar{x})^2}
 \tag{8}
 \end{equation}
 
-Em que $x_i$ o menor número da amostra; $\bar{x}$ é a média amostral; as constantes $a_i$ são constantes geradas pelas médias, variâncias e covariâncias das estatísticas de ordem de uma amostra de tamanho n de uma distribuição Normal.
+Em que $x_i$ são os dados ordenados em ordem crescente (amostra classificada); $\bar{x}$ é a média amostral; as constantes $a_i$ são constantes geradas pelas médias, variâncias e covariâncias das estatísticas de ordem de uma amostra de tamanho n de uma distribuição Normal. 
+
+
+A ideia é comparar a ordenação dos dados observados com os valores esperados se a distribuição fosse normal. O teste gera uma estatística $W$, que mede o quão próximos estão os dados da normalidade. O Valor calculado fica entre 0 e 1, sendo que quanto mais perto de 1, mais normal é a distribuição. 
 
 ## Exemplo no R
 
@@ -376,7 +379,7 @@ plt.ylabel('Frequencia')
 ```
 
 
-```{python econ5_5a, echo=TRUE, results='hide'}
+```{python econ5_5a, echo=TRUE, results='HIDE'}
 # Q-Q plot
 plt.figure(figsize=(12, 6))
 stats.probplot(residuals, dist="norm", plot=plt)
@@ -384,3 +387,7 @@ plt.title('Q-Q Plot dos Resíduos')
 plt.tight_layout()
 plt.show();
 ```
+
+Esse Q-Q Plot (quantile-quantile plot) compara os quantis teóricos de uma normal padrão (no eixo x) com os quantis dos seus resíduos observados (no eixo y). A Linha vermelha é a  referência, ou seja, como os pontos ficariam se os resíduos fossem perfeitamente normais. Já os pontos azuis são os valores observados ordenados (resíduos). Quanto mais os pontos seguirem a linha vermelha, mais próximos de uma normalidade estão os resíduos.
+
+Como visto no gráfico, muitos pontos sobem bem acima da linha. Isso mostra caudas pesadas / outliers no topo, ou seja, há valores muito grandes em relação ao esperado numa normal. Na parte central, a maioria dos pontos no meio do gráfico segue razoavelmente a linha. Então, na média, os resíduos não se afastam tanto da normalidade, mas as caudas estragam o ajuste. Os resíduos não seguem uma distribuição Normal.

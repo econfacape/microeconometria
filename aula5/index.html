@@ -4421,7 +4421,7 @@ window.Quarto = {
     <div>
     <div class="quarto-title-meta-heading">Data de Publicação</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">15 de julho de 2024</p>
+      <p class="date">8 de setembro de 2025</p>
     </div>
   </div>
   
@@ -4693,7 +4693,8 @@ X-squared = 31121, df = 2, p-value &lt; 2.2e-16</code></pre>
 W=\frac{(\sum_{i=1}^{n}a_ix_i)^2}{(\sum_{i=1}^{n}x_i-\bar{x})^2}
 \tag{8}
 \end{equation}\]</span></p>
-<p>Em que <span class="math inline">\(x_i\)</span> o menor número da amostra; <span class="math inline">\(\bar{x}\)</span> é a média amostral; as constantes <span class="math inline">\(a_i\)</span> são constantes geradas pelas médias, variâncias e covariâncias das estatísticas de ordem de uma amostra de tamanho n de uma distribuição Normal.</p>
+<p>Em que <span class="math inline">\(x_i\)</span> são os dados ordenados em ordem crescente (amostra classificada); <span class="math inline">\(\bar{x}\)</span> é a média amostral; as constantes <span class="math inline">\(a_i\)</span> são constantes geradas pelas médias, variâncias e covariâncias das estatísticas de ordem de uma amostra de tamanho n de uma distribuição Normal.</p>
+<p>A ideia é comparar a ordenação dos dados observados com os valores esperados se a distribuição fosse normal. O teste gera uma estatística <span class="math inline">\(W\)</span>, que mede o quão próximos estão os dados da normalidade. O Valor calculado fica entre 0 e 1, sendo que quanto mais perto de 1, mais normal é a distribuição.</p>
 </section>
 <section id="exemplo-no-r-1" class="level2">
 <h2 class="anchored" data-anchor-id="exemplo-no-r-1">Exemplo no R</h2>
@@ -4792,8 +4793,8 @@ W = 0.41717, p-value &lt; 2.2e-16</code></pre>
 Dep. Variable:                 salary   R-squared:                       0.013
 Model:                            OLS   Adj. R-squared:                  0.008
 Method:                 Least Squares   F-statistic:                     2.767
-Date:                Seg, 15 Jul 2024   Prob (F-statistic):             0.0978
-Time:                        16:40:12   Log-Likelihood:                -1804.5
+Date:                Seg, 08 Set 2025   Prob (F-statistic):             0.0978
+Time:                        16:19:53   Log-Likelihood:                -1804.5
 No. Observations:                 209   AIC:                             3613.
 Df Residuals:                     207   BIC:                             3620.
 Df Model:                           1                                         
@@ -4845,9 +4846,105 @@ Notes:
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Q-Q plot</span></span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">6</span>))</span>
 <span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>stats.probplot(residuals, dist<span class="op">=</span><span class="st">&quot;norm&quot;</span>, plot<span class="op">=</span>plt)</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">&#39;Q-Q Plot dos Resíduos&#39;</span>)</span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>plt.show()<span class="op">;</span></span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>((array([-2.71527877, -2.40726711, -2.23184658, -2.10630578, -2.00718005,
+       -1.92456989, -1.85332434, -1.79040654, -1.73386931, -1.68238623,
+       -1.63501137, -1.5910454 , -1.54995609, -1.5113286 , -1.47483301,
+       -1.44020241, -1.40721773, -1.37569678, -1.34548635, -1.31645635,
+       -1.28849527, -1.2615068 , -1.23540717, -1.210123  , -1.18558964,
+       -1.16174985, -1.13855265, -1.11595247, -1.09390835, -1.07238338,
+       -1.05134413, -1.03076025, -1.01060409, -0.99085037, -0.9714759 ,
+       -0.95245941, -0.93378126, -0.91542334, -0.89736885, -0.87960225,
+       -0.86210904, -0.84487576, -0.82788981, -0.81113943, -0.79461361,
+       -0.77830201, -0.7621949 , -0.74628316, -0.73055816, -0.71501177,
+       -0.6996363 , -0.68442448, -0.66936941, -0.65446456, -0.6397037 ,
+       -0.62508093, -0.61059061, -0.59622739, -0.58198612, -0.56786193,
+       -0.55385013, -0.53994623, -0.52614595, -0.51244514, -0.49883987,
+       -0.48532631, -0.47190081, -0.45855984, -0.44529999, -0.43211797,
+       -0.41901062, -0.40597487, -0.39300775, -0.38010638, -0.36726796,
+       -0.3544898 , -0.34176927, -0.3291038 , -0.3164909 , -0.30392816,
+       -0.2914132 , -0.27894372, -0.26651747, -0.25413223, -0.24178586,
+       -0.22947623, -0.21720128, -0.20495897, -0.1927473 , -0.18056431,
+       -0.16840806, -0.15627665, -0.14416819, -0.13208084, -0.12001275,
+       -0.10796211, -0.09592714, -0.08390604, -0.07189706, -0.05989844,
+       -0.04790843, -0.03592531, -0.02394734, -0.01197281,  0.        ,
+        0.01197281,  0.02394734,  0.03592531,  0.04790843,  0.05989844,
+        0.07189706,  0.08390604,  0.09592714,  0.10796211,  0.12001275,
+        0.13208084,  0.14416819,  0.15627665,  0.16840806,  0.18056431,
+        0.1927473 ,  0.20495897,  0.21720128,  0.22947623,  0.24178586,
+        0.25413223,  0.26651747,  0.27894372,  0.2914132 ,  0.30392816,
+        0.3164909 ,  0.3291038 ,  0.34176927,  0.3544898 ,  0.36726796,
+        0.38010638,  0.39300775,  0.40597487,  0.41901062,  0.43211797,
+        0.44529999,  0.45855984,  0.47190081,  0.48532631,  0.49883987,
+        0.51244514,  0.52614595,  0.53994623,  0.55385013,  0.56786193,
+        0.58198612,  0.59622739,  0.61059061,  0.62508093,  0.6397037 ,
+        0.65446456,  0.66936941,  0.68442448,  0.6996363 ,  0.71501177,
+        0.73055816,  0.74628316,  0.7621949 ,  0.77830201,  0.79461361,
+        0.81113943,  0.82788981,  0.84487576,  0.86210904,  0.87960225,
+        0.89736885,  0.91542334,  0.93378126,  0.95245941,  0.9714759 ,
+        0.99085037,  1.01060409,  1.03076025,  1.05134413,  1.07238338,
+        1.09390835,  1.11595247,  1.13855265,  1.16174985,  1.18558964,
+        1.210123  ,  1.23540717,  1.2615068 ,  1.28849527,  1.31645635,
+        1.34548635,  1.37569678,  1.40721773,  1.44020241,  1.47483301,
+        1.5113286 ,  1.54995609,  1.5910454 ,  1.63501137,  1.68238623,
+        1.73386931,  1.79040654,  1.85332434,  1.92456989,  2.00718005,
+        2.10630578,  2.23184658,  2.40726711,  2.71527877]), array([-1.16016828e+03, -1.12716828e+03, -9.94922433e+02, -9.84477520e+02,
+       -9.67280828e+02, -8.85507712e+02, -8.75372056e+02, -8.44613158e+02,
+       -8.16360192e+02, -7.86910569e+02, -7.78976334e+02, -7.74207945e+02,
+       -7.65606040e+02, -7.65606040e+02, -7.38053326e+02, -7.24959725e+02,
+       -7.24004153e+02, -7.21062816e+02, -7.08720995e+02, -7.00657586e+02,
+       -6.94554512e+02, -6.83355447e+02, -6.80006525e+02, -6.69559257e+02,
+       -6.61657586e+02, -6.59100117e+02, -6.57187262e+02, -6.56494129e+02,
+       -6.52318155e+02, -6.49856633e+02, -6.42043826e+02, -6.30908179e+02,
+       -6.27303919e+02, -6.24851888e+02, -6.21266592e+02, -6.16772523e+02,
+       -6.10753559e+02, -6.03608413e+02, -6.00006525e+02, -5.96755932e+02,
+       -5.92763032e+02, -5.92547385e+02, -5.85320528e+02, -5.83903434e+02,
+       -5.83212691e+02, -5.82941414e+02, -5.64156400e+02, -5.51364938e+02,
+       -5.50814596e+02, -5.44957352e+02, -5.40364938e+02, -5.29055698e+02,
+       -5.26023116e+02, -5.23475147e+02, -5.21559257e+02, -5.13559257e+02,
+       -5.11458538e+02, -5.07610785e+02, -5.03706759e+02, -5.02306291e+02,
+       -4.95510084e+02, -4.94348338e+02, -4.89212691e+02, -4.83659959e+02,
+       -4.78861379e+02, -4.75360192e+02, -4.70898688e+02, -4.69856633e+02,
+       -4.62008898e+02, -4.50561630e+02, -4.43613158e+02, -4.38767778e+02,
+       -4.35615531e+02, -4.29657586e+02, -4.28360192e+02, -4.27559257e+02,
+       -4.27554512e+02, -4.27158772e+02, -4.24414128e+02, -4.16662349e+02,
+       -4.12622649e+02, -4.12100117e+02, -4.09364938e+02, -4.07556885e+02,
+       -3.67116717e+02, -3.61809851e+02, -3.58154027e+02, -3.57460911e+02,
+       -3.56671840e+02, -3.54610785e+02, -3.51098371e+02, -3.50610785e+02,
+       -3.44393445e+02, -3.33962098e+02, -3.24261846e+02, -2.87149281e+02,
+       -2.75969216e+02, -2.74308664e+02, -2.67606040e+02, -2.67156400e+02,
+       -2.59844779e+02, -2.56215063e+02, -2.55259491e+02, -2.54706759e+02,
+       -2.53964470e+02, -2.53109599e+02, -2.35812223e+02, -2.34873242e+02,
+       -2.28023116e+02, -2.13999407e+02, -2.10809851e+02, -2.01908179e+02,
+       -1.99702014e+02, -1.88610785e+02, -1.88215063e+02, -1.70760660e+02,
+       -1.66606040e+02, -1.63854261e+02, -1.63598931e+02, -1.54053326e+02,
+       -1.43765405e+02, -1.35910569e+02, -1.32805105e+02, -1.29058071e+02,
+       -1.16861379e+02, -1.13261846e+02, -1.06109599e+02, -1.01060444e+02,
+       -8.46440384e+01, -6.97138770e+01, -6.82523730e+01, -6.54141284e+01,
+       -6.28661240e+01, -4.17677779e+01, -3.17677779e+01, -3.08518879e+01,
+       -2.81095991e+01, -2.75829490e+01, -2.15592573e+01, -1.20065252e+01,
+       -3.80985052e+00, -6.20276238e-01,  1.74999968e+00,  6.19188641e+00,
+        2.04502422e+01,  5.96564099e+01,  6.83939599e+01,  7.51854041e+01,
+        7.89395563e+01,  7.95462069e+01,  8.30751945e+01,  1.01991102e+02,
+        1.17440743e+02,  1.17492288e+02,  1.24332906e+02,  1.27290868e+02,
+        1.38796800e+02,  1.49492288e+02,  1.59047393e+02,  1.67445488e+02,
+        1.77145739e+02,  1.86600125e+02,  1.88386842e+02,  1.99593007e+02,
+        2.21297986e+02,  2.42445488e+02,  2.53897519e+02,  2.71979256e+02,
+        2.97885655e+02,  3.04885655e+02,  3.06389215e+02,  3.18276632e+02,
+        3.20306806e+02,  3.38180659e+02,  3.48548580e+02,  3.53290868e+02,
+        3.54140994e+02,  3.88693709e+02,  4.12539089e+02,  4.34981629e+02,
+        4.49494661e+02,  4.52295614e+02,  4.53735781e+02,  4.58391587e+02,
+        4.92639808e+02,  5.07581126e+02,  5.22054511e+02,  5.29960275e+02,
+        5.48040275e+02,  5.97558070e+02,  6.81145739e+02,  6.87792055e+02,
+        7.04880910e+02,  7.40443115e+02,  7.69698454e+02,  7.77932438e+02,
+        8.31693709e+02,  8.43925320e+02,  9.06424134e+02,  9.31194895e+02,
+        1.51831630e+03,  1.66828612e+03,  1.70703316e+03,  2.53849941e+03,
+        2.65694430e+03,  2.91339159e+03,  5.48809657e+03,  9.84613150e+03,
+        1.34998857e+04])), (874.6069248402564, -2.538502707456285e-13, 0.6361788021963526))</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">&#39;Q-Q Plot dos Resíduos&#39;</span>)</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>plt.show()<span class="op">;</span></span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -4856,6 +4953,8 @@ Notes:
 </div>
 </div>
 </div>
+<p>Esse Q-Q Plot (quantile-quantile plot) compara os quantis teóricos de uma normal padrão (no eixo x) com os quantis dos seus resíduos observados (no eixo y). A Linha vermelha é a referência, ou seja, como os pontos ficariam se os resíduos fossem perfeitamente normais. Já os pontos azuis são os valores observados ordenados (resíduos). Quanto mais os pontos seguirem a linha vermelha, mais próximos de uma normalidade estão os resíduos.</p>
+<p>Como visto no gráfico, muitos pontos sobem bem acima da linha. Isso mostra caudas pesadas / outliers no topo, ou seja, há valores muito grandes em relação ao esperado numa normal. Na parte central, a maioria dos pontos no meio do gráfico segue razoavelmente a linha. Então, na média, os resíduos não se afastam tanto da normalidade, mas as caudas estragam o ajuste. Os resíduos não seguem uma distribuição Normal.</p>
 </section>
 </section>
 
