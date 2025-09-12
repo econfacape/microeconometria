@@ -4391,7 +4391,8 @@ window.Quarto = {
   <li><a href="#teste-de-normalidade-de-jarque-bera" id="toc-teste-de-normalidade-de-jarque-bera" class="nav-link" data-scroll-target="#teste-de-normalidade-de-jarque-bera">Teste de Normalidade de Jarque-Bera</a></li>
   <li><a href="#exemplo-no-r" id="toc-exemplo-no-r" class="nav-link" data-scroll-target="#exemplo-no-r">Exemplo no R</a></li>
   <li><a href="#teste-de-normalidade-de-shapiro-wilk" id="toc-teste-de-normalidade-de-shapiro-wilk" class="nav-link" data-scroll-target="#teste-de-normalidade-de-shapiro-wilk">Teste de Normalidade de Shapiro-Wilk</a></li>
-  <li><a href="#exemplo-no-r-1" id="toc-exemplo-no-r-1" class="nav-link" data-scroll-target="#exemplo-no-r-1">Exemplo no R</a></li>
+  <li><a href="#estatística-omnibus-dagostino-pearson-de-normalidade" id="toc-estatística-omnibus-dagostino-pearson-de-normalidade" class="nav-link" data-scroll-target="#estatística-omnibus-dagostino-pearson-de-normalidade">Estatística Omnibus (D’Agostino &amp; Pearson) de Normalidade</a></li>
+  <li><a href="#exemplo-no-r-de-testes-de-normalidade" id="toc-exemplo-no-r-de-testes-de-normalidade" class="nav-link" data-scroll-target="#exemplo-no-r-de-testes-de-normalidade">Exemplo no R de testes de Normalidade</a></li>
   <li><a href="#outras-análises-que-podem-ser-feitas-com-os-resíduos" id="toc-outras-análises-que-podem-ser-feitas-com-os-resíduos" class="nav-link" data-scroll-target="#outras-análises-que-podem-ser-feitas-com-os-resíduos">Outras análises que podem ser feitas com os resíduos</a></li>
   <li><a href="#análise-de-normalidade-no-python" id="toc-análise-de-normalidade-no-python" class="nav-link" data-scroll-target="#análise-de-normalidade-no-python">Análise de Normalidade no Python</a></li>
   </ul></li>
@@ -4421,7 +4422,7 @@ window.Quarto = {
     <div>
     <div class="quarto-title-meta-heading">Data de Publicação</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">8 de setembro de 2025</p>
+      <p class="date">12 de setembro de 2025</p>
     </div>
   </div>
   
@@ -4695,9 +4696,35 @@ W=\frac{(\sum_{i=1}^{n}a_ix_i)^2}{(\sum_{i=1}^{n}x_i-\bar{x})^2}
 \end{equation}\]</span></p>
 <p>Em que <span class="math inline">\(x_i\)</span> são os dados ordenados em ordem crescente (amostra classificada); <span class="math inline">\(\bar{x}\)</span> é a média amostral; as constantes <span class="math inline">\(a_i\)</span> são constantes geradas pelas médias, variâncias e covariâncias das estatísticas de ordem de uma amostra de tamanho n de uma distribuição Normal.</p>
 <p>A ideia é comparar a ordenação dos dados observados com os valores esperados se a distribuição fosse normal. O teste gera uma estatística <span class="math inline">\(W\)</span>, que mede o quão próximos estão os dados da normalidade. O Valor calculado fica entre 0 e 1, sendo que quanto mais perto de 1, mais normal é a distribuição.</p>
+<p><br></p>
 </section>
-<section id="exemplo-no-r-1" class="level2">
-<h2 class="anchored" data-anchor-id="exemplo-no-r-1">Exemplo no R</h2>
+<section id="estatística-omnibus-dagostino-pearson-de-normalidade" class="level2">
+<h2 class="anchored" data-anchor-id="estatística-omnibus-dagostino-pearson-de-normalidade">Estatística Omnibus (D’Agostino &amp; Pearson) de Normalidade</h2>
+<p>O teste <strong>Omnibus D’Agostino e Pearson</strong> combina duas estatísticas de normalidade, a assimetria e a curtose padronizadas. A ideia é que, se os resíduos seguem de fato uma distribuição normal, eles devem ter assimetria <span class="math inline">\(\approx\)</span> 0 e excesso de curtose <span class="math inline">\(\approx\)</span> 0.</p>
+<p>É definida como a soma dos quadrados das estatísticas de assimetria e curtose padronizadas:</p>
+<p><span class="math display">\[
+K^2 = Z_1^2 + Z_2^2 \sim \chi^2(2)
+\]</span></p>
+<p>Coeficiente de assimetria amostra é definido por</p>
+<p><span class="math display">\[
+\hat{g}_1 = \frac{\frac{1}{n} \sum_{i=1}^n (x_i - \bar{x})^3}{\left( \frac{1}{n} \sum_{i=1}^n (x_i - \bar{x})^2 \right)^{3/2}}
+\]</span></p>
+<p>A estatística padronizada é</p>
+<p><span class="math display">\[
+Z_1 = \frac{\sqrt{n(n-1)}}{n-2} \cdot \frac{\hat{g}_1}{\sqrt{\frac{6(n-2)}{(n+1)(n+3)}}}
+\]</span></p>
+<p>O excesso de curtose amostral é definido por:</p>
+<p><span class="math display">\[
+\hat{g}_2 = \frac{\frac{1}{n} \sum_{i=1}^n (x_i - \bar{x})^4}{\left( \frac{1}{n} \sum_{i=1}^n (x_i - \bar{x})^2 \right)^{2}} - 3
+\]</span></p>
+<p>A Estatística padronizada é</p>
+<p><span class="math display">\[
+Z_2 = \frac{\hat{g}_2 - \frac{6}{n+1}}{\sqrt{\frac{24n(n-2)(n-3)}{(n+1)^2 (n+3)(n+5)}}}
+\]</span></p>
+<p>No output do statsmodels em Python, aparece a <strong>Omnibus statistic</strong> como parte dos testes de normalidade dos resíduos da regressão.</p>
+</section>
+<section id="exemplo-no-r-de-testes-de-normalidade" class="level2">
+<h2 class="anchored" data-anchor-id="exemplo-no-r-de-testes-de-normalidade">Exemplo no R de testes de Normalidade</h2>
 <p><br></p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Estimação do Modelo</span></span>
@@ -4793,8 +4820,8 @@ W = 0.41717, p-value &lt; 2.2e-16</code></pre>
 Dep. Variable:                 salary   R-squared:                       0.013
 Model:                            OLS   Adj. R-squared:                  0.008
 Method:                 Least Squares   F-statistic:                     2.767
-Date:                Seg, 08 Set 2025   Prob (F-statistic):             0.0978
-Time:                        16:19:53   Log-Likelihood:                -1804.5
+Date:                Sex, 12 Set 2025   Prob (F-statistic):             0.0978
+Time:                        10:35:32   Log-Likelihood:                -1804.5
 No. Observations:                 209   AIC:                             3613.
 Df Residuals:                     207   BIC:                             3620.
 Df Model:                           1                                         

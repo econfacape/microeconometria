@@ -297,7 +297,45 @@ Em que $x_i$ são os dados ordenados em ordem crescente (amostra classificada); 
 
 A ideia é comparar a ordenação dos dados observados com os valores esperados se a distribuição fosse normal. O teste gera uma estatística $W$, que mede o quão próximos estão os dados da normalidade. O Valor calculado fica entre 0 e 1, sendo que quanto mais perto de 1, mais normal é a distribuição. 
 
-## Exemplo no R
+<br>
+
+## Estatística Omnibus (D’Agostino & Pearson) de Normalidade
+
+O teste **Omnibus D’Agostino e Pearson** combina duas estatísticas de normalidade, a assimetria e a curtose padronizadas. A ideia é que, se os resíduos seguem de fato uma distribuição normal, eles devem ter assimetria $\approx$ 0 e excesso de curtose $\approx$ 0.
+
+É definida como a soma dos quadrados das estatísticas de assimetria e curtose padronizadas:  
+
+$$
+K^2 = Z_1^2 + Z_2^2 \sim \chi^2(2)
+$$  
+
+Coeficiente de assimetria amostra é definido por  
+
+$$
+\hat{g}_1 = \frac{\frac{1}{n} \sum_{i=1}^n (x_i - \bar{x})^3}{\left( \frac{1}{n} \sum_{i=1}^n (x_i - \bar{x})^2 \right)^{3/2}}
+$$  
+
+A estatística padronizada é 
+
+$$
+Z_1 = \frac{\sqrt{n(n-1)}}{n-2} \cdot \frac{\hat{g}_1}{\sqrt{\frac{6(n-2)}{(n+1)(n+3)}}}
+$$  
+
+O excesso de curtose amostral é definido por:  
+
+$$
+\hat{g}_2 = \frac{\frac{1}{n} \sum_{i=1}^n (x_i - \bar{x})^4}{\left( \frac{1}{n} \sum_{i=1}^n (x_i - \bar{x})^2 \right)^{2}} - 3
+$$  
+
+A Estatística padronizada é
+
+$$
+Z_2 = \frac{\hat{g}_2 - \frac{6}{n+1}}{\sqrt{\frac{24n(n-2)(n-3)}{(n+1)^2 (n+3)(n+5)}}}
+$$  
+
+No output do statsmodels em Python, aparece a **Omnibus statistic** como parte dos testes de normalidade dos resíduos da regressão. 
+
+## Exemplo no R de testes de Normalidade
 
 <br>
 
