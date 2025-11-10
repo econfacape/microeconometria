@@ -70,9 +70,15 @@ Com base nesta idéia, alguns testes foram desenvolvidos visando verificar a pre
 
 Considere o modelo abaixo, uma série temporal que se inicia em 1947 e faz uma regressão do consumo em função da renda, da riqueza e da taxa de juros. As três primeiras variáveis estão em log. 
 
+```{r setup}
+library(reticulate)
+use_condaenv("py-econo", require = TRUE)
+py_config()
+```
+
 ``` {r aula10_1, warning=FALSE, message=FALSE}
 #Direcionado o R para o Diretorio a ser trabalhado
-setwd('/Users/jricardofl/Dropbox/tempecon/facape')
+setwd('C:/Users/Lenovo/Dropbox/tempecon/facape')
 
 #Inicio do Script
 
@@ -235,7 +241,7 @@ $$
 
 e $ep(\hat \beta_1)=[SE/\hat \sigma]^2\sqrt(\hat v)$, em que SE é o erro padrão usual do MQO para $\hat \beta_j$.
 
-Desta forma obtêm-se os erros-padrões robustos dos parâmetros. Fazendo uso do pacote `` sandwich``, e a opção para a matriz de variância-covariância consistente com heterocedasticidade e autocorrelação vcovHAC conforme o script abaixo. Conforme a ordem da autocorelação (se acima da primeira ordem), pode ser mais indicado considerar o tratamento para a estrutura geral de Newey e West (1987) e Wooldridge (1989), citados por Wooldridge
+Desta forma obtêm-se os erros-padrões robustos dos parâmetros. Fazendo uso do pacote `` sandwich``, e a opção para a matriz de variância-covariância consistente com heterocedasticidade e autocorrelação ``vcov=NeweyWest`` conforme o script abaixo. Conforme a ordem da autocorelação (se acima da primeira ordem), pode ser mais indicado considerar o tratamento para a estrutura geral de Newey e West (1987) e Wooldridge (1989), citados por Wooldridge
 (2016, seção 12.5).
 
 <br>
@@ -245,7 +251,6 @@ Desta forma obtêm-se os erros-padrões robustos dos parâmetros. Fazendo uso do
 
 regressao1 <- lm(log(consumo) ~log(renda) + log(riqueza) + tx_juros, data=dados)
 coeftest(regressao1, vcov=NeweyWest)
-coeftest(regressao1, vcov=vcovHAC)
 ```
 
 ## Exemplo no Python
@@ -263,7 +268,7 @@ from statsmodels.tsa.stattools import adfuller
 import statsmodels.stats.diagnostic as diag
 from statsmodels.stats.diagnostic import acorr_breusch_godfrey
 
-os.chdir('/Users/jricardofl/Dropbox/tempecon/facape')
+os.chdir('C:/Users/Lenovo/Dropbox/tempecon/facape')
 
 #Inicio do Script
 
@@ -290,45 +295,76 @@ print(result1.summary())
 dw_statistic = sms.durbin_watson(result1.resid)
 print('Durbin-Watson:', dw_statistic)
 
-# Teste de Breusch-Godfrey
-# Modelo deve estar estimado
-aic_values = []
-bic_values = []
+import statsmodels.api as sm
+import pandas as pd
 
-max_lags = 10 
+resid = result1.resid
+df_resid = pd.DataFrame({'u': resid})
+
+max_lags = 10
+rows = []
 
 for lags in range(1, max_lags + 1):
-    bg_test = acorr_breusch_godfrey(result1, nlags=lags)
-    # Collect results
-    aic_values.append(result1.aic)
-    bic_values.append(result1.bic)
+    lm_stat, lm_pvalue, f_stat, f_pvalue = acorr_breusch_godfrey(result1, nlags=lags)
+    rows.append({
+        'Lags': lags,
+        'LM-stat': lm_stat,
+        'LM p-value': lm_pvalue,
+        'F-stat': f_stat,
+        'F p-value': f_pvalue
+    })
 
-# Create DataFrame to analyze results
-results = pd.DataFrame({
-    'Lags': range(1, max_lags + 1),
-    'AIC': aic_values,
-    'BIC': bic_values
-})
-
-print(results)
+results_bg = pd.DataFrame(rows)
 
 
-# Roda o teste de Breusch-Godfrey com o lag definido
-bg_test = acorr_breusch_godfrey(result1, nlags=1)  # Ajusta 'nlags'
-
-print(f"Lagrange Multiplier Statistic: {bg_test[0]}")
-print(f"P-Value: {bg_test[1]}")
-print(f"F-Statistic: {bg_test[2]}")
-print(f"P-Value (F-Statistic): {bg_test[3]}")
+print(results_bg)
 
 
-from statsmodels.stats.diagnostic import acorr_ljungbox
+resid = result1.resid
+df_resid = pd.DataFrame({'u': resid})
 
-# Perform Ljung-Box test for autocorrelation
-lb_test = acorr_ljungbox(result1.resid, lags=[1], return_df=True)
-print('Ljung-Box Test:')
-print(lb_test)
+max_lag = 10
+aic_list = []
+bic_list = []
+
+for p in range(1, max_lag + 1):
+    df_aux = df_resid.copy()
+    
+    # cria as defasagens dos resíduos
+    for j in range(1, p + 1):
+        df_aux[f'u_lag{j}'] = df_aux['u'].shift(j)
+    
+    df_aux = df_aux.dropna()
+    
+    y = df_aux['u']
+    X = df_aux[[f'u_lag{j}' for j in range(1, p + 1)]]
+    X = sm.add_constant(X)
+
+    model_p = sm.OLS(y, X).fit()
+    
+    aic_list.append(model_p.aic)
+    bic_list.append(model_p.bic)
+    
+    print(f"p = {p} | AIC = {model_p.aic:.4f} | BIC = {model_p.bic:.4f}")
+
 ```
+
+
+Há evidência de autocorrelação de $1^a$ e de $2^a$ ordem nos resíduos do modelo. A partir do 3 lag não se rejeita mais a hipótese nula. um processo AR(1) já captura bem a estrutura da autocorrelação dos resíduos, se for considerado o critério de informação. 
+
+
+## Correlação da autocorrelação no Python
+
+```{python}
+result_hac1 = result1.get_robustcov_results(
+    cov_type='HAC',
+    maxlags=1  # número de defasagens na correção Newey-West
+)
+
+print(result_hac1.summary())
+```
+
+Mantém o modelo original, mas usa-se erros-padrão robustos Newey-West para corrigir o efeito da autocorrelação. Esta é uma solução prática e muito usada na literatura aplicada.
 
 <hr>
 
