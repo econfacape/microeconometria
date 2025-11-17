@@ -1,0 +1,389 @@
+---
+title: "TCC do João Vitor"
+author: "Joao Ricardo Lima"
+format: html
+editor: source
+---
+
+## Estimação do Modelo Backward Looking.
+
+```{r setup, message=FALSE, warning=FALSE}
+library(BETS)
+library(mFilter)
+library(dplyr)
+library(lmtest)
+library(tseries)
+library(sandwich)
+############################
+# Estimacoes Econometricas
+
+#Arquivo 03
+#Estimacao da Curva de Phillips
+#IBC-SA ok
+
+# IBC-Br dessazonalizado
+ibc_sa_df <- BETSget(24364)
+ibc_sa_df[[1]] <- as.Date(ibc_sa_df[[1]])
+
+# Filtrar o período que você quer (2006-01 a 2025-06)
+ibc_sa_df_recorte <- subset(
+  ibc_sa_df,
+  ibc_sa_df[[1]] >= as.Date("2006-01-01") &
+  ibc_sa_df[[1]] <= as.Date("2025-06-01")
+)
+
+# Criar a série ts usando a 2ª coluna (os valores)
+ibc_sa <- ts(
+  as.numeric(ibc_sa_df_recorte[[2]]),
+  start     = c(2006, 1),
+  frequency = 12
+)
+
+#start(ibc_sa)
+#end(ibc_sa)
+#frequency(ibc_sa)
+
+# Câmbio R$/US$
+cambio_bc_df <- BETSget(3697)
+cambio_bc_df[[1]] <- as.Date(cambio_bc_df[[1]])
+
+# Filtrar o período que você quer (2006-01 a 2025-06)
+cambio_bc_df_recorte <- subset(
+  cambio_bc_df,
+  cambio_bc_df[[1]] >= as.Date("2006-01-01") &
+  cambio_bc_df[[1]] <= as.Date("2025-06-01")
+)
+
+# Criar a série ts usando a 2ª coluna (os valores)
+cambio_bc <- ts(
+  as.numeric(cambio_bc_df_recorte[[2]]),
+  start     = c(2006, 1),
+  frequency = 12
+)
+
+#start(cambio_bc)
+#end(cambio_bc)
+#frequency(cambio_bc)
+
+# IPCA
+ipca_bc <- BETSget(433)
+ipca_bc   <- window(ipca_bc,   start = c(2006, 1), end = c(2025, 6))
+
+#start(ipca_bc)
+#end(ipca_bc)
+#frequency(ipca_bc)
+
+# https://portalibre.fgv.br/indicador-de-expectativa-de-inflacao-dos-consumidores
+# Serie historica - Consultas Gratuitas
+ipcae <- ts(read.csv2(file='dados/expectativas.csv',
+                      header=T,sep=";",dec=","), start=c(2005,9), freq=12)
+
+ipcae   <- window(ipcae,   start = c(2006, 1), end = c(2025, 6))
+#start(ipcae)
+#end(ipcae)
+#frequency(ipcae)
+
+# Número de observações (vai ser igual para todas, se alinhou certinho)
+n_obs <- length(ipca_bc)
+
+# Sequência de datas mensais
+data_seq <- seq.Date(
+  from = as.Date("2006-01-01"),
+  by   = "month",
+  length.out = n_obs
+)
+
+# Base principal
+dados_phillips <- data.frame(
+  date   = data_seq,
+  ipca   = as.numeric(ipca_bc),
+  ipcae  = as.numeric(ipcae),
+  ibc_sa = as.numeric(ibc_sa),
+  cambio = as.numeric(cambio_bc)
+)
+
+# Hiato do produto (HP filter sobre log do IBC-SA)
+ibc_log <- log(dados_phillips$ibc_sa)
+hiato.hp <- hpfilter(ibc_log, type='lambda', freq=14400)
+
+# Hiato em % (desvio cíclico vezes 100)
+dados_phillips$hiato <- 100 * hiato.hp$cycle
+
+# Variação do câmbio
+dados_phillips$dcambio <- c(NA, diff(dados_phillips$cambio))
+
+# Log do câmbio
+dados_phillips$lcambio <- log(dados_phillips$cambio)
+
+# Diferença do log do câmbio (aprox. variação %)
+dados_phillips$dlcambio <- c(NA, diff(dados_phillips$lcambio))
+
+# Inércia da inflação (lag de 1 período)
+dados_phillips <- dados_phillips |>
+  mutate(
+    ipca_lag1 = dplyr::lag(ipca, 1)
+  )
+
+# Base final sem NAs (por causa de lag e diff)
+dados_model <- na.omit(dados_phillips)
+#str(dados_model)
+
+# Salvando a base de dados
+#write.csv2(dados_model,
+#           file = "dados/dados_model.csv",
+#           row.names = FALSE)
+```
+
+
+```{r tcc_1, message=FALSE, warning=FALSE }
+
+#setwd("C:/Users/Lenovo/Dropbox/Embrapa/2025/Orientandos/Joao Vitor/dados")
+
+#dados_model <- ts(read.csv2(file='dados/dados_model.csv',
+#                       header=T,sep=";",dec=","))
+
+# Estimar Curva de Phillips backward-looking
+mod_backa <- lm(
+  ipca ~ ipca_lag1 + hiato + lcambio,
+  data = dados_model
+)
+
+summary(mod_backa)
+
+# Teste de autocorrelação
+res_back <- residuals(mod_backa)
+bgtest(mod_backa, order = 1)
+
+# Teste de Normalidade
+jarque.bera.test(res_back)
+
+# Teste de heterocedasticidade
+bptest(mod_backa)
+
+```
+
+O modelo não apresenta problemas de autocorrelação nos resíduos. Por outro lado, pelo teste de Jarque Bera, os resíduos não seguem a distribuição Normal. Como se tem algo em torno de 230 observações mensais, pelo Teorema Central do Limite, mesmo que os resíduos não sejam exatamente normais, os testes t e F ficam assintoticamente válidos, de forma que eventuais desvios de normalidade não comprometem de maneira substantiva as conclusões. Pelo teste de heterocedasticidade, contudo, há forte evidencia da variância dos resíduos não ser constante. Por este motivo, o modelo foi estimado com erros padrão robustos.
+
+```{r}
+# Estimar Curva de Phillips backward-looking
+# erro robusto
+
+# White/HC1 (robusto à heterocedasticidade)
+coeftest(mod_backa, vcov = vcovHC(mod_backa, type = "HC1"))
+```
+
+
+Com relação a interpretação se tem que a inércia (ipca_lag1) é estatisticamente significativa e Um aumento de 1 p.p. na inflação do mês anterior aumenta, em média, a inflação deste mês em 0,535 p.p., mantendo hiato e câmbio constantes. A inflação do mês passado tem um peso grande na inflação deste mês. Mesmo numa amostra mais longa, a inflação brasileira ainda mostra memória forte.
+
+Sobre o Hiato do produto (hiato) o sinal é positivo, como esperado, e estatisticamente significativo a 5%. Um aumento de 1 p.p. no hiato (economia mais aquecida que o potencial) aumenta a inflação em 0,019 p.p. no mês, em média. Quanto mais aquecida a economia, maior a inflação.
+
+O log da taxa de câmbio tem sinal positivo como esperado pela teoria econômica, mas sendo estatisticamente não significativo. Então, o modelo não encontrou evidência robusta de pass-through contemporâneo nesse tipo de especificação simples.
+
+o modelo explica algo como 32% da variação mensal da inflação, o que é razoável para um modelo tão simples de inflação mensal. A estatistica F é altamente significativa, ou seja, o conjunto das variáveis explica a inflação de forma estatisticamente relevante.
+
+## Estimação do Modelo Forward Looking 
+
+### Com expectativa de inflação
+
+
+```{r tcc_2, message=FALSE, warning=FALSE}
+mod_forw <- lm(
+  ipca ~ ipcae + hiato + lcambio,
+  data = dados_model
+)
+
+summary(mod_forw)
+```
+
+Modelo não ficou com bom ajustamento.
+
+### Com inflação futura
+
+Usando inflação futura realizada como proxy de expectativa (rational expectations).
+
+```{r tcc_3, message=FALSE, warning=FALSE}
+dados_phillips <- dados_phillips |>
+  mutate(
+    ipca_lead1 = dplyr::lead(ipca, 1)
+  )
+
+dados_model2 <- na.omit(dados_phillips)
+
+mod_forw_lead <- lm(
+  ipca ~ ipca_lead1 + hiato + lcambio,
+  data = dados_model2
+)
+
+summary(mod_forw_lead)
+```
+
+
+Um aumento de 1 p.p. na inflação do mês seguinte está associado a um aumento de cerca de 0,54 p.p. na inflação corrente, em média, controlando por hiato e câmbio. No entanto, essa especificação sofre de endogeneidade.
+
+Um aumento de 1 p.p. no hiato está associado a um aumento de cerca de 0,02 p.p. na inflação mensal. Sinal positivo e estatisticamente significativo.
+
+O câmbio não tem efeito robusto na inflação contemporânea nessas especificações simples, depois de controlar por inflação e hiato.
+
+### Modelo considerando a endogeneidade
+
+```{r tcc_4, message=FALSE, warning=FALSE}
+#Modelo considerando a endogeneidade
+library(AER)  
+
+dados_iv <- dados_phillips |>
+  mutate(
+    ipca_lag1   = dplyr::lag(ipca, 1),
+    ipca_lag2   = dplyr::lag(ipca, 2),
+    hiato_lag1  = dplyr::lag(hiato, 1),
+    lcambio_lag1 = dplyr::lag(lcambio, 1),
+    ipca_lead1  = dplyr::lead(ipca, 1)
+  ) |>
+  na.omit()
+
+mod_forw_iv <- ivreg(
+  ipca ~ ipca_lead1 + hiato + lcambio |
+         ipca_lag1 + ipca_lag2 + hiato + hiato_lag1 + lcambio + lcambio_lag1,
+  data = dados_iv
+)
+
+summary(mod_forw_iv, diagnostics = TRUE)
+
+```
+
+Depois de corrigir a endogeneidade com IV, a inflação futura continua fortemente correlacionada com a inflação corrente e até mais do que no MQO.
+Isso reforça a ideia de persistência inflacionária: choques em $\pi_t$ tendem a se manter em $\pi_{t+1}$.
+
+Na especificação forward com IV, o papel do hiato e do câmbio praticamente desaparece estatisticamente. O modelo passa a ser dominado pela relação entre inflação corrente e futura.
+
+Pelo teste de Wu-Hausman, há forte evidência de que a inflação futura é de fato endógena. Logo, o MQO não é adequado para essa especificação, e a estimação por IV/MQ2E é justificada.
+Pelo resultado do teste de Sargan, não se rejeita a validade dos instrumentos, ou seja, os instrumentos parecem plausíveis.
+
+```{r tcc_4a, message=FALSE, warning=FALSE}
+#Residuos da regressão MQ2E
+res_forw_iv <- residuals(mod_forw_iv)
+
+# Testes de Autocorrelação
+
+bgtest(mod_forw_iv, order = 4)    # até 4 defasagens
+bgtest(mod_forw_iv, order = 12)   # prazo mais longo (um ano)
+
+# Teste de Normalidade
+jarque.bera.test(res_forw_iv)
+
+# Teste de heterocedasticidade
+bptest(mod_forw_iv)
+```
+
+Nao se rejeita a hipótese nula de ausencia de autocorrelação nos resíduos. Por outro lado, o modelo não tem resíduos que seguem a distribuição Normal e foi encontrada heterocedasticidade.
+
+```{r tcc_4b, message=FALSE, warning=FALSE}
+# Erros-padrão robustos à heterocedasticidade (White/HC1)
+coeftest(mod_forw_iv, vcov = vcovHC(mod_forw_iv, type = "HC1"))
+```
+
+
+## Curva de Phillips híbrida
+
+```{r tcc_5, message=FALSE, warning=FALSE}
+mod_hib_ipcae <- lm(
+  ipca ~ ipca_lag1 + ipcae + hiato + lcambio,
+  data = dados_model
+)
+
+summary(mod_hib_ipcae)
+```
+
+A inflação é fortemente inercial. Um aumento de 1 p.p. na inflação do mês anterior aumenta a inflação atual em cerca de 0,53 p.p., em média, mesmo na presença do termo de expectativas.
+
+Quando se controla por inércia e hiato, as medidas de expectativas não acrescentam informação estatisticamente relevante. A Curva “híbrida” com FGV acaba sendo, empiricamente, uma Curva de Phillips essencialmente backward: quem manda é ipca_lag1 + hiato.
+
+Um aumento de 1 p.p. no hiato está associado a um aumento de cerca de 0,019 p.p. na inflação mensal. Efeito pequeno em termos mensais, mas consistente com a teoria: economia mais aquecida leva a mais inflação.
+
+O cambio nao foi estatisticamente significativo
+
+```{r tcc_6, message=FALSE, warning=FALSE}
+mod_hib_lead <- lm(
+  ipca ~ ipca_lag1 + ipca_lead1 + hiato + lcambio,
+  data = dados_model2
+)
+
+summary(mod_hib_lead)
+```
+
+```{r tcc_6a, message=FALSE, warning=FALSE}
+#Residuos da regressão MQ2E
+res_hib_lead <- residuals(mod_hib_lead)
+
+# Testes de Autocorrelação
+
+bgtest(mod_hib_lead, order = 4)    # até 4 defasagens
+bgtest(mod_hib_lead, order = 12)   # prazo mais longo (um ano)
+
+# Teste de Normalidade
+jarque.bera.test(res_hib_lead)
+
+# Teste de heterocedasticidade
+bptest(mod_hib_lead)
+```
+
+Os resíduos do modelo apresentam autocorrelação e heterocedasticidade, além de ausência de normalidade.
+
+
+```{r tcc_6b, message=FALSE, warning=FALSE}
+# Erros-padrão robustos a hetero + autocorrelação (HAC Newey–West)
+coeftest(
+  mod_hib_lead,
+  vcov = NeweyWest(mod_hib_lead, lag = 4, prewhite = FALSE)
+)
+
+
+
+coeftest(
+  mod_hib_lead,
+  vcov = NeweyWest(mod_hib_lead, lag = 12, prewhite = FALSE)
+)
+
+```
+
+
+Um aumento de 1 p.p. na inflação passada está associado a um aumento de cerca de 0,40 p.p. na inflação corrente, mantendo constantes inflação futura, hiato e câmbio.
+
+Um aumento de 1 p.p. na inflação do mês seguinte está associado a um aumento de cerca de 0,40 p.p. na inflação corrente.
+
+O hiato não é estatisticamente significativo, assim como o Cambio.
+
+### Modelo hibrido com endogeneidade
+
+```{r tcc_7, message=FALSE, warning=FALSE}
+
+mod_hib_iv <- ivreg(
+  ipca ~ ipca_lag1 + ipca_lead1 + hiato + lcambio |
+         ipca_lag1 + ipca_lag2 + hiato + hiato_lag1 + lcambio + lcambio_lag1,
+  data = dados_iv
+)
+summary(mod_hib_iv, diagnostics = TRUE)
+
+```
+
+
+```{r tcc_7a, message=FALSE, warning=FALSE}
+#Residuos da regressão MQ2E
+res_hib_iv <- residuals(mod_hib_iv)
+
+# Testes de Autocorrelação
+
+bgtest(mod_hib_iv, order = 4)    # até 4 defasagens
+bgtest(mod_hib_iv, order = 12)   # prazo mais longo (um ano)
+
+# Teste de Normalidade
+jarque.bera.test(res_hib_iv)
+
+# Teste de heterocedasticidade
+bptest(mod_hib_iv)
+```
+
+No modelo híbrido com IV, o teste de instrumentos fracos sugere que os instrumentos utilizados não possuem poder explicativo suficiente para o termo endógeno de inflação futura, o que limita a confiabilidade das estimativas MQ2E, especialmente do coeficiente associado a ipca_lead1.
+
+Não há ganho claro em sair do MQO para o IV na híbrida, com esse conjunto de instrumentos.
+
+Além disso, o modelo tem autocorrelação, heterocedasticidade e ausencia de normalidade.
