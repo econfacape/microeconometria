@@ -5,7 +5,7 @@ date: "today"
 editor: source
 lang: pt
 language: 
-  toc-title-document: '<a href="https://www.facape.br/" target="_blank"><img src="https://github.com/econfacape/macroeconometria/blob/main/logofacape.jpg?raw=true" alt="Logotipo Facape" width="150"></a>'
+  toc-title-document: '<a href="https://www.facape.br/" target="_blank"><img src="logofacape.jpg" alt="Logotipo Facape" width="150"></a>'
 format: 
   html:
     toc: true
