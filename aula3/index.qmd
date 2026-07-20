@@ -5,7 +5,7 @@ date: "today"
 editor: source
 lang: pt
 language: 
-  toc-title-document: '<a href="https://www.facape.br/" target="_blank"><img src="https://github.com/econfacape/macroeconometria/blob/main/logofacape.jpg?raw=true" alt="Logotipo Facape" width="150"></a>'
+  toc-title-document: '<a href="https://www.facape.br/" target="_blank"><img src="logofacape.jpg" alt="Logotipo Facape" width="150"></a>'
 format: 
   html:
     toc: true
@@ -141,7 +141,8 @@ Se "$u_i$" for positivo, a reta subestima $y_i$. Se for negativo, superestima. S
 getwd()
 
 #Direcionado o R para o Diretorio a ser trabalhado
-setwd('/Users/jricardofl/Dropbox/tempecon/Facape/econometria1')
+#setwd('/Users/jricardofl/Dropbox/tempecon/Facape/econometria1')
+setwd('C:/Users/Lenovo/Dropbox/tempecon/Facape/econometria1')
 
 #Limpa o Ambiente Global
 rm(list=ls())
