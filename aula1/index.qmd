@@ -43,18 +43,37 @@ Contudo, a **Econometria** pode ser utilizada em diversas outras áreas que não
 
 <br>
 
+## Breve Histórico
+
+O termo **Econometria** foi elaborado pelo economista norueguês Ragnar Frisch em 1926, a partir da junção das palavras gregas *oikonomia* (economia) e *metron* (medida). Frisch, ao lado de Irving Fisher e Joseph Schumpeter, fundou em 1930 a **Sociedade Econométrica** (*Econometric Society*), com o objetivo de promover o desenvolvimento da teoria econômica em conexão com a Estatística e a Matemática.
+
+Um marco importante foi o trabalho do economista holandês Jan Tinbergen, que construiu, em 1936, um dos primeiros modelos macroeconométricos completos, para a economia dos Países Baixos. Por essas contribuições fundadoras, Frisch e Tinbergen foram os primeiros laureados, em 1969, com o Prêmio Nobel de Ciências Econômicas.
+
+No Brasil, assim como em diversos países, a disciplina foi originalmente chamada de **Estatística Econômica**, denominação que reflete sua origem como aplicação de métodos estatísticos a problemas econômicos, antes de se consolidar como um campo próprio, com identidade teórica e metodológica bem definida.
+
+<br>
+
 # Passos na análise econômica empírica
 
 Análise empírica é aquela que usa dados para testar uma teoria ou estimar uma relação. Para realizar esta análise é preciso seguir alguns passos:
 
-* Afirmação da teoria ou hipótese econômica  
-* Especificação do modelo matemático (equação)  
-* Especificação do modelo econométrico   
-* Obtenção dos dados   
-* Estimação dos parâmetros do modelo econométrico  
-* Teste de hipóteses  
-* Previsão  
-* Uso do Modelo para elaboração de Políticas públicas ou Empresas
+1) **Afirmação da teoria ou hipótese econômica**: todo trabalho empírico parte de uma proposição teórica que se deseja testar ou de uma relação que se acredita existir entre variáveis econômicas. Sem uma teoria (ou, ao menos, uma conjectura bem fundamentada) que oriente a escolha das variáveis, a análise de dados se torna um exercício de tentativa e erro, sujeito a encontrar relações espúrias, ou seja, sem sentido econômico;
+
+2) **Especificação do modelo matemático (equação)**: a teoria é traduzida em uma equação matemática que relaciona a variável de interesse a uma ou mais variáveis explicativas, geralmente com um sinal e uma magnitude esperados para os parâmetros;
+
+3) **Especificação do modelo econométrico**: como o modelo matemático é determinístico, ou seja, não deixa espaço para erros de medida ou fatores omitidos, ele é reescrito como um modelo estocástico, com a inclusão de um termo de erro que capture toda a influência de variáveis não observadas ou não incluídas no modelo;
+
+4) **Obtenção dos dados**: é necessário reunir uma amostra de dados sobre as variáveis do modelo. A qualidade, a fonte e a estrutura desses dados (corte transversal, série temporal, etc., como será visto na próxima seção) afetam diretamente a qualidade das estimativas obtidas;
+
+5) **Estimação dos parâmetros do modelo econométrico**: com os dados em mãos, aplica-se um método estatístico, o mais usual, e tratado neste curso, é o dos Mínimos Quadrados Ordinários (MQO), para obter estimativas numéricas dos parâmetros do modelo;
+
+6) **Teste de hipóteses**: os parâmetros estimados devem ser submetidos a testes estatísticos, para verificar se são estatisticamente significativos e se têm o sinal e a magnitude condizentes com a teoria que motivou o modelo;
+
+7) **Previsão**: uma vez validado, o modelo estimado pode ser usado para prever valores futuros ou não observados da variável dependente, dados novos valores das variáveis explicativas;
+
+8) **Uso do modelo para elaboração de Políticas Públicas ou de decisões Empresariais**: por fim, os resultados podem subsidiar a tomada de decisão de governos (avaliação e desenho de políticas públicas) ou de empresas (decisões de precificação, investimento, produção, etc.).
+
+Este curso de **Econometria I** concentra-se, principalmente, nas etapas 2 a 6 -- da especificação do modelo à estimação e ao teste de hipóteses --, tomando o **modelo de regressão linear** como principal ferramenta. As etapas 7 e 8 aparecerão ao longo do curso por meio de exemplos aplicados de previsão e de interpretação de resultados para tomada de decisão.
 
 <br>
 
@@ -165,26 +184,29 @@ kable(head(dados4, 10))  %>%
 
 # Metodologia da Econometria - Exemplo
 
-1. Afirmação da teoria ou hipótese econômica:
+Para ilustrar, na prática, os 8 passos descritos anteriormente, considere o seguinte exemplo simplificado:
 
-A quantidade demandada de um bem Y é inversamente relacionada com o seu preço (X);  
-  
+1) **Afirmação da teoria ou hipótese econômica**: a quantidade demandada de um bem Y é inversamente relacionada com o seu preço (X);
 
-2. Especificação do modelo matemático (equação):  
+2) **Especificação do modelo matemático (equação)**:
 
-$$Y=\beta_0+\beta_1X$$ com $\beta_1<0$ 
+$$Y=\beta_0+\beta_1X$$ com $\beta_1<0$
 
-  
-3. Especificação do modelo econométrico  
+3) **Especificação do modelo econométrico**:
 $$Y=\hat{\beta_0}+\hat{\beta_1}X+\hat{u}$$
 em que Y é a quantidade demandada, X o preço, os $\beta_i$ são os parâmetros estimados e u é o termo estocástico que diferencia um modelo matemático e o estatístico. Ele representa tudo o que afetar Y e que não está explicitado no modelo.
 
-4. Os dados podem ser seção cruzada ou um série temporal. Existem também combinações de seção cruzada e série temporal, denominados de dados em Painel.
+4) **Obtenção dos dados**: os dados podem ser de corte transversal ou de série temporal. Existem também combinações de corte transversal e série temporal, denominadas de dados em Painel.
+
+5) **Estimação dos parâmetros**: suponha que, a partir de uma amostra de dados sobre preço e quantidade demandada, tenha-se estimado o seguinte modelo:
 
 $$\hat{Y}=10-0.9X$$
-Se o preço aumentar 10 reais, a demanda reduz 9 unidades;
 
-5. Testar se a constante -0.9 estimada é estatisticamente igual ou diferente de zero, ou seja, se $\beta_1=0$.
+O **coeficiente de inclinação** estimado, $\hat\beta_1=-0,9$, indica que, se o preço aumentar 1 real, a quantidade demandada cai, em média, 0,9 unidade, mantendo tudo o mais constante. Logo, se o preço aumentar 10 reais, a demanda se reduz, em média, em 9 unidades.
+
+6) **Teste de hipóteses**: testa-se se o coeficiente de inclinação estimado, $\hat\beta_1=-0,9$, é estatisticamente diferente de zero, ou seja, se $\beta_1=0$. Caso não se rejeite $H_0:\beta_1=0$, não há evidência estatística de que o preço afete a quantidade demandada.
+
+As etapas 7 (previsão) e 8 (uso para elaboração de políticas públicas ou decisões empresariais) seriam realizadas na sequência: com o modelo estimado, seria possível prever a quantidade demandada para um novo valor de X (preço) e usar esse resultado para subsidiar, por exemplo, uma decisão de precificação.
 
 <br>
 
@@ -192,7 +214,11 @@ Se o preço aumentar 10 reais, a demanda reduz 9 unidades;
 
 Regressão Linear é a principal ferramenta da econometria e trata do estudo da dependência de uma variável, regressando (Y), em relação a uma ou mais variáveis explicativas (regressores), com o objetivo de estimar e/ou prever o valor médio de Y dados os valores de X. 
 
-Apesar da análise de regressão tratar da dependência de uma variável sobre outras variáveis, isto não necessariamente implica "causa". Uma relação estatística em si não pode logicamente implicar em causa. Para atribuir causalidade deve-se considerar a teoria econômica ou mesmo o senso comum.
+Apesar da análise de regressão tratar da dependência de uma variável sobre outras variáveis, isto não necessariamente implica "causa". Uma relação estatística, por si só, não pode implicar causalidade. Para atribuir causalidade deve-se considerar a teoria econômica ou mesmo o senso comum.
+
+Um exemplo clássico de correlação sem causalidade é a associação estatística entre o consumo de sorvete e o número de afogamentos: nos meses de verão, ambos aumentam simultaneamente, não porque um cause o outro, mas porque uma terceira variável, a temperatura, afeta as duas. Esse tipo de relação é chamado de **correlação espúria** e mostra por que a simples existência de uma correlação (ou mesmo de uma regressão estatisticamente significativa) nunca é suficiente, isoladamente, para se afirmar causalidade.
+
+Para que uma relação estimada por regressão possa ser interpretada como causal, em geral é necessário que: a) exista uma teoria econômica (ou mecanismo plausível) que explique por que X afetaria Y; b) a causa preceda o efeito no tempo; e c) os principais fatores de confusão (*confounders*), ou seja, variáveis que afetam simultaneamente X e Y, estejam devidamente controlados no modelo, seja pela inclusão de variáveis adicionais (regressão múltipla, tratada a partir da Aula 6), seja pelo uso de desenhos quase-experimentais, como diferenças-em-diferenças e controle sintético, temas que serão vistos mais adiante no curso.
 
 <br>
 
@@ -204,8 +230,8 @@ As estimativas de correlação podem ser positivas ou negativas. O primeiro caso
 
 O coeficiente de correlação de Pearson ($r$) pode ser encontrado pela fórmula:
 
-$$r=\frac{\sum X_iY_i-\frac{\sum X_i-\sum Y_i}{n}}{\Bigg[\sum X_i^2-\frac{(\sum X_i)^2}{n}\Bigg]\Bigg[\sum Y_i^2-\frac{(\sum Y_i)^2}{n}\Bigg]}$$
-A ocorrência de um valor de r=0 ou próximo de zero indica que não há correlação linear entre as variáveis, mas pode ocorrer não linear.
+$$r=\frac{\sum X_iY_i-\dfrac{\sum X_i\sum Y_i}{n}}{\sqrt{\Bigg[\sum X_i^2-\frac{(\sum X_i)^2}{n}\Bigg]\Bigg[\sum Y_i^2-\frac{(\sum Y_i)^2}{n}\Bigg]}}$$
+A ocorrência de um valor de r=0 ou próximo de zero indica que não há correlação **linear** entre as variáveis, mas pode existir uma relação **não linear** entre elas, como ilustrado no quarto gráfico do exemplo a seguir.
 
 <br>
 
