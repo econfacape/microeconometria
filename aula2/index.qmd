@@ -96,23 +96,23 @@ $$
 E(u|x)=E(u)=0
 $$
 		
-O que está indicado na equação acima é que o valor médio de u é o mesmo para qualquer valor de x e igual a sua média aritmética. Em outras palavras, diz que u é **independente da média** de x. 
+O que está indicado na equação acima é que o valor médio de u é o mesmo para qualquer valor de x e igual a sua média aritmética. Em outras palavras, diz que u é **média-independente** de x: o valor esperado de u não muda conforme x varia.
 
-Considerando o valor esperado da equação de Y em função de X e usando $E(u|x)=0$, se obtém: 
-		
+Considerando o valor esperado da equação de Y em função de X e usando $E(u|x)=0$, se obtém:
+
 $$
 E(y|x)=\beta_0+\beta_1x
 $$
-		
+
 A equação dada acima mostra que a **função de regressão populacional (FRP)**, $E(y|x)$, é uma função linear de x;
-	
+
 A linearidade significa que o aumento de uma unidade em x faz com que o valor esperado de y varie segundo a magnitude de $\beta_1$;
 
 Para qualquer valor dado de x, a distribuição de y está centrada ao redor de $E(y|x)$. 
 
-![Modelo Clássico de Regressão Linear](img_r/wooldp26.png){width=85%}
+![Modelo Clássico de Regressão Linear](img_r/fig_eyx_linear.png){width=85%}
 
-Fonte: WOOLDRIDGE, 2017
+Fonte: elaboração própria, com base em WOOLDRIDGE, 2017
 
 
 
@@ -150,9 +150,9 @@ $$
 
 então, um método bom para se obter as estimativas dos $\beta$s seria fazer com que a soma de todos os erros fosse a menor possível; 
 
-![Modelo Clássico de Regressão Linear](img_r/wooldp31.png){width=85%}
+![Modelo Clássico de Regressão Linear](img_r/fig_valores_residuos.png){width=85%}
 
-Fonte: WOOLDRIDGE, 2017
+Fonte: elaboração própria, com base em WOOLDRIDGE, 2017
 
 Por questões teóricas, o método dos Mínimos Quadrados Ordinários (MQO) minimiza a soma dos erros ao quadrado, dando peso diferente às observações cujo valor estimado esteja mais próximo ou mais distante do valor observado ($Y$); 
 
@@ -206,12 +206,14 @@ Uma vez que se tenha $\hat{\beta_1}$, dados os valores das médias de Y e X se o
 
 Considerando a outra equação, mas suprimindo o N, que não afeta a solução, se pode obter:
 
-$$	
+$$
 \sum(Y-(\overline{Y}-\hat{\beta_1}\overline{X})-\hat{\beta_1}X)(X)=0
 $$
 
-$$	
-\sum(X)(Y-\overline{Y})=\sum(X)(-\hat{\beta_1}\overline{X})+\hat{\beta_1}X=0
+Expandindo os termos dentro do somatório:
+
+$$
+\sum(X)(Y-\overline{Y})+\hat{\beta_1}\sum(X)(\overline{X}-X)=0
 $$
 
 Como $\hat{\beta_1}$ é uma constante e colocando em evidência:
@@ -242,11 +244,7 @@ $$
 
 com $x=X-\overline{X}$ e $y=Y-\overline{Y}$.
 
-A equação dada em acima é a covariância amostral de x e y dividida pela variância amostral de x. Podemos reescrever a forma de encontrar o $\hat{\beta}_1$ como abaixo:
-
-$$
-\hat{\beta_1}=\frac{cov(xy)}{\hat{\sigma}_x     \hat{\sigma}_x}\frac{\hat{\sigma}_y}{\hat{\sigma}_y}
-$$
+A equação dada em acima é a covariância amostral de x e y dividida pela variância amostral de x. Podemos reescrever a forma de encontrar o $\hat{\beta}_1$ multiplicando e dividindo por $\hat{\sigma}_y$:
 
 $$
 \hat{\beta_1}=\frac{cov(xy)}{\hat{\sigma}_x \hat{\sigma}_y}\frac{\hat{\sigma}_y}{\hat{\sigma}_x}
@@ -308,12 +306,12 @@ library(rstatix)
 ``` {r econ1, warning=FALSE, message=FALSE}
 
 #Carregar dados no computador
-ceolsal1 <- data('ceosal1')
+data('ceosal1')
 
 #Observar a estrutura dos dados
 glimpse(ceosal1)
 
-tail(ceolsal1)
+tail(ceosal1)
 ```
 
 
@@ -421,8 +419,8 @@ ceosal1["salary"].describe()
 ceosal1["roe"].describe()
 
 # Covariância e Correlação
-ceosal1.cov
-ceosal1.corr
+ceosal1.cov()
+ceosal1.corr()
 
 # Gráfico
 
@@ -453,8 +451,8 @@ reg1.fit().params
 result = reg1.fit()
 print(result.summary())
 print("Parameters: ", result.params)
-print(result.params[0])
-print(result.params[1])
+print(result.params.iloc[0])
+print(result.params.iloc[1])
 
 y_hat = result.fittedvalues
 u_hat = result.resid
