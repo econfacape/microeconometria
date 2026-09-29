@@ -5,7 +5,7 @@ date: "today"
 editor: source
 lang: pt
 language: 
-  toc-title-document: '<a href="https://www.facape.br/" target="_blank"><img src="https://github.com/econfacape/macroeconometria/blob/main/logofacape.jpg?raw=true" alt="Logotipo Facape" width="150"></a>'
+  toc-title-document: '<a href="https://www.facape.br/" target="_blank"><img src="img_r/logofacape.jpg" alt="Logotipo Facape" width="150"></a>'
 format: 
   html:
     toc: true
@@ -159,10 +159,17 @@ cor(x)
 corrplot(cor(x), order="hclust", tl.col="black", tl.cex = .75)
 
 #Calculo do Fator de Inflacao da Variancia
-vif(lm(cigs ~ income + cigpric
-                 + educ + age +
+#Usando a mesma especificacao de regressao1 (log(income), log(cigpric) e I(age^2))
+vif(lm(cigs ~ log(income) + log(cigpric)
+                 + educ + age + I(age^2) +
                    restaurn, data=dados))
 ```
+
+<br>
+
+O FIV foi calculado usando a mesma especificação de `regressao1` (com `log(income)`, `log(cigpric)` e o termo quadrático `I(age^2)`), para diagnosticar a multicolinearidade do modelo que de fato foi estimado. É esperado que `age` e `I(age^2)` apresentem FIV bem alto entre si — isso é uma multicolinearidade "benigna", decorrente da própria construção do termo polinomial (idade e idade² são mecanicamente correlacionadas), e não indica um problema real de identificação entre conceitos distintos, como ocorreria se duas variáveis genuinamente diferentes fossem colineares.
+
+<br>
 
 <br>
 
@@ -170,11 +177,27 @@ vif(lm(cigs ~ income + cigpric
 
 <br>
 
-```{r aula9_2, warning=FALSE, message=FALSE}
+```{r aula9_2a, warning=FALSE, message=FALSE}
 #Analise dos residuos do modelo
 par(mfrow=c(2,2))
 plot(regressao1)
+```
 
+<br>
+
+O `plot()` aplicado a um objeto `lm` produz quatro gráficos de diagnóstico, cada um verificando uma hipótese diferente do modelo clássico:
+
+1) **Residuals vs Fitted** (resíduos *versus* valores ajustados) — verifica linearidade e, principalmente, **homocedasticidade**. Sob homocedasticidade, os pontos devem estar espalhados aleatoriamente em torno da linha horizontal em zero, sem nenhum padrão sistemático. Um formato de "funil" (dispersão crescente ou decrescente à medida que os valores ajustados aumentam) é o sinal visual clássico de heterocedasticidade.
+
+2) **Normal Q-Q** — compara os resíduos padronizados com os quantis teóricos de uma distribuição Normal. Se os pontos seguem aproximadamente a linha diagonal, não há evidência forte contra a normalidade dos resíduos; desvios nas caudas (pontos que se afastam da linha nas extremidades) sugerem caudas mais pesadas ou distribuição assimétrica.
+
+3) **Scale-Location** (ou *Spread-Location*) — mostra a raiz quadrada dos resíduos padronizados (em valor absoluto) *versus* os valores ajustados. É o gráfico mais direto para **heterocedasticidade**: sob variância constante, a linha suavizada (vermelha) deve ser aproximadamente horizontal, com os pontos espalhados de forma homogênea ao longo do eixo X. Uma linha com tendência crescente (ou qualquer padrão não horizontal) indica que a dispersão dos resíduos muda com o nível dos valores ajustados — evidência gráfica de heterocedasticidade, complementar aos testes formais de White e BPG apresentados mais adiante.
+
+4) **Residuals vs Leverage** — identifica observações influentes, combinando o *leverage* (o quanto uma observação é atípica nos valores de X) com o tamanho do resíduo. Observações que aparecem fora das curvas tracejadas de distância de Cook merecem atenção especial: podem estar distorcendo desproporcionalmente as estimativas de MQO, inclusive mascarando ou simulando heterocedasticidade.
+
+<br>
+
+```{r aula9_2b, warning=FALSE, message=FALSE}
 #Salvando os residuos do modelo e os valores estimados
 resid_sq <- (regressao1$residuals)^2
 ajustados1 <- regressao1$fitted.values
@@ -196,12 +219,20 @@ A **hipótese nula** do Teste de White é os **resíduos são homocedásticos**.
 #Testes de Heterocedasticidade de White
 #Caso especial do BPG
 #H0: Residuos sao homocedasticos.
-regres_white <- lm(cigs ~ log(income) + log(cigpric)
-                 + educ + age + I(age^2) + 
-                   I(log(income^2)) + I(log(cigpric^2))
-                 + I(educ^2) + restaurn, data=dados)
-bptest(regres_white) 
+
+#O teste de White regride os residuos ao quadrado de regressao1 (via varformula)
+#contra os regressores originais e seus quadrados - e nao cria um novo modelo para cigs
+bptest(regressao1,
+       varformula = ~ log(income) + log(cigpric) + educ + age + I(age^2) +
+                       I(log(income)^2) + I(log(cigpric)^2) + I(educ^2) + restaurn,
+       data = dados)
 ```
+
+<br>
+
+Note que o teste é aplicado sobre `regressao1` (o modelo já estimado), usando o argumento `varformula` do `bptest()` para especificar contra o que os resíduos ao quadrado devem ser regredidos — os regressores originais e seus quadrados. Isso é diferente de estimar um novo modelo para `cigs` já com os termos quadráticos na equação da média: o teste de White precisa comparar os **resíduos** do modelo original com essas variáveis, não gerar um modelo alternativo para a variável dependente.
+
+Essa é a versão do teste de White **sem produtos cruzados** entre os regressores (uma simplificação usual quando há muitos regressores, para não perder muitos graus de liberdade). O teste equivalente em Python, mais adiante, usa `het_white()`, que inclui automaticamente todos os produtos cruzados — por isso os dois números não devem coincidir exatamente, embora a conclusão (rejeitar ou não homocedasticidade) costume ser a mesma.
 
 <br>
 
@@ -247,11 +278,37 @@ check_model(regressao1)
 
 <br>
 
+O `check_model()` organiza vários diagnósticos num único painel. Para o modelo `regressao1`, aparecem seis gráficos:
+
+1) **Posterior Predictive Check** — compara a distribuição observada de `cigs` (linha verde) com distribuições simuladas a partir do modelo estimado (linhas azuis). Quanto mais parecidas as curvas, melhor o modelo reproduz o padrão dos dados observados. Aqui as curvas divergem bastante (a distribuição observada tem uma segunda "corcova" que o modelo não captura), sinal de que a especificação linear pode não ser a ideal para uma variável de contagem como `cigs`, que tem muitos zeros.
+
+2) **Linearity** — o equivalente do gráfico *Residuals vs Fitted* já visto na seção anterior. A linha de referência (verde) deveria ser aproximadamente horizontal em zero; pequenos desvios são esperados, mas uma tendência marcada indica má especificação da forma funcional.
+
+3) **Homogeneity of Variance** — é a versão do pacote {performance} para o gráfico *Scale-Location*: mostra $\sqrt{|resíduos\ padronizados|}$ *versus* valores ajustados. A linha de referência deveria ser horizontal sob homocedasticidade. Aqui ela é claramente crescente, o que **confirma visualmente** a heterocedasticidade já detectada pelos testes de White, BPG e NCV.
+
+4) **Influential Observations** — o equivalente do gráfico *Residuals vs Leverage*: identifica observações que, combinando leverage alto e resíduo grande, têm potencial de distorcer desproporcionalmente as estimativas de MQO (via distância de Cook). Pontos fora das curvas tracejadas (aqui, nenhum ultrapassa a curva de 0,9) merecem inspeção individual.
+
+5) **Collinearity** — mostra o FIV de cada regressor em escala logarítmica, com faixas de referência: verde (FIV < 5, baixo), azul (entre 5 e 10, moderado) e vermelho (FIV ≥ 10, alto). Como já discutido, `age` e `I(age^2)` aparecem na faixa vermelha, a multicolinearidade "benigna" esperada do termo polinomial.
+
+6) **Normality of Residuals** — um gráfico Q-Q dos resíduos: quanto mais os pontos seguirem a linha verde (com a banda cinza de referência), mais próxima da Normal é a distribuição dos resíduos. Aqui os pontos se afastam da linha nas duas extremidades, ecoando a rejeição da normalidade já observada nos testes de Jarque-Bera e Shapiro-Wilk feitos anteriormente.
+
+Em conjunto, os painéis 3 (Homogeneity of Variance) e 1 (Posterior Predictive Check) são os mais relevantes para o tema desta aula: eles mostram graficamente o mesmo problema de heterocedasticidade (e de possível má especificação do modelo para uma variável de contagem) que os testes formais já haviam indicado.
+
+<br>
+
 ## Heterocedasticidade: como corrigir?
 
 <br>
 
-Usar mínimos quadrados ponderados se conhecer a verdadeira variância heterocedástica $\sigma^2_i$. Contudo, raramente isto ocorre. O que mais se usa é transformação logarítmica de variáveis com grande variância e o procedimento de White para estimar erros-padrão robustos. O procedimento não altera a estimação no ponto, apenas os erros-padrão corrigindo a heterocedasticidade.
+Usar mínimos quadrados ponderados (MQP) se conhecer a verdadeira variância heterocedástica $\sigma^2_i$. Contudo, raramente isto ocorre.
+
+Quando $\sigma^2_i$ não é conhecida, mas se tem uma suspeita razoável de como ela se relaciona com os regressores, pode-se usar os **Mínimos Quadrados Generalizados Factíveis (MQGF)**, também chamado de *Feasible GLS (FGLS)*. A ideia é estimar $\sigma^2_i$ em duas etapas:
+
+1) Estimar o modelo original por MQO e obter os resíduos $\hat u_i$;
+
+2) Modelar a variância desses resíduos em função dos regressores — por exemplo, regredir $\ln(\hat u_i^2)$ contra $X$'s (forma sugerida por Park) — e usar os valores ajustados dessa segunda regressão, $\hat\sigma^2_i$, como peso na reestimação do modelo original por MQP: cada observação $i$ é dividida por $\hat\sigma_i$, e o modelo transformado é estimado por MQO.
+
+O MQGF é *factível* justamente porque usa uma variância **estimada** (não a verdadeira, desconhecida), o que o diferencia do MQG "puro". Na prática, ele só melhora a eficiência da estimativa se a forma escolhida para $\sigma^2_i$ estiver razoavelmente correta — daí porque a correção de erros-padrão robustos de White (abaixo) costuma ser preferida no dia a dia: ela não exige acertar a forma da heterocedasticidade, apenas corrige a inferência (testes t e F) mantendo as mesmas estimativas pontuais de MQO. O que mais se usa, portanto, é a transformação logarítmica de variáveis com grande variância e o procedimento de White para estimar erros-padrão robustos. O procedimento de White não altera a estimação no ponto, apenas os erros-padrão, corrigindo a heterocedasticidade.
 
 A correção clássica de White para a matriz de variância dos coeficientes é dada por:
 
@@ -287,11 +344,19 @@ coeftest(regressao1, vcov=vcovHC, type='HC0')
 coeftest(regressao1, vcov=vcovHC, type='HC1') #(Eviews)
 coeftest(regressao1, vcov=vcovHC, type='HC2') 
 coeftest(regressao1, vcov=vcovHC, type='HC3') 
-coeftest(regressao1, vcov=vcovHC, type='HC4') #sugerido (2011)
+coeftest(regressao1, vcov=vcovHC, type='HC4') #Cribari-Neto (2004)
 ```
 
 
 ## Exemplo no Python
+
+
+```{r setup}
+#| include: false
+#library(reticulate)
+#use_condaenv("py-econo", require = TRUE)
+#py_config()
+```
 
 ```{python aula9_6a, warning=FALSE, message=FALSE}
 
