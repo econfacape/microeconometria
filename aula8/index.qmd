@@ -5,7 +5,7 @@ date: "today"
 editor: source
 lang: pt
 language: 
-  toc-title-document: '<a href="https://www.facape.br/" target="_blank"><img src="https://github.com/econfacape/macroeconometria/blob/main/logofacape.jpg?raw=true" alt="Logotipo Facape" width="150"></a>'
+  toc-title-document: '<a href="https://www.facape.br/" target="_blank"><img src="img_r/logofacape.jpg" alt="Logotipo Facape" width="150"></a>'
 format: 
   html:
     toc: true
@@ -43,6 +43,25 @@ Uma das premissas do Modelo Clássico de Regressão Linear é que não existe **
 
 <br>
 
+### Por que a multicolinearidade é um problema? Uma intuição geométrica
+
+<br>
+
+Antes de entrar nos aspectos técnicos, vale entender **por que** isso importa. Gujarati \& Porter (2009) usam diagramas de Venn para dar essa intuição: pense em cada círculo como representando a variância de uma variável, e nas áreas de sobreposição como a variância que duas (ou mais) variáveis têm em comum.
+
+![Intuição geométrica da multicolinearidade](img_r/venn_multicolinearidade.png){width=95%}
+
+Fonte: elaboração própria, com base em Gujarati \& Porter (2009)
+
+O MQO só consegue estimar o efeito **líquido** (isolado) de $X_2$ sobre $Y$ a partir da área em que $X_2$ e $Y$ se sobrepõem **sem** envolver $X_3$ — ou seja, a variação em $Y$ que só $X_2$ ajuda a explicar, mantendo $X_3$ constante. O mesmo vale para o efeito líquido de $X_3$.
+
+* No painel da **esquerda** (baixa colinearidade entre $X_2$ e $X_3$), essas áreas exclusivas são grandes: o modelo consegue atribuir, com boa precisão, "quanto" de $Y$ vem de $X_2$ e "quanto" vem de $X_3$.
+* No painel da **direita** (alta colinearidade), $X_2$ e $X_3$ passam a se sobrepor fortemente entre si. A área em que os três círculos se cruzam ($Y \cap X_2 \cap X_3$) cresce, mas essa área é **ambígua**: o modelo não sabe se deve atribuir essa parte de $Y$ a $X_2$ ou a $X_3$, já que as duas variáveis se movem quase sempre juntas na amostra. Sobra pouca área exclusiva para cada uma, mesmo que a área total explicada de $Y$ (soma de todas as sobreposições) continue grande.
+
+É exatamente essa perda de área exclusiva que se traduz, algebricamente, em variância inflada dos estimadores $\hat\beta$ (erro-padrão grande, intervalo de confiança largo, estatística t baixa) — mesmo com $R^2$ alto, como será visto na próxima seção. No caso extremo de colinearidade perfeita, os círculos de $X_2$ e $X_3$ se sobrepõem por completo, não sobra nenhuma área exclusiva, e o efeito individual de cada variável deixa de ser identificável — é o mesmo resultado que aparece adiante, de forma algébrica, quando $|\mathbf{X'X}|=0$.
+
+<br>
+
 ```{r aula8_1, warning=FALSE, message=FALSE}
 x1 <- c(10,15,18,24,30)
 x2 <- c(50,75,90,120,150)
@@ -75,7 +94,7 @@ $$
 
 <br>
 
-sendo o determinante desta matriz igual a zero $|\mathbf{X'X}|=0$.
+sendo o determinante desta matriz igual a zero $|\mathbf{X'X}|=0$, não se consegue inverter a matriz e, então, não se consegue encontrar os betas em $(\mathbf{X'X})^{-1}\mathbf{X'Y}$.
 
 <br>
 
@@ -135,8 +154,8 @@ $$
 
 Como o erro padrão é grande, normalmente os betas são não significativos, ou seja, iguais a zero.
 
-O $R^2$ tende a ser muito alto.
- 
+O sintoma clássico da multicolinearidade é justamente essa combinação: $R^2$ (e a estatística F do modelo) alto e significativo, mostrando que as variáveis explicativas em conjunto explicam bem Y, mas com poucos ou nenhum coeficiente individualmente significativo — porque a variância de cada $\hat\beta$ está inflada.
+
 Os estimadores de MQO e os erros-padrões podem ser sensíveis às pequenas mudanças nos dados.
  
 Em resumo, os resultados encontrados se tornam duvidosos quando se regride com regressores colineares.
@@ -178,11 +197,11 @@ X_3=\beta_0+\beta_1X_1+\beta_2X_2+u
 $$
 <br>
 
-calcular em cada regressão auxiliar os $R^2$: a) $R^2_{x_2.x_3x_4}$; b) $R^2_{x_3.x_2x_4}$; c) $R^2_{x_4.x_2x_3}$
+calcular em cada regressão auxiliar os $R^2$: a) $R^2_{x_1.x_2x_3}$; b) $R^2_{x_2.x_1x_3}$; c) $R^2_{x_3.x_1x_2}$
 
 <br>
 
-comparar cada um com o $R^2$ geral. Pela *Regra Prática de Klein*, a multicolinearidade é um problema sério se o $R^2$ obtido em todas as regressões auxiliares for maior que o $R^2$ geral.
+comparar cada um com o $R^2$ geral. Pela *Regra Prática de Klein*, a multicolinearidade pode ser um problema sério se o $R^2$ obtido em **qualquer uma** das regressões auxiliares, isoladamente, for maior do que o $R^2$ geral — não é necessário que isso ocorra simultaneamente em todas elas.
 
 <br>
 
@@ -205,7 +224,19 @@ em que $\sigma^2$ é a variância do termo de erro e $r^2_{23}$ é o coeficiente
 se considerarmos a razão $\frac{1}{1-r^2_{23}}$, esta mensura o grau na qual a variância do estimador de MQO é inflado devido a colinearidade. Este fator é conhecido como **FIV** (Fator de Inflação de Variância).
 
 Se o FIV for maior do que 10 diz-se que esta variável é altamente colinear;
- Com mais de 2 variáveis, o quadrado do coeficiente de correlação pode ser obtido do $R^2$ das regressões auxiliares. 
+ Com mais de 2 variáveis, o quadrado do coeficiente de correlação pode ser obtido do $R^2$ das regressões auxiliares.
+
+<br>
+
+**Tolerância (TOL)** - é simplesmente o inverso do FIV:
+
+$$
+TOL=\frac{1}{FIV}=(1-r^2_{23})
+$$
+
+Enquanto o FIV mede o quanto a variância do $\hat\beta$ está inflada pela colinearidade, a TOL mede a proporção da variância de $X_2$ (ou $X_3$) que **não** é explicada pelas demais variáveis explicativas — quanto mais próxima de zero, maior a colinearidade.
+
+Como o limite prático do FIV é 10, o limite correspondente da TOL é o seu inverso: $TOL<0,10$ também indica multicolinearidade severa. Ou seja, FIV e TOL são a mesma informação vista de ângulos opostos — não é necessário calcular os dois, mas é comum que os softwares estatísticos reportem ambos.
 
 <br>
 
@@ -215,7 +246,13 @@ Se o FIV for maior do que 10 diz-se que esta variável é altamente colinear;
 
 1) Aumentar o tamanho da amostra;
 
-2) Exclusão de variáveis, desde que não cause viés de especificação ou omissão de variável relevante.
+2) Exclusão de variáveis, desde que não cause viés de especificação ou omissão de variável relevante;
+
+3) Combinar as variáveis colineares em um único índice ou variável composta, quando fizer sentido teórico (por exemplo, um indicador que resuma duas variáveis muito correlacionadas);
+
+4) Buscar informação extra-amostral ou *a priori* (por exemplo, um valor de elasticidade já conhecido de outro estudo) para fixar um dos parâmetros e reduzir o número de coeficientes a estimar livremente;
+
+5) Não fazer nada: se o objetivo do modelo é apenas prever Y (e não interpretar individualmente cada $\hat\beta$), a multicolinearidade não compromete a qualidade da previsão, desde que o padrão de correlação entre os regressores se mantenha fora da amostra.
 
 <br>
 
@@ -302,6 +339,14 @@ check_model(regressao1)
 
 
 ## Multicolinearidade: Exemplo no Python
+
+```{r setup}
+#| include: false
+#library(reticulate)
+#use_condaenv("py-econo", require = TRUE)
+#py_config()
+```
+
 
 ```{python aula8_7a}
 import wooldridge
