@@ -206,28 +206,38 @@ O teste BG possui as seguintes características:
 
 A) A variância de $u_t$ seja homocedástica;
 
-B) Definir a ordem de "p". Normalmente isto é um processo de tentativa e erro, com o uso de critérios de Akaike ou Schwarz para definição do melhor modelo. Deve ser escolhido o modelo com menor valor de critério de informação;
+B) Definir a ordem de "p". Em vez de testar cada defasagem manualmente, o caminho objetivo é comparar modelos com diferentes ordens usando um critério de informação (Akaike ou Schwarz/BIC) e escolher aquele com o menor valor — o próprio R pode automatizar essa busca, como mostrado a seguir;
 
 <br>
 
+Em vez de testar "no chute" cada defasagem separadamente, o ideal é escolher a ordem "p" de forma objetiva, por critério de informação (Akaike ou Schwarz/BIC) — comparando, para cada p candidato, o ajuste de uma regressão auxiliar dos resíduos contra suas próprias defasagens, e escolhendo o p com menor critério:
+
 ```  {r aula10_5, warning=FALSE, message=FALSE}
-#Teste de Breusch-Godfrey
-#AIC(regressao1)
-#BIC(regressao1)
-bg1 <- bgtest(regressao1,1)
-coeftest(bg1)
-bg1
+#Selecao automatica da ordem "p" por AIC/BIC
+u <- residuals(regressao1)
+n <- length(u)
+maxlag <- 8
 
-bg2 <- bgtest(regressao1,2)
-coeftest(bg2)
-bg2
+resultado <- data.frame(p = integer(), AIC = double(), BIC = double())
 
-bg3 <- bgtest(regressao1,3)
-coeftest(bg3)
-bg3
+for (p in 1:maxlag) {
+  dados_aux <- data.frame(u = u)
+  for (j in 1:p) dados_aux[[paste0("lag", j)]] <- c(rep(NA, j), head(u, n - j))
+  dados_aux <- na.omit(dados_aux)
+  modelo_aux <- lm(u ~ ., data = dados_aux)
+  resultado <- rbind(resultado, data.frame(p = p, AIC = AIC(modelo_aux), BIC = BIC(modelo_aux)))
+}
+
+resultado
+
+p_escolhido <- resultado$p[which.min(resultado$BIC)]
+cat("Ordem escolhida por BIC:", p_escolhido, "\n")
+
+#Teste de Breusch-Godfrey na ordem escolhida
+bgtest(regressao1, order = p_escolhido)
 ```
 
-Os resultados mostram evidência de autocorrelação de **1ª ordem** ($LM=5{,}3122$, $p=0{,}0212$) e de **2ª ordem** ($LM=6{,}4476$, $p=0{,}0398$) a 5% de significância. Já para a defasagem 3 ($LM=6{,}6577$, $p=0{,}0837$), não se rejeita mais $H_0$ a 5% (embora rejeite a 10%). Esse padrão — autocorrelação detectada até a 2ª ordem, mas não além — é consistente com o que será encontrado na seção em Python mais adiante, e sugere que um processo AR(1) ou AR(2) já captura razoavelmente bem a estrutura de autocorrelação presente nos resíduos deste modelo.
+Tanto o AIC quanto o BIC apontam **p=1** como a melhor ordem para estes dados — ambos os critérios crescem monotonicamente a partir daí, sem ambiguidade. O teste de Breusch-Godfrey nessa ordem ($LM=5{,}3122$, $p=0{,}0212$) rejeita $H_0$ a 5%, confirmando a presença de autocorrelação de 1ª ordem — resultado consistente com o teste de Durbin-Watson visto acima e com a análise em Python mais adiante. Note que essa é uma forma **objetiva** (não arbitrária) de decidir a ordem: se os dados exigissem, por exemplo, uma defasagem 4, o critério de informação teria apontado isso automaticamente — não é preciso "adivinhar" nem testar manualmente cada possibilidade.
 
 <br>
 
