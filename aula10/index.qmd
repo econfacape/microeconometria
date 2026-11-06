@@ -33,7 +33,7 @@ execute:
 
 # Quebra de Pressupostos do Modelo Clássico de Regressão Linear
 
-# Autocorrelação e viés de especificação
+## Autocorrelação e viés de especificação
 
 <br>
 
@@ -41,15 +41,25 @@ execute:
 
 Pode existir autocorrelação no cross-section, mas é muito mais presente em séries temporais. Existe dependência entre os termos de erro $(E(u_i u_j \ne 0 \quad \forall \quad  i \ne j))$. Diversos fatores podem gerar a correlação serial, como por exemplo: 
 
-a) inércia; 
+a) inércia - dinâmica omitida (faltando defasagens da variável dependente ou de regressores); 
 
-b) viés de especificação; 
+b) viés de especificação (variável relevante omitida ou forma funcional incorreta); 
 
-c) ausência de estacionariedade; 
+c) desconsiderar quebra estrutural quando ela existe;
 
-Com relação à propriedade dos estimadores, com autocorrelação, os estimadores de MQO são não-viesados e consistentes, mas não são eficientes. **Os testes t e F não são mais válidos**. 
+d) ausência de estacionariedade; 
+
+Com relação à propriedade dos estimadores, com autocorrelação, os estimadores de MQO são não-viesados e consistentes, mas não são eficientes. **Os testes t e F não são mais válidos**.
+
+**Atenção a uma exceção importante**: essa manutenção de não-viés e consistência vale apenas quando o modelo **não** tem variável dependente defasada entre os regressores. Se o modelo incluir $y_{t-1}$ como regressor (ex.: $y_t=\alpha+\beta y_{t-1}+\varepsilon_t$) e os erros forem autocorrelacionados, $y_{t-1}$ passa a ser correlacionado com o erro $u_t$ (que depende de $u_{t-1}$, que por sua vez afetou $y_{t-1}$) — violando $E(u_t\mid y_{t-1})=0$. Nesse caso, o MQO deixa de ser não-viesado **e** deixa de ser consistente, não apenas ineficiente.
 
 Nesta situação, da mesma forma que para a heterocedasticidade, é melhor utilizar o método de Mínimos Quadrados Generalizados (MQG).
+
+**Intuição: por que o erro-padrão do MQO fica "enganosamente" pequeno sob autocorrelação?** A fórmula usual do erro-padrão do MQO pressupõe que cada observação traz uma unidade de informação nova e independente sobre os parâmetros — é essa independência que permite reduzir a incerteza à medida que $n$ aumenta. Quando há autocorrelação positiva ($\rho>0$), resíduos consecutivos tendem a ter o mesmo sinal: um choque positivo em $t$ tende a ser seguido por outro choque positivo em $t+1$, formando "corridas" (*runs*) de valores de mesmo sinal, em vez de alternarem aleatoriamente.
+
+![Resíduos independentes vs. resíduos com autocorrelação positiva](img_r/autocorr_intuicao.png){width=95%}
+
+Note como o painel da direita cruza o zero com muito menos frequência do que o da esquerda — vários períodos seguidos "andam juntos", repetindo essencialmente o mesmo sinal, em vez de cada observação contribuir com uma peça nova e independente de informação. Embora a amostra tenha $n$ observações, a quantidade de informação *efetivamente independente* nela é menor do que $n$ sugere. A fórmula usual do erro-padrão, que não "sabe" disso, trata essas observações redundantes como se fossem todas independentes — e por isso **subestima** sistematicamente a verdadeira incerteza em torno de $\hat\beta$, produzindo testes *t* e *F* liberais demais (rejeitando $H_0$ com mais frequência do que deveria).
 
 Considere um modelo com resíduos que tem correlação de primeira ordem:
 
@@ -71,14 +81,15 @@ Com base nesta idéia, alguns testes foram desenvolvidos visando verificar a pre
 Considere o modelo abaixo, uma série temporal que se inicia em 1947 e faz uma regressão do consumo em função da renda, da riqueza e da taxa de juros. As três primeiras variáveis estão em log. 
 
 ```{r setup}
-library(reticulate)
-use_condaenv("py-econo", require = TRUE)
-py_config()
+#| include: false
+#library(reticulate)
+#use_condaenv("py-econo", require = TRUE)
+#py_config()
 ```
 
 ``` {r aula10_1, warning=FALSE, message=FALSE}
 #Direcionado o R para o Diretorio a ser trabalhado
-setwd('C:/Users/Lenovo/Dropbox/tempecon/facape')
+#setwd('/Users/jricardofl/Dropbox/tempecon/facape')
 
 #Inicio do Script
 
@@ -97,7 +108,7 @@ library(scatterplot3d)
 
 options(digits=4)
 
-#Extracao dos dados
+#Extracao dos dados (arquivo na mesma pasta do index.qmd)
 dados <- read.csv2('autocorrelacao.csv', header=T, sep=";", dec=".")
 dados <- ts(dados, start=c(1947))
 
@@ -115,7 +126,7 @@ summary(regressao1)
 Apesar de existirem testes estatísticos, uma análise gráfica pode ser útil para tentar verificar algum comportamento nos dados que de indicativo se existência de autocorrelação.
 
 
-``` {r aula10_2, warning=FALSE, message=FALSE, fig_width= 12, fig_height= 16 }
+``` {r aula10_2, warning=FALSE, message=FALSE, fig.width=12, fig.height=16}
 #Analise dos residuos do modelo
 par(mfrow=c(2,2))
 plot(regressao1)
@@ -123,7 +134,7 @@ resid <- regressao1$residuals
 resid <- ts(resid, start=c(1947))
 ```
 
-``` {r eaula10_3, warning=FALSE, message=FALSE, fig_width= 12, fig_height= 10 }
+``` {r aula10_3, warning=FALSE, message=FALSE, fig.width=12, fig.height=10}
 par(mfrow=c(1,1))
 scatterplot3d(lag(resid,-1), resid, pch=16, box=FALSE)
 ```
@@ -163,6 +174,8 @@ Dado que $-1\le \rho \le 1$, tem-se que $0\le d \le 4$, que são os limites de "
 # Testa the hipotese que nao existe correlacao de 1 lag nos residuos
 dwtest(regressao1, alt="two.sided")
 ```
+
+Para o modelo de consumo estimado, $d=1{,}2892$ (p-valor $=0{,}0019$ no teste bilateral). Como o p-valor é bem menor que 0,05, rejeita-se $H_0$ de ausência de autocorrelação. Além disso, $d$ está abaixo de 2 (mais perto de 0 do que de 4), o que é consistente com autocorrelação **positiva** nos resíduos — padrão comum em séries macroeconômicas anuais como esta.
 
 <br>
 
@@ -214,6 +227,8 @@ coeftest(bg3)
 bg3
 ```
 
+Os resultados mostram evidência de autocorrelação de **1ª ordem** ($LM=5{,}3122$, $p=0{,}0212$) e de **2ª ordem** ($LM=6{,}4476$, $p=0{,}0398$) a 5% de significância. Já para a defasagem 3 ($LM=6{,}6577$, $p=0{,}0837$), não se rejeita mais $H_0$ a 5% (embora rejeite a 10%). Esse padrão — autocorrelação detectada até a 2ª ordem, mas não além — é consistente com o que será encontrado na seção em Python mais adiante, e sugere que um processo AR(1) ou AR(2) já captura razoavelmente bem a estrutura de autocorrelação presente nos resíduos deste modelo.
+
 <br>
 
 ## Autocorrelação: Como Corrigir?
@@ -224,7 +239,7 @@ Existem diversas formas de corrigir a autocorrelação:
 
 A) Transformar as séries, diferenciando-as, caso se saiba o valor de $\rho$ ou considerando $\rho=1$;
 
-B) Fazer uma transformação generalizada: $Y_t- \hat{\rho}(Y_{t-1})$ para obter $\hat{\rho}$, fazer $\approx 1-\frac{d}{2}$;
+B) Fazer uma transformação generalizada (Cochrane-Orcutt): primeiro estima-se $\hat\rho \approx 1-\dfrac{d}{2}$ a partir da estatística de Durbin-Watson e, em seguida, usa-se esse $\hat\rho$ para transformar **todas** as variáveis do modelo por quase-diferenciação — $Y_t^*=Y_t-\hat\rho Y_{t-1}$ e, da mesma forma, $X_t^*=X_t-\hat\rho X_{t-1}$ para cada regressor — reestimando o modelo por MQO com as variáveis transformadas;
 
 C) Usar o método de correção dos erros padrões de Newey-West (HAC-Consistente com auto e hetero), desde que a amostra seja grande. Erros robustos.
 
@@ -235,11 +250,11 @@ Desta forma, estima-se o modelo padrão de regressão linear por MQO. Em seguida
 <br>
 
 $$
-\hat v= \sum_{t=1}^{n} k^2 \hat a^2_t + 2 \sum_{h=1}^{g} [1-h/(g+1)]\Big(\sum_{t=h+1}^{n} \hat a_t \hat a{t-h}\Big)
+\hat v= \sum_{t=1}^{n} \hat a^2_t + 2 \sum_{h=1}^{g} \left[1-\frac{h}{g+1}\right]\left(\sum_{t=h+1}^{n} \hat a_t \hat a_{t-h}\right)
 $$
 <br>
 
-e $ep(\hat \beta_1)=[SE/\hat \sigma]^2\sqrt(\hat v)$, em que SE é o erro padrão usual do MQO para $\hat \beta_j$.
+e $ep(\hat \beta_1)=\left[\dfrac{SE}{\hat \sigma}\right]^2\sqrt{\hat v}$, em que SE é o erro padrão usual do MQO para $\hat \beta_j$.
 
 Desta forma obtêm-se os erros-padrões robustos dos parâmetros. Fazendo uso do pacote `` sandwich``, e a opção para a matriz de variância-covariância consistente com heterocedasticidade e autocorrelação ``vcov=NeweyWest`` conforme o script abaixo. Conforme a ordem da autocorelação (se acima da primeira ordem), pode ser mais indicado considerar o tratamento para a estrutura geral de Newey e West (1987) e Wooldridge (1989), citados por Wooldridge
 (2016, seção 12.5).
@@ -256,7 +271,7 @@ coeftest(regressao1, vcov=NeweyWest)
 ## Exemplo no Python
 
 ``` {python aula10_6a, warning=FALSE, message=FALSE}
-#Direcionado o R para o Diretorio a ser trabalhado
+#Direcionado o Python para o Diretorio a ser trabalhado
 import os
 import pandas as pd
 import numpy as np
@@ -268,10 +283,10 @@ from statsmodels.tsa.stattools import adfuller
 import statsmodels.stats.diagnostic as diag
 from statsmodels.stats.diagnostic import acorr_breusch_godfrey
 
-os.chdir('C:/Users/Lenovo/Dropbox/tempecon/facape')
+#os.chdir('/Users/jricardofl/Dropbox/tempecon/facape')
 
 #Inicio do Script
-
+#Arquivo na mesma pasta do index.qmd
 df = pd.read_csv(filepath_or_buffer = "autocorrelacao.csv", header=0, sep =';', decimal = ".")
 df.head()
 
@@ -368,7 +383,7 @@ Mantém o modelo original, mas usa-se erros-padrão robustos Newey-West para cor
 
 <hr>
 
-# Viés de Especificação
+## Viés de Especificação
 
 <br>
 
@@ -381,6 +396,18 @@ Mantém o modelo original, mas usa-se erros-padrão robustos Newey-West para cor
 3) a variância do erro estará errada; 
 
 4) IC, erros padrão e testes de hipóteses não são calculados corretamente.
+
+**De onde vem o viés, exatamente?** Considere que o modelo verdadeiro é $y=\beta_0+\beta_1x_1+\beta_2x_2+u$, mas por engano se estima o modelo restrito $y=\beta_0+\beta_1x_1+u$ (omitindo $x_2$). Pode-se mostrar que:
+
+$$
+E(\hat\beta_1)=\beta_1+\beta_2\hat\delta_1
+$$
+
+em que $\hat\delta_1$ é o coeficiente de inclinação da regressão auxiliar $x_2=\delta_0+\delta_1x_1+\text{erro}$ — ou seja, mede a relação entre a variável omitida e a variável incluída. O viés (o termo $\beta_2\hat\delta_1$) depende do produto de dois sinais: o efeito de $x_2$ sobre $y$ ($\beta_2$) e a correlação entre $x_2$ e $x_1$ ($\hat\delta_1$). Por isso:
+
+* se $\beta_2$ e $\hat\delta_1$ tiverem o **mesmo sinal**, o viés é **positivo** ($\hat\beta_1$ superestima $\beta_1$);
+* se tiverem **sinais opostos**, o viés é **negativo** ($\hat\beta_1$ subestima $\beta_1$);
+* se $\hat\delta_1=0$ (variável omitida não correlacionada com a incluída), não há viés no coeficiente de inclinação — mas, como visto no item 2 acima, o intercepto ainda pode ficar deslocado.
 
 **Inserir uma variável irrelevante** - *Conseqüências*: a perda da eficiência, ou seja, erros-padrão maiores do que as dos parâmetros do modelo verdadeiro. 
 
@@ -458,6 +485,11 @@ summary(regressao2)
 resettest(regressao2, power=2 , type='fitted')
 resettest(regressao2, power=3 , type='fitted')
 ```
+
+Em **nenhum** dos quatro testes — `regressao1` (com `educ^2`) ou `regressao2` (sem `educ^2`), potência 2 ou 3 — o teste RESET rejeita a hipótese nula de boa especificação (todos os p-valores ficam acima de 0,30). Ou seja: mesmo o modelo mais simples, `regressao2`, sem o termo quadrático de educação, não é sinalizado pelo RESET como mal especificado nesta amostra.
+
+Isso ilustra uma limitação prática importante do teste RESET: ele tem poder para detectar certos tipos de não linearidade omitida (via polinômios dos valores ajustados), mas **não garante detectar toda forma de má especificação**. A ausência de rejeição não é prova de que o modelo está corretamente especificado — é apenas a ausência de evidência suficiente, nesta amostra, para rejeitá-lo. Por isso o teste deve ser usado como uma ferramenta de triagem, combinada com teoria econômica e outras verificações, não como veredito final sobre a forma funcional correta.
+
 <br>
 
 O teste Reset de Ramsey é usado para analisar má especificação do modelo. É um teste mais geral, tanto de variáveis irrelevantes, quanto de forma funcional incorreta e correlação entre os regressores e o termo de erro.
