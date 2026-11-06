@@ -94,7 +94,7 @@ No modelo **Logit**, a função logística é:
 
 
 $$
-G(z)=\Lambda(z)\frac{exp(z)}{1+exp(z)}
+G(z)=\Lambda(z)=\frac{exp(z)}{1+exp(z)}
 \tag{3}
 $$
 
@@ -116,7 +116,7 @@ em que $\phi(z)$ é a densidade normal padrão.
 
 
 $$
-\phi(z)=(2\pi)^{-1/2}exp(-Z^2/2)
+\phi(z)=(2\pi)^{-1/2}exp(-z^2/2)
 \tag{5}
 $$
 
@@ -188,7 +188,7 @@ No caso do Modelo Logit, o efeito marginal das variáveis contínuas é dado por
 
 
 $$
-\frac{\partial P(y=1|x)}{\partial x_j}=\lambda(\mathbf{x'\beta})[1-(\mathbf{x'\beta})]\beta_j
+\frac{\partial P(y=1|x)}{\partial x_j}=\Lambda(\mathbf{x'\beta})[1-\Lambda(\mathbf{x'\beta})]\beta_j
 \tag{8}
 $$
 
@@ -208,7 +208,7 @@ ou, em outras palavras,
 
 
 $$
-G(\beta_0+\beta_1+\dots+\beta_kx_k-G(\beta_0+\dots+\beta_kx_k)
+G(\beta_0+\beta_1+\beta_2x_2+\dots+\beta_kx_k)-G(\beta_0+\beta_2x_2+\dots+\beta_kx_k)
 \tag{10}
 $$
 
@@ -293,7 +293,7 @@ que é a mesma coisa de
 
 
 $$
-L=\Pi G(\mathbf{x'\beta})^y[1-G(\mathbf{x'\beta}]^{1-y}, y=0,1
+L=\Pi G(\mathbf{x'\beta})^y[1-G(\mathbf{x'\beta})]^{1-y}, y=0,1
 \tag{16}
 $$
 
@@ -371,15 +371,25 @@ $$
 
 
 
-q é igual ao número de variáveis independentes da regressão.	
+q é igual ao número de restrições testadas (isto é, o número de variáveis excluídas no modelo restrito em relação ao irrestrito). No caso particular, muito comum, de testar a significância conjunta de **todas** as variáveis explicativas (modelo restrito = apenas intercepto), q coincide com o número de variáveis independentes da regressão.	
 	
-Para a análise da qualidade do ajustamento do modelo, existem algumas possibilidades. Por exemplo, o $Pseudo-R^2$ de McFadden, que sugere um indicador 1-$L_{ir}/L_o$, sendo o primeiro o valor do log de verossimilhança do modelo estimado e o segundo o log verossimilhança de um modelo estimado apenas com intercepto. Se as variáveis explicativas não tiverem sentido, $L_{ir}/L_o=1$ e o pseudo $R^2$ será igual a zero. 
+Para a análise da qualidade do ajustamento do modelo, existem algumas possibilidades. Por exemplo, o $Pseudo-R^2$ de McFadden, que sugere um indicador $1-\ln L_{ir}/\ln L_o$, sendo o primeiro o valor do log de verossimilhança do modelo estimado e o segundo o log de verossimilhança de um modelo estimado apenas com intercepto. Se as variáveis explicativas não tiverem sentido, $\ln L_{ir}/\ln L_o=1$ e o pseudo $R^2$ será igual a zero.
 
-Quanto mais o $L_{ir}$ se aproxima de zero, mais o pseudo $R^2$ tende a 1.
+Quanto mais o $\ln L_{ir}$ se aproxima de zero, mais o pseudo $R^2$ tende a 1.
 		
 A outra possibilidade é verificar um indicador de qualidade do ajustamento chamado percentagem corretamente predita. Neste caso, se define um preditor binário das $y_i$ para ser um, se a probabilidade predita for pelo menos 0,5 e zero, caso contrário. Matematicamente, $\tilde y_i=1$ se $G(\hat{\beta_0}+x_i\hat{\beta}) \geq 0,5$ e $\tilde y_i=0$ se $G(\hat{\beta_0}+x_i\hat{\beta}) < 0,5$. A percentagem corretamente prevista é a percentagem de vezes que $\tilde y_i=y_i$.
 
-	
+
+
+## Interpretações no Probit
+
+Diferente do Logit, o modelo Probit não tem uma transformação equivalente à razão de chances (odds ratio) com interpretação direta e intuitiva — exponenciar um coeficiente de Probit não produz uma quantidade com leitura econômica simples, porque a CDF Normal não tem a mesma estrutura multiplicativa da função logística. Por isso, a leitura prática de um modelo Probit se apoia em dois pilares:
+
+1) **Sinal e significância do coeficiente** — o sinal de $\beta_j$ já diz se $x_j$ aumenta ou diminui a probabilidade de $y=1$, e o teste z (ou o IC) diz se esse efeito é estatisticamente distinguível de zero. Isso é suficiente para responder perguntas qualitativas (ex.: "ter recebido assistência técnica aumenta a chance de adoção da tecnologia?").
+
+2) **Efeito marginal** (equação 7), que converte o coeficiente numa magnitude interpretável — a mudança na probabilidade de $y=1$ associada a uma variação unitária em $x_j$, igual ao que se faz no Logit.
+
+Vale notar também que os coeficientes de Logit e Probit **não são diretamente comparáveis em magnitude**, mesmo estimados nos mesmos dados: a distribuição logística padrão tem variância $\pi^2/3\approx3{,}29$, enquanto a Normal padrão tem variância 1. Por isso, os coeficientes do Logit tendem a ser cerca de **1,6 a 1,8 vezes maiores** que os do Probit correspondente — é só uma diferença de escala (normalização da variância do erro latente), não uma diferença substantiva no modelo. Já as **probabilidades previstas e os efeitos marginais** dos dois modelos costumam ser muito parecidos, já que ambos aproximam a mesma relação subjacente entre $X$ e $P(y=1|X)$. Isso será comparado diretamente nos exemplos práticos a seguir.
 
 ## Exemplo Modelo Logit no R
 
@@ -395,7 +405,7 @@ O exemplo abaixo foi retirado do site (https://stats.oarc.ucla.edu/r/dae/logit-r
 #install_github("leeper/prediction")
 #install_github("leeper/margins")
 
-mydata <- read.csv("https://stats.idre.ucla.edu/stat/data/binary.csv")
+mydata <- read.csv("dados/binary.csv")
 ## ver as primeiras linhas dos dados
 head(mydata)
 
@@ -473,6 +483,40 @@ exp(cbind(OR = coef(mylogit), confint(mylogit)))
 
 Agora podemos dizer que para um aumento de uma unidade no gpa, as chances de ser admitido na pós-graduação (versus não ser admitido) aumentam por um fator de 2,23. Observe que, enquanto R o produz, a razão de chances para o intercepto geralmente não é interpretada.
 
+### Qualidade do Ajustamento no R
+
+A teoria apresentou três formas de avaliar o ajuste de um modelo de escolha binária: o teste da Razão de Verossimilhança (RV, equação 23), o Pseudo-$R^2$ de McFadden e a percentagem corretamente predita. O `summary(mylogit)` já mostra a *null deviance* e a *residual deviance* — e é exatamente a partir delas que se constrói as três métricas:
+
+```{r  aula11_5b, warning=FALSE, message=FALSE}
+#Teste da Razao de Verossimilhanca (equacao 23), a partir das deviances
+#RV = 2*(L_ir - L_r) = deviance nula - deviance residual (em termos de -2*logL)
+RV <- mylogit$null.deviance - mylogit$deviance
+df_RV <- mylogit$df.null - mylogit$df.residual
+p_RV <- pchisq(RV, df_RV, lower.tail = FALSE)
+cat("RV =", RV, "| df =", df_RV, "| p-valor =", p_RV, "\n")
+
+#Confere com o teste sequencial do anova()
+anova(mylogit, test = "Chisq")
+
+#Pseudo-R2 de McFadden: 1 - (deviance residual / deviance nula)
+#equivalente a 1 - ln(L_ir)/ln(L_o), ja que deviance = -2*logLik
+pseudoR2 <- 1 - mylogit$deviance / mylogit$null.deviance
+cat("Pseudo-R2 de McFadden =", round(pseudoR2, 4), "\n")
+
+#Percentagem corretamente predita (classificando em 1 se prob >= 0.5)
+pred_class <- ifelse(fitted(mylogit) >= 0.5, 1, 0)
+tabela_classif <- table(Previsto = pred_class, Observado = mydata$admit)
+tabela_classif
+cat("Percentagem corretamente predita =",
+    round(100 * sum(diag(tabela_classif)) / sum(tabela_classif), 2), "%\n")
+```
+
+O teste RV (RV=41,46; df=5; p<0,0001) rejeita fortemente a hipótese de que todas as variáveis explicativas são irrelevantes — o modelo como um todo é significativo. O `anova()` mostra ainda a contribuição marginal de cada bloco de variáveis (gre, gpa e os três indicadores de rank), todas estatisticamente significativas.
+
+O Pseudo-$R^2$ de McFadden é baixo (≈0,083) — o que **não** significa que o modelo seja ruim: pseudo-$R^2$ não tem a mesma escala do $R^2$ do MCRL, e valores entre 0,2 e 0,4 já costumam ser considerados um ajuste muito bom nesse contexto (McFadden, 1974). O que importa é a significância das variáveis e a razoabilidade das probabilidades previstas, não o valor absoluto do pseudo-$R^2$.
+
+Já a tabela de classificação mostra que o modelo acerta 71% das previsões (254 dos 273 "não admitidos" e 30 dos 127 "admitidos") — repare que o modelo é bem melhor em prever quem **não** é admitido do que quem é, um padrão comum quando uma das categorias é menos frequente na amostra.
+
 Pode-se usar probabilidades previstas para ajudá-lo a entender o modelo. As probabilidades previstas podem ser calculadas para variáveis preditoras categóricas e contínuas. Para criar probabilidades previstas, primeiro precisamos criar um novo quadro de dados com os valores que queremos que as variáveis independentes assumam para criar nossas previsões.
 
 Começaremos calculando a probabilidade prevista de admissão em cada valor de classificação, mantendo gre e gpa em suas médias. Primeiro, criamos e visualizamos o quadro de dados.
@@ -547,7 +591,11 @@ ggplot(newdata3, aes(x = gre, y = PredictedProb)) + geom_ribbon(aes(ymin = LL,
 ```{r  aula11_11a, warning=FALSE, message=FALSE}
 library(margins)
 #Stata=margins, dydx(*) para calculo dos efeitos marginais
-mydata <- read.csv("https://stats.idre.ucla.edu/stat/data/binary.csv")
+mydata <- read.csv("dados/binary.csv")
+#Importante: reaplica factor() ao recarregar, senao 'rank' volta a ser
+#numerico e o modelo e re-ajustado com rank como variavel continua
+#(mudando o numero de coeficientes e a interpretacao do efeito marginal)
+mydata$rank <- factor(mydata$rank)
 mylogit <- glm(admit ~ gre + gpa + rank, data = mydata, family = "binomial")
 m <- margins(mylogit)
 summary(m, type= "response")
@@ -555,7 +603,7 @@ summary(m, type= "response")
 
 
 
-A interpretação do efeito marginal para gpa é que com o aumento de uma unidade na nota média (gpa), a probabilidade de entrar na pós-graduação aumenta 0,15 pontos percentuais. 
+A interpretação do efeito marginal para gpa é que com o aumento de uma unidade na nota média (gpa), a probabilidade de entrar na pós-graduação aumenta aproximadamente 0,156 (ou seja, **15,6 pontos percentuais**).
 
 
 
@@ -570,7 +618,7 @@ summary(m2, type= "response")
 ## Exemplo Modelo Probit no R
 
 ```{r  aula11_12, warning=FALSE, message=FALSE}
-mydata <- read.csv("https://stats.idre.ucla.edu/stat/data/binary.csv")
+mydata <- read.csv("dados/binary.csv")
 mydata$rank <- factor(mydata$rank)
 
 myprobit <- glm(admit ~ gre + gpa + rank, family = binomial(link = "probit"), data = mydata)
@@ -588,7 +636,36 @@ newdata1
 
 ```
 
+### Comparando Logit e Probit
+
+Como os dois modelos (`mylogit` e `myprobit`) foram estimados com as mesmas variáveis e os mesmos dados, dá para comparar diretamente coeficientes e probabilidades previstas:
+
+```{r  aula11_12b, warning=FALSE, message=FALSE}
+#Coeficientes lado a lado e a razao entre eles
+comparacao <- data.frame(
+  Logit  = coef(mylogit),
+  Probit = coef(myprobit),
+  Razao  = coef(mylogit) / coef(myprobit)
+)
+round(comparacao, 4)
+
+#Probabilidades previstas para o mesmo individuo (gre=650, gpa=4, rank=1)
+cat("Probabilidade prevista (Logit): ", predict(mylogit, newdata1, type = "response"), "\n")
+cat("Probabilidade prevista (Probit):", predict(myprobit, newdata1, type = "response"), "\n")
+
+#Correlacao entre as probabilidades previstas para toda a amostra
+cor(fitted(mylogit), fitted(myprobit))
+```
+
+Como antecipado na teoria, a razão entre os coeficientes do Logit e do Probit fica consistentemente entre **1,63 e 1,68** para todas as variáveis — bem próxima do fator teórico $\sqrt{\pi^2/3}\approx1{,}81$ (a razão exata varia um pouco na prática porque as duas distribuições não são apenas reescalonamentos perfeitas uma da outra, mas a ordem de grandeza bate). Já as probabilidades previstas são quase idênticas: para o indivíduo com gre=650, gpa=4 e rank=1, o Logit prevê 66,8% de chance de admissão e o Probit prevê 66,2% — uma diferença de pouco mais de meio ponto percentual. Considerando toda a amostra, a correlação entre as probabilidades previstas pelos dois modelos é de **0,9998**. Na prática, a escolha entre Logit e Probit raramente muda a conclusão substantiva do estudo — a preferência costuma ser por conveniência (o Logit tem a interpretação de razão de chances) ou por tradição da área de pesquisa.
+
 ## Exemplo Modelo Logit no Python
+
+```{r setup}
+#library(reticulate)
+#use_condaenv("py-econo", require = TRUE)
+#py_config()
+```
 
 ```{python aula11_12a}
 
@@ -601,8 +678,8 @@ import statsmodels.formula.api as smf
 import statsmodels.api as sm
 from scipy.stats import norm
 
-# Importação de dados
-url = "https://stats.idre.ucla.edu/stat/data/binary.csv"
+# Importação de dados (arquivo local, mesma pasta do index.qmd)
+url = "dados/binary.csv"
 dados = pd.read_csv(url)
 
 # Estatísticas Descritivas
@@ -657,6 +734,13 @@ specific_values['Probabilidades'] = predictions
 
 # Obtendo os nomes dos coeficientes
 coef_names = result.params.index
+
+# Alinha o indice de 'predictions' aos rotulos de rank (1 a 4) ANTES de
+# combinar em marginal_effects_df. Sem isso, o pandas reindexa
+# silenciosamente ao impor index=[1,2,3,4] abaixo (que nao bate com o
+# indice padrao 0..3 de 'predictions'), deslocando cada linha e gerando
+# NaN na ultima categoria
+predictions.index = [1, 2, 3, 4]
 
 # Calculando os efeitos marginais manualmente
 marginal_effects = {}
@@ -731,38 +815,44 @@ c) **Rank 4 (0,211938):** As chances de ser admitido para alguém no rank 4 são
 
 **Efeito Marginal para Variáveis Categóricas (rank):**
 
-a) **C(rank)[T.2] (-0,1415):** Para alguém no rank 2, a probabilidade de ser admitido diminui aproximadamente 0,1415 pontos percentuais em comparação com alguém na categoria de referência (rank 1), mantendo outras variáveis constante. Um valor negativo indica uma diminuição na probabilidade de admissão.
+a) **C(rank)[T.2] (-0,1415):** Para alguém no rank 2, a probabilidade de ser admitido diminui aproximadamente 0,1415 (ou seja, **14,15 pontos percentuais**) em comparação com alguém na categoria de referência (rank 1), mantendo outras variáveis constante. Um valor negativo indica uma diminuição na probabilidade de admissão.
 
-b) **C(classificação)[T.3] (-0,2807):** Para alguém no rank 3, a probabilidade de ser admitido diminui aproximadamente 0,2807 pontos percentuais em comparação com alguém no rank 1, mantendo as outras variáveis constantes.
+b) **C(classificação)[T.3] (-0,2807):** Para alguém no rank 3, a probabilidade de ser admitido diminui aproximadamente 0,2807 (ou seja, **28,07 pontos percentuais**) em comparação com alguém no rank 1, mantendo as outras variáveis constantes.
 
-c) **C(classificação)[T.4] (-0,3250):** Para alguém no rank 4, a probabilidade de ser admitido diminui aproximadamente 0,3250 pontos percentuais em comparação com alguém no rank 1, mantendo as outras variáveis constantes.
+c) **C(classificação)[T.4] (-0,3250):** Para alguém no rank 4, a probabilidade de ser admitido diminui aproximadamente 0,3250 (ou seja, **32,50 pontos percentuais**) em comparação com alguém no rank 1, mantendo as outras variáveis constantes.
 
 Quanto mais negativo for o efeito marginal, maior será a redução da probabilidade de admissão para determinado posto face ao posto de referência.
 
 **Efeito Marginal para Variáveis Contínuas:**
 
-a) **gre (0,0005):** Para cada aumento de uma unidade na pontuação GRE, a probabilidade de ser admitido aumenta aproximadamente 0,0005 pontos percentuais, mantendo as outras variáveis constantes. Embora pequeno, este efeito marginal positivo indica que pontuações mais altas no GRE aumentam ligeiramente a probabilidade de admissão.
+a) **gre (0,0005):** Para cada aumento de uma unidade na pontuação GRE, a probabilidade de ser admitido aumenta aproximadamente 0,0005 (ou seja, **0,05 pontos percentuais**), mantendo as outras variáveis constantes. Embora pequeno, este efeito marginal positivo indica que pontuações mais altas no GRE aumentam ligeiramente a probabilidade de admissão.
 
-b) **gpa (0,1684):** Para cada aumento de uma unidade no GPA, a probabilidade de ser admitido aumenta aproximadamente 0,1684 pontos percentuais, mantendo as demais variáveis constantes. Isto sugere que um GPA mais elevado tem um impacto positivo significativo na probabilidade de admissão.
+b) **gpa (0,1684):** Para cada aumento de uma unidade no GPA, a probabilidade de ser admitido aumenta aproximadamente 0,1684 (ou seja, **16,84 pontos percentuais**), mantendo as demais variáveis constantes. Isto sugere que um GPA mais elevado tem um impacto positivo significativo na probabilidade de admissão.
 
 **Efeito Marginal de Valores Específicos**
 
-a) Rank 1 
+*(Nota: numa versão anterior deste material, a tabela de efeitos marginais por valor específico estava com as linhas desalinhadas — um bug de indexação no pandas fazia a linha "Rank 1" mostrar os valores do Rank 2, "Rank 2" os do Rank 3, e "Rank 4" aparecer como NaN por falta de dado correspondente. Corrigido o alinhamento, os quatro ranks têm efeitos marginais perfeitamente calculáveis, como abaixo.)*
 
-- gre(0,000533) um aumento de uma unidade no gre resulta em um aumento de 0,000533 na probabilidade de admissão, mantendo o gpa e a classificação constantes.
-- gpa(0,189291) um aumento de uma unidade no gpa resulta em um aumento de 0,189291 na probabilidade de admissão, mantendo gre e classificação constantes.
-- rank_2(-0,159016) passar de rank 1 para rank 2 diminui a probabilidade de admissão em 0,159016, mantendo gre e gpa constantes.
-- rank_3(-0,315517) passar de rank 1 para rank 3 diminui a probabilidade de admissão em 0,315517, mantendo gre e gpa constantes.
-- rank_4(-0,365253) passar de rank 1 para rank 4 diminui a probabilidade de admissão em 0,365253, mantendo gre e gpa constantes.
+a) Rank 1
+
+- gre(0,000561) um aumento de uma unidade no gre resulta em um aumento de 0,000561 na probabilidade de admissão, mantendo o gpa e a classificação constantes.
+- gpa(0,199339) um aumento de uma unidade no gpa resulta em um aumento de 0,199339 na probabilidade de admissão, mantendo gre e classificação constantes.
+- rank_2(-0,167458) passar de rank 1 para rank 2 diminui a probabilidade de admissão em 0,167458, mantendo gre e gpa constantes.
+- rank_3(-0,332267) passar de rank 1 para rank 3 diminui a probabilidade de admissão em 0,332267, mantendo gre e gpa constantes.
+- rank_4(-0,384643) passar de rank 1 para rank 4 diminui a probabilidade de admissão em 0,384643, mantendo gre e gpa constantes.
 
 b) Rank 2
-- gre(0,000412) um aumento de uma unidade no gre resulta num aumento de 0,000412 na probabilidade de admissão.
-- gpa(0,146297) um aumento de uma unidade no gpa resulta num aumento de 0,146297 na probabilidade de admissão.
-- rank_2(-0.122898) o quanto a probabilidade de ser admitido reduz por estar no Rank 2, sem comparação com o Rank 1, assumindo que o efeito da categoria de referência já está contabilizado no modelo.
-- rank_3(-0,243853) passar de rank 2 para rank 3 diminui a probabilidade de admissão em 0,243853.
-- rank_4(-0,282293) passar de rank 2 para rank 4 diminui a probabilidade de admissão em 0,282293.
+- gre(0,000533) um aumento de uma unidade no gre resulta num aumento de 0,000533 na probabilidade de admissão.
+- gpa(0,189291) um aumento de uma unidade no gpa resulta num aumento de 0,189291 na probabilidade de admissão.
+- rank_2(-0,159016) o quanto a probabilidade de ser admitido reduz por estar no Rank 2, sem comparação com o Rank 1, assumindo que o efeito da categoria de referência já está contabilizado no modelo.
+- rank_3(-0,315517) passar de rank 2 para rank 3 diminui a probabilidade de admissão em 0,315517.
+- rank_4(-0,365253) passar de rank 2 para rank 4 diminui a probabilidade de admissão em 0,365253.
 
-c) Rank 4 - Valores faltantes (NaN) indicam que o software não conseguiu calcular efeitos marginais confiáveis para esta categoria.
+c) Rank 3
+- gre(0,000412), gpa(0,146297), rank_2(-0,122898), rank_3(-0,243853), rank_4(-0,282293) — mesma leitura dos itens anteriores, agora calculados no ponto (gre=600, gpa=3,5) para quem está no Rank 3.
+
+d) Rank 4
+- gre(0,000366), gpa(0,130008), rank_2(-0,109215), rank_3(-0,216703), rank_4(-0,250863) — idem, para quem está no Rank 4. Como esperado, a magnitude dos efeitos marginais diminui à medida que a probabilidade prevista se afasta de 0,5 (ranks mais baixos já partem de uma probabilidade de admissão menor, então a mesma variação em X move a probabilidade proporcionalmente menos).
 
 
 **Probabilidades com valores específicos por Rank:**
@@ -786,8 +876,8 @@ import statsmodels.formula.api as smf
 
 #from statsmodels.discrete.discrete_model import Probit
 
-# Importação de dados
-url = "https://stats.idre.ucla.edu/stat/data/binary.csv"
+# Importação de dados (arquivo local, mesma pasta do index.qmd)
+url = "dados/binary.csv"
 dados = pd.read_csv(url)
 
 # Estimação do Modelo Probit
